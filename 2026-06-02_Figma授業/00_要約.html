@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma 3日目：ポートフォリオ制作（コンポーネント実践）｜2026年6月2日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月2日｜講師：A先生</div>
+  <h1>Figma 3日目：ポートフォリオ制作（コンポーネント実践）</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 2時間38分（実習デー・前半）</span>
+    <span>📖 教科書 82〜119p</span>
+    <span>🎯 スタイル階層・コンポーネント実践・ファーストビュー・3カラム</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    Figma 3日目は、いよいよ<strong>実際にポートフォリオサイトを1枚作っていく実践</strong>。前回学んだフレーム・スタイル・コンポーネント・オートレイアウトを総動員して、
+    <strong>スタイルの整理 → ボタン/ヘッダー/フッターを部品化 → ファーストビュー → サービス（3カラム）→ ワークス（カード）</strong> の順に組み立てた。
+    一貫テーマは「<strong>コーディング（HTML/CSS）を意識したFigma制作</strong>」。
+  </div>
+
+  <h3 style="border:none; padding:0; margin-bottom:6px;">🎯 今日作っているもの（完成イメージ）</h3>
+  <figure style="margin:14px 0 30px;">
+    <img src="img/portfolio_complete.png"
+         alt="猫田小春のポートフォリオサイト完成形：ヘッダー（ロゴ＋Service/Works/About/Contact）、ファーストビュー（iMac写真＋Nekota Koharu）、Service（Graphic/Web/Direction の3アイコン）、Works（6枚のカード）、About（プロフィール）、フッター"
+         style="width:100%; max-width:560px; display:block; margin:0 auto;
+                border:1px solid var(--border); border-radius:10px;
+                box-shadow:0 2px 12px rgba(0,0,0,.08);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+      ▲ 教科書サンプル「猫田小春のポートフォリオ」の完成形。今日はこの上から順番に作っていった
+    </figcaption>
+  </figure>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#style-hierarchy">スタイルの階層整理（スラッシュ）</a></li>
+      <li><a href="#build-order">制作の順番（トップページから）</a></li>
+      <li><a href="#component-build">コンポーネントを作る（ボタン・ヘッダー・フッター）</a></li>
+      <li><a href="#first-view">ファーストビュー（画像は塗りで配置）</a></li>
+      <li><a href="#center-align">2種類の中央揃え</a></li>
+      <li><a href="#service-section">サービスセクション（3カラム）</a></li>
+      <li><a href="#section-spacing">セクションの余白（8の倍数で揃える）</a></li>
+      <li><a href="#hug-fill-recap">hug / fill の復習・幅の逆算</a></li>
+      <li><a href="#naming">命名規則はプロジェクト次第</a></li>
+      <li><a href="#works">ワークス（カード）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>時刻をクリックすると、その内容の詳しい解説に飛べます。<span class="star">★★★</span>＝特に重要。<br>
+    ※この日の録画は約2時間38分（実習デーで前半中心）。最後は「続きは明日」で終了。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#style-hierarchy">00:00</a></td><td><a href="#style-hierarchy">スタイルのレイヤーをフレームで整理</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#style-hierarchy">00:06</a></td><td><a href="#style-hierarchy">教科書82p：スラッシュで階層（ディレクトリ）化</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#build-order">00:09</a></td><td><a href="#build-order">制作の順番＝まずトップページから</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component-build">00:11</a></td><td><a href="#component-build">ボタンをコンポーネント化（テキストプロパティ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component-build">00:14</a></td><td><a href="#component-build">ボタン名は「メイン/配布」＝拡張性を考えた命名</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#component-build">00:23</a></td><td><a href="#component-build">ヘッダー（グローバルナビ）作成・教科書99〜100p</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component-build">00:26</a></td><td><a href="#component-build">黒・白も「スタイルの色」を適用（一括管理）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component-build">00:35</a></td><td><a href="#component-build">フッター（コピーライト表記）作成</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">00:41</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#first-view">00:52</a></td><td><a href="#first-view">デザイン制作開始・教科書105p（フレーム作成）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#first-view">00:54</a></td><td><a href="#first-view">高さは適当に伸ばす・幅は変えない</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#first-view">00:58</a></td><td><a href="#first-view">MVの高さ＝モニター高さ−ヘッダー（−94px）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#first-view">01:06</a></td><td><a href="#first-view">画像は「フレームの塗り」で配置（cover）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#center-align">01:15</a></td><td><a href="#center-align">2種類の中央揃え（要素 vs 文字）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#service-section">01:19</a></td><td><a href="#service-section">サービスセクション・教科書113p</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#naming">01:28</a></td><td><a href="#naming">命名規則は教科書通りでなくプロジェクト次第</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#section-spacing">01:33</a></td><td><a href="#section-spacing">セクション上余白160px（8の倍数で揃える）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">01:36</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#service-section">01:46</a></td><td><a href="#service-section">3カラム（フレックス）の組み方</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#service-section">01:47</a></td><td><a href="#service-section">アイコンは「フレーム」で作る（imgの親要素）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#service-section">01:55</a></td><td><a href="#service-section">「選択範囲の色」で色を一括変更・教科書118p</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#hug-fill-recap">02:02</a></td><td><a href="#hug-fill-recap">ダミーテキストの幅を文字数から逆算</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#service-section">02:05</a></td><td><a href="#service-section">余白が均等/不均等で囲い方が変わる</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#hug-fill-recap">02:13</a></td><td><a href="#hug-fill-recap">本文は fill（コンテナに合わせて拡大）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#section-spacing">02:17</a></td><td><a href="#section-spacing">セクションを2枚で囲んで上下160を可視化</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#works">02:20</a></td><td><a href="#works">ワークスのカードをコンポーネント化（続きは明日）</a></td><td class="center"><span class="star">★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>スタイルは階層化できる</h4><p>名前に <code>/</code>（スラッシュ）を入れると <code>Bold/12px-Bold</code> のようにフォルダ分けできる（教科書82p）。</p></div>
+      <div class="card"><span class="num">2</span><h4>黒・白もスタイルを適用</h4><p>テキスト初期の黒は「ただの黒」。<strong>登録した黒スタイルを当て直す</strong>と一括管理できる（忘れがち）。</p></div>
+      <div class="card"><span class="num">3</span><h4>まずトップページから</h4><p>教科書はスタイル→部品→デザインの順。でも実際は<strong>トップページを先に作る</strong>方が現実的。</p></div>
+      <div class="card"><span class="num">4</span><h4>部品名は拡張性で</h4><p>ボタンは何種類も増える。<code>ボタン</code>でなく <code>メイン/配布ボタン</code> のように役割で分けて命名。</p></div>
+      <div class="card"><span class="num">5</span><h4>画像はフレームの塗りで</h4><p>画像を直に置くと <code>&lt;img&gt;</code> 扱い。<strong>フレームの「塗り」に入れる</strong>と <code>background cover</code> になる。</p></div>
+      <div class="card"><span class="num">6</span><h4>MV高さ＝モニター−ヘッダー</h4><p>メインビジュアルの高さに <code>−94</code> と入れてヘッダー分を引く。画面ぴったりに。</p></div>
+      <div class="card"><span class="num">7</span><h4>中央揃えは2種類</h4><p><strong>オートレイアウト＝要素の中央</strong>／<strong>タイプグラフィ＝文字の中央</strong>。別物。</p></div>
+      <div class="card"><span class="num">8</span><h4>余白は8の倍数で揃える</h4><p>セクションの上下余白は <code>160px</code> など<strong>全部同じ数字</strong>に。バラつくと下手に見える。</p></div>
+      <div class="card"><span class="num">9</span><h4>均等か不均等かで作りが変わる</h4><p>余白が均等なら一括オートレイアウト。不均等なら<strong>2個ずつセットにして入れ子</strong>。</p></div>
+      <div class="card"><span class="num">10</span><h4>アイコンもフレームで</h4><p>丸アイコンは楕円ツールでなく<strong>フレームで作る</strong>＝中の <code>&lt;img&gt;</code> の親要素になる。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== スタイル階層 ===== -->
+  <section id="style-hierarchy">
+    <h2 class="section-title"><span class="icon">🗂️</span>スタイルの階層整理（スラッシュ）</h2>
+    <p>前回までで色・フォントのスタイルを登録した。数が増えるとレイヤーパネルが渋滞するので、まず<strong>フレームで色ごと・太さごとにまとめて名前をつける</strong>（ブラック、Aカラー、Regular／Bold など）。</p>
+    <div class="callout">
+      <span class="label">スラッシュで階層化（教科書82p）</span>
+      スタイル名を付けるときに <code>/</code> を入れると<strong>ディレクトリ（フォルダ）</strong>が作れる。例：<code>Bold / 12px-Bold</code> とすると「Bold」フォルダの中に入る。
+    </div>
+    <p>ただし<strong>1ページ〜10ページ以下の小規模サイトなら、わざわざ階層化しなくてもOK</strong>。やるなら <code>Bold</code> / <code>Regular</code> 、あるいは <code>EN</code> / <code>JP</code>（英語・日本語）くらい。プロジェクト次第。</p>
+  </section>
+
+  <!-- ===== 制作の順番 ===== -->
+  <section id="build-order">
+    <h2 class="section-title"><span class="icon">🔢</span>制作の順番（トップページから）</h2>
+    <p>教科書は <strong>①スタイル登録 → ②コンポーネント作成 → ③デザイン</strong> の順。でも前回も言った通り、初心者には現実的でない。</p>
+    <blockquote>まだサイトを作ったことがないと、どんなコンポーネントが必要かまだ見えない。フォントの文字感覚も最初から決めるのは難しい。だから実際は、<strong>まずトップページだけ作ってみる</strong>。スタイルもコンポーネントも一旦気にしない。そこから使った色やフォントを登録していく。<span class="citation">── A先生</span></blockquote>
+    <p class="callout primary" style="font-size:14px;"><span class="label">この授業の進め方</span> 今回は<strong>教科書のサンプル（猫田小春のポートフォリオ）をなぞって作る</strong>ので、教科書の順番で進める。ただし要所で「実際の現場ではこうする」という補足が入る。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== コンポーネントを作る ===== -->
+  <section id="component-build">
+    <h2 class="section-title"><span class="icon">🧩</span>コンポーネントを作る（ボタン・ヘッダー・フッター）</h2>
+    <p>サイトで繰り返し使うパーツを、ひとつずつ部品化していく。共通の作法は<strong>オートレイアウト → 塗り/パディング → コンポーネント化 → テキストプロパティ</strong>。</p>
+
+    <h3>① ボタン</h3>
+    <ul class="bullet-pro">
+      <li>テキスト → <strong>オートレイアウト（上下10 / 左右48）</strong> → 塗りはスタイルのグリーン、文字は白</li>
+      <li>コンポーネント化 → <strong>テキストプロパティ</strong>で文言を変えられるように紐付け</li>
+    </ul>
+    <div class="callout">
+      <span class="label">名前は拡張性を考える</span>
+      ボタンは1種類では済まない（サイトには5種類くらいある）。最初に <code>ボタン</code> と付けると2個目の名前に困る。だから <code>メイン/配布ボタン</code> <code>プライマリ</code> のように<strong>役割で分けて命名</strong>しておく。
+    </div>
+
+    <h3>② ヘッダー（グローバルナビ）— 教科書99〜100p</h3>
+    <ul class="bullet-pro">
+      <li>ロゴ（テキスト 24 Bold）＋ ナビリンク（16 Regular）。Contactは<strong>ボタンのインスタンス</strong>を配置</li>
+      <li>ナビをオートレイアウトで囲んで間隔40px → ロゴとナビをさらに囲む → 全体を <strong>幅1440px・左右40/上下24パディング</strong></li>
+      <li>ページが増えても使えるように<strong>ヘッダーもコンポーネント化</strong></li>
+    </ul>
+    <div class="callout success">
+      <span class="label">いちばん忘れやすいポイント</span>
+      テキストを打つと初期は黒（#000）だが、それは<strong>「ただの黒」でスタイルの黒ではない</strong>。そのままだと一括管理できない。必ず<strong>塗りから「登録した黒スタイル」を当て直す</strong>。白も同じ。
+    </div>
+
+    <h3>③ フッター</h3>
+    <ul class="bullet-pro">
+      <li>コピーライト表記（14 Regular）→ オートレイアウト → 幅1440・右寄せ・グリーン背景・白文字 → コンポーネント化</li>
+      <li>コピーライトの正式表記は<strong>「© ＋ 制作した年 ＋ 著作者名」の最低3つ</strong>（細かい決まりは就職先で教わるのでOK）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== ファーストビュー ===== -->
+  <section id="first-view">
+    <h2 class="section-title"><span class="icon">🖥️</span>ファーストビュー（画像は塗りで配置）</h2>
+    <p>5時間目から実際のデザイン制作（教科書105p〜）。まず<strong>デスクトップのフレーム</strong>を作り、名前を <code>トップPC</code> に変え、高さを縦にビヨーンと伸ばす。</p>
+    <div class="callout">
+      <span class="label">高さは適当・幅は厳守</span>
+      中身を入れるほど高さは変わるので、最初の高さは<strong>マジで適当でいい</strong>（教科書の4000pxぴったりは誰もやらない）。ただし<strong>幅だけは絶対に変えない</strong>。
+    </div>
+
+    <h3>メインビジュアルの高さ＝モニター高さ−ヘッダー</h3>
+    <p>「画面の高さいっぱい」に見せたいので、もう一度デスクトップのフレームを出して中に入れ（＝モニター高さの目安）、名前を <code>MV</code> に。そのフレームの高さ欄に <strong><code>-94</code></strong>（ヘッダーの高さ）と打つと、<strong>ヘッダー分を引いた高さ</strong>になる。ヘッダーの真下にピタッと置けば画面ぴったりのファーストビューに。</p>
+
+    <h3>画像は「フレームの塗り」で入れる</h3>
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>画像を直に置く（避ける）</h4>
+        <ul>
+          <li>フレームの中に画像オブジェクトとして入る</li>
+          <li>HTMLだと <code>&lt;img&gt;</code> 要素扱い</li>
+          <li>サイズ調整が面倒・はみ出すと切れる</li>
+        </ul>
+      </div>
+      <div class="compare-col right">
+        <h4>フレームの塗りに入れる（これ）</h4>
+        <ul>
+          <li>画像をエクスポート → フレームの<strong>「塗り」に画像をアップロード</strong></li>
+          <li>CSSの <code>background-size: cover</code> と同じ状態</li>
+          <li>枠に合わせて自動でトリミング表示</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-size:14px; color:var(--text-soft);">※ 教科書は全部「画像を直に配置」だが、実際の制作では背景画像（cover）で入れる方がスマート、と先生の補足。</p>
+  </section>
+
+  <!-- ===== 2種類の中央揃え ===== -->
+  <section id="center-align">
+    <h2 class="section-title"><span class="icon">🎯</span>2種類の中央揃え</h2>
+    <p>タイトル「Nekota Koharu」と説明文を中央に置くとき、<strong>「中央揃え」が2種類ある</strong>のがつまずきポイント。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>揃えたいもの</th><th>使う場所</th><th>CSSでいうと</th></tr></thead>
+        <tbody>
+          <tr><td><strong>要素（ブロック）の中央</strong></td><td>オートレイアウトの整列（マス目アイコン）</td><td><code>justify-content / align-items</code></td></tr>
+          <tr><td><strong>文字そのものの中央</strong></td><td>タイプグラフィの「中央揃え」</td><td><code>text-align: center</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>オートレイアウトで縦並び＆中央にしても、<strong>文字が左揃えのまま</strong>のことがある。その時はテキストレイヤーを選んで、タイプグラフィから中央揃え（text-align）を当てる。位置は<strong>モニターの真ん中あたりで大体でOK</strong>（コーディングでビシッと合わせるのは厳しいので）。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== サービスセクション ===== -->
+  <section id="service-section">
+    <h2 class="section-title"><span class="icon">🧱</span>サービスセクション（3カラム）</h2>
+    <p>教科書113p〜。<strong>Graphic Design / Web Design / Direction の3カラム</strong>を作る。考え方はCSSの <code>display: flex</code>。</p>
+
+    <h3>作る順番：子要素から</h3>
+    <p>大きいセクションは最後。まず<strong>タイトル・アイコン・テキストなど細かいものから作る</strong>。セクションタイトルは他でも使い回すので<strong>コンポーネント化＋テキストプロパティ（EN/JP の2か所）</strong>にしておく。</p>
+
+    <h3>アイコンは「フレーム」で作る</h3>
+    <div class="callout">
+      <span class="label">なぜ楕円ツールでなくフレームか</span>
+      丸アイコンの中には <code>&lt;img&gt;</code>（SVG）が入る。リセットCSSで <code>img { width:100%; display:block }</code> が当たることが多く、<strong>緑の丸＝imgの親要素</strong>になる。だからFigmaでも<strong>フレームで囲んで中に画像</strong>を置くのがコーディング的にスマート。140×140固定・角丸140で正円に。
+    </div>
+
+    <h3>「選択範囲の色」で一括変更（教科書118p）</h3>
+    <p>フレームやオートレイアウトを選ぶと、右パネルに<strong>その中で使われている色の一覧</strong>が出る。ここから黒→白などを<strong>まとめて変更</strong>できる。横の的（まと）アイコンで「その色を使っているレイヤー」を選択することも可能。</p>
+
+    <h3>余白が均等か、不均等か</h3>
+    <div class="compare">
+      <div class="compare-col right">
+        <h4>均等な余白</h4>
+        <ul>
+          <li>3つを<strong>まとめてオートレイアウト</strong></li>
+          <li>間隔を1つ指定すれば均等に並ぶ</li>
+        </ul>
+      </div>
+      <div class="compare-col left">
+        <h4>不均等な余白（例：24と16）</h4>
+        <ul>
+          <li>そのままだと作れない</li>
+          <li><strong>2個ずつセットにして入れ子</strong>のオートレイアウトにする</li>
+        </ul>
+      </div>
+    </div>
+    <p>今回のアイテムは<strong>画像↔タイトル＝24px、タイトル↔本文＝16px</strong>の不均等なので、入れ子で作る。アイテム同士は64px間隔・幅300px。</p>
+  </section>
+
+  <!-- ===== セクションの余白 ===== -->
+  <section id="section-spacing">
+    <h2 class="section-title"><span class="icon">📏</span>セクションの余白（8の倍数で揃える）</h2>
+    <p>セクションの上の余白は <strong>160px</strong>。これは適当ではなく、<strong>8の倍数</strong>を基準にしている。</p>
+    <div class="callout primary">
+      <span class="label">なぜ全部同じ数字に揃えるのか</span>
+      この余白はコーディングでは<strong>セクションの <code>margin-top</code></strong> になる。全セクションを160で揃えておけば、<code>section</code> にまとめて160を当てられて<strong>コードが楽</strong>。毎回 160／150／132／79 とバラバラだと、コード量が増え、均等性のないデザインに見える。
+    </div>
+    <blockquote>余白がバラバラだと、センスのいい人か下手くその2択になっちゃう。で、多分下手くそが作ったようなデザインに生まれちゃうので、ここは大体同じ数字にしておくのを強くおすすめします。<span class="citation">── A先生</span></blockquote>
+    <p>さらに本格的にするなら、セクションを<strong>2枚のオートレイアウトで囲む</strong>（中身のコンテナ＋外側のセクション幅1440・上下パディング160）。こうすると、コーディング時に<strong>「ここに160の余白が入っている」とパッと見で分かる</strong>。</p>
+  </section>
+
+  <!-- ===== hug/fill 復習 ===== -->
+  <section id="hug-fill-recap">
+    <h2 class="section-title"><span class="icon">↔️</span>hug / fill の復習・幅の逆算</h2>
+    <h3>ダミーテキストの幅は文字数から逆算</h3>
+    <p>説明文の幅をいくつにするか。先生は<strong>「1文字14px × 文字数」で当たりをつける</strong>（実際は計算ミスで、教科書の正解は300px）。<mark>ピクセルだけでなく「何文字分」という幅感も大事</mark>。</p>
+
+    <h3>本文は fill（コンテナに合わせて拡大）</h3>
+    <div class="callout">
+      <span class="label">なぜ fill なのか</span>
+      親アイテムの幅を300pxに広げたとき、本文が…
+      <ul style="margin:8px 0 0;">
+        <li><strong>fill（コンテナに合わせて拡大）</strong>＝親に合わせて広がる ◎</li>
+        <li><strong>固定</strong>＝250pxのまま → 右に<strong>いらない余白</strong>が生まれる ✗</li>
+      </ul>
+      余白を取りたいなら固定ではなく<strong>パディング</strong>を使う。幅はfillにしておくのが正解。
+    </div>
+  </section>
+
+  <!-- ===== 命名規則 ===== -->
+  <section id="naming">
+    <h2 class="section-title"><span class="icon">🏷️</span>命名規則はプロジェクト次第</h2>
+    <p>教科書では <code>SectionTitle</code> のように<strong>単語の頭を大文字</strong>（キャメルケース）にしている。でもこれは絶対ではない。</p>
+    <div class="callout">
+      <span class="label">強くメモしておくこと</span>
+      命名規則は<strong>プロジェクトごとに決める</strong>。Figmaは大文字でもコーディングは小文字、というブレが起きうる。たとえばインターンの制作では<strong>「小文字統一」「アンダースコア区切り（<code>section_title</code>）」</strong>などのルールがあり、教科書通りに大文字で作ると注意される。<strong>教科書＝絶対ではない</strong>。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== ワークス ===== -->
+  <section id="works">
+    <h2 class="section-title"><span class="icon">🗃️</span>ワークス（カード）</h2>
+    <p>最後はWorks（制作実績）のカードづくり。1枚のカードを作って<strong>コンポーネント化</strong>するところまで。</p>
+    <ul class="bullet-pro">
+      <li>画像フレーム（約300×300・この段階では塗りグレーでOK、画像は後で）</li>
+      <li>プロジェクト名（18 Bold）</li>
+      <li>タグ（14 Regular・グレー背景・パディング・角丸4）→ オートレイアウトで囲って背景色</li>
+      <li>全体をオートレイアウトでまとめて <code>ワークスアイテム</code> と命名 → コンポーネント化</li>
+    </ul>
+    <div class="callout primary">
+      <span class="label">続きは明日</span>
+      タグは「グラフィックデザイン」など<strong>複数種類</strong>あるので<strong>バリアント</strong>で、プロジェクト名は<strong>テキストプロパティ</strong>で変えられるようにする。インスタンスをカンプに並べていくのは翌日の授業で。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:210px;">用語</th><th>意味（このクラスでの理解）</th></tr></thead>
+        <tbody>
+          <tr><td>スタイルの階層（スラッシュ）</td><td>スタイル名に <code>/</code> を入れてフォルダ分け。例 <code>Bold/12px-Bold</code></td></tr>
+          <tr><td>グローバルナビゲーション</td><td>全ページ共通のヘッダー内ナビ。ロゴ＋リンク＋Contactボタン</td></tr>
+          <tr><td>コピーライト表記</td><td>© ＋ 制作年 ＋ 著作者名（最低3つ）。フッターに置く</td></tr>
+          <tr><td>ファーストビュー</td><td>ページを開いて最初に見える画面（ヘッダー＋メインビジュアル）</td></tr>
+          <tr><td>メインビジュアル（MV）</td><td>トップの主役画像エリア。高さ＝モニター−ヘッダー</td></tr>
+          <tr><td>塗りで画像配置</td><td>フレームの塗りに画像を入れる＝<code>background-size:cover</code>。直置きの <code>&lt;img&gt;</code> と区別</td></tr>
+          <tr><td>2種類の中央揃え</td><td>オートレイアウト＝要素の中央／タイプグラフィ＝文字の中央(<code>text-align</code>)</td></tr>
+          <tr><td>8の倍数</td><td>余白の基準。セクション上下は160などで全部揃える</td></tr>
+          <tr><td>命名規則</td><td>キャメル/スネーク/小文字統一など。プロジェクトごとに決める</td></tr>
+          <tr><td>3カラム / コンテナ / アイテム</td><td>flexの考え方。親＝コンテナ、横並びの各列＝アイテム</td></tr>
+          <tr><td>選択範囲の色</td><td>選択した要素の中で使われている色一覧。一括変更できる</td></tr>
+          <tr><td>hug（コンテンツを内包）</td><td>中身の大きさに合わせる。<code>fit-content</code></td></tr>
+          <tr><td>fill（コンテナに合わせて拡大）</td><td>親の幅に合わせる。<code>width:100%</code>。余白はパディングで取る</td></tr>
+          <tr><td>テキストプロパティ／バリアント</td><td>前回の復習。文言の差し替え／状態・種類違いのパターン</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <p>授業で作りかけた分＝そのまま続き。猫田小春のポートフォリオを上から完成させていく。</p>
+    <ul class="check-list">
+      <li>スタイルのレイヤーを<strong>フレーム＋スラッシュ</strong>で整理（Bold/Regular など）</li>
+      <li><strong>ボタン・ヘッダー・フッター</strong>をコンポーネント化（黒・白はスタイルの色を当て直す）</li>
+      <li><strong>ファーストビュー</strong>：MVの高さを「モニター−ヘッダー（−94）」、画像はフレームの塗りで配置</li>
+      <li>タイトル・説明文を<strong>2種類の中央揃え</strong>で真ん中に</li>
+      <li><strong>サービスセクション</strong>：タイトルをコンポーネント化＋テキストプロパティ(EN/JP)、3カラム、アイコンはフレーム、余白24/16・アイテム幅300・間64、セクション上下160</li>
+      <li>【明日】<strong>ワークスのカード</strong>にバリアント（タグ違い）＋テキストプロパティを付け、インスタンスをカンプに配置</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>まずはトップページだけ作ってみる。スタイルもコンポーネントも一旦気にしない。そこから使った色やフォントを登録していく。<span class="citation">── 制作の現実的な順番</span></blockquote>
+    <blockquote>4000pxぴったりとか誰もやらないです。高さは適当に伸ばす。ただし幅は変えちゃダメですからね。<span class="citation">── フレームの高さと幅</span></blockquote>
+    <blockquote>余白がバラバラだと、センスのいい人か下手くその2択になっちゃう。ここは大体同じ数字にしておくのを強くおすすめします。<span class="citation">── セクションの余白</span></blockquote>
+    <blockquote>教科書が絶対というわけじゃない。命名規則はプロジェクトごとにバラバラ。これは強くどこかにメモっといてください。<span class="citation">── 命名規則について</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-03｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

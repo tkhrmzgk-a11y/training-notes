@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ボックスモデル・box-sizing・カードレイアウト・タイポグラフィ｜2026年5月13日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月13日｜講師：A先生</div>
+  <h1>ボックスモデル・box-sizing・カードレイアウト・タイポグラフィ</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 4時間50分</span>
+    <span>📖 HTML本70-73p / Webデザイン本18-19p</span>
+    <span>🎯 ブロック/インライン・display・heightの罠・ボックスモデル・border-box・余白4方向・カード演習・タイポグラフィ・フォント表</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="callout primary" style="margin-top: 40px;">
+    <span class="label">📌 今日のひとことまとめ</span>
+    <p style="margin:0; font-size:18px; line-height:1.85;">
+      テーマは <strong>「ボックスモデル」</strong> と <strong>「タイポグラフィ（文字の見せ方）」</strong>。<br>
+      かんたんに言うと <mark>「すべての要素は “中身→内側余白→線→外側余白” の4層の箱でできている」「box-sizing: border-box はサイトを作る限り必ず書く」「行間・文字サイズ・太さ・字間で読みやすさが激変する」</mark>という話です。
+    </p>
+  </div>
+
+  <nav class="toc" style="margin-top: 40px;">
+    <h2>📑 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（1日の流れ）</a></li>
+      <li><a href="#must">今日おさえる10個</a></li>
+      <li><a href="#width-block">ブロック要素の幅は親いっぱい</a></li>
+      <li><a href="#display">display で性質を切り替える</a></li>
+      <li><a href="#height-trap">height の罠</a></li>
+      <li><a href="#box-model">ボックスモデル（図解あり）</a></li>
+      <li><a href="#border-box">box-sizing: border-box（最重要）</a></li>
+      <li><a href="#padding-margin">余白の4方向指定</a></li>
+      <li><a href="#card">カードレイアウト演習</a></li>
+      <li><a href="#typography">タイポグラフィ（文字の見せ方）</a></li>
+      <li><a href="#font-map">フォント印象マップ</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">チェックリスト</a></li>
+      <li><a href="#quotes">先生の名言</a></li>
+    </ol>
+  </nav>
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:90px">時刻</th><th>内容</th><th style="width:80px" class="center">大事さ</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><a href="#width-block">00:01</a></td><td><a href="#width-block"><strong>ブロック要素の幅＝親いっぱい</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#display">00:23</a></td><td><a href="#display"><strong>display（block/inline/inline-block）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#height-trap">00:37</a></td><td><a href="#height-trap">height の罠（基本書かない）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#box-model">01:02</a></td><td><a href="#box-model"><strong>ボックスモデル（padding/border/margin）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#border-box">01:18</a></td><td><a href="#border-box"><strong>box-sizing: border-box（絶対書く）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#padding-margin">01:25</a></td><td><a href="#padding-margin">余白の4方向指定（1値/2値/4値）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#card">01:43</a></td><td><a href="#card"><strong>カードレイアウト演習</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">02:28</td><td>お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#typography">03:18</a></td><td><a href="#typography"><strong>タイポグラフィ（教科書18p）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#typography">03:24</a></td><td><a href="#typography">line-height（行間）和文1.5〜2</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#typography">03:36</a></td><td><a href="#typography">font-weight / letter-spacing / text-align</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#font-map">04:13</a></td><td><a href="#font-map"><strong>フォント印象マップ作成</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">04:50</td><td>授業終了</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <div class="card-grid">
+      <a href="#width-block" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">1</span><h4>ブロックの幅</h4><p>無指定で<mark>親→親→…→body幅</mark>。</p></div></a>
+      <a href="#display" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">2</span><h4>display切替</h4><p>block/inline/inline-block。</p></div></a>
+      <a href="#height-trap" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">3</span><h4>heightの罠</h4><p>px指定はNG。<mark>基本書かない</mark>。</p></div></a>
+      <a href="#box-model" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">4</span><h4>ボックスモデル</h4><p>content→padding→border→margin。</p></div></a>
+      <a href="#border-box" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">5</span><h4>border-box</h4><p><mark>サイト作る限り絶対書く</mark>。1行目。</p></div></a>
+      <a href="#padding-margin" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">6</span><h4>余白4方向</h4><p>1値=全部/2値=上下左右/4値=上右下左。</p></div></a>
+      <a href="#card" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">7</span><h4>共通＋個別クラス</h4><p>共通スタイルは1箇所にまとめる。</p></div></a>
+      <a href="#typography" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">8</span><h4>line-height</h4><p>和文は<strong>1.5〜2</strong>が読みやすい。</p></div></a>
+      <a href="#typography" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">9</span><h4>text-align</h4><p>center/left/right/justify。</p></div></a>
+      <a href="#font-map" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">10</span><h4>フォント表</h4><p>自分のフォント表を作って一生使う。</p></div></a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="width-block">
+    <h2 class="section-title"><span class="icon">📦</span>ブロック要素の幅は親いっぱい</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ブロック要素は<strong>幅を指定しないと、親 → その親 → … → 最終的に body と同じ幅</strong>になります。<br>
+        <mark>テキストが短くても、箱は親いっぱいに広がっている</mark>（DevToolsで水色の領域を見ると一目瞭然）。
+      </p>
+    </div>
+    <p>逆に<strong>インライン要素</strong>（<code>span</code>等）は、テキストの分だけの幅。だから文中の一部だけ色を変えるのに <code>&lt;span&gt;</code> が使えます。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="display">
+    <h2 class="section-title"><span class="icon">🔀</span>display で性質を切り替える</h2>
+    <div class="card-grid">
+      <div class="card"><h4 style="color:var(--primary);">display: block</h4><p>ブロック化。幅高さ指定可、後ろで改行。</p></div>
+      <div class="card"><h4 style="color:var(--accent);">display: inline</h4><p>インライン化。幅高さ指定不可、改行なし。</p></div>
+      <div class="card"><h4 style="color:var(--success);">display: inline-block</h4><p><mark>いいとこ取り</mark>。幅高さ指定可＋横並び。</p></div>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">inline-blockで横並びにして収まらず下に落ちる現象＝「カラム落ち」。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="height-trap">
+    <h2 class="section-title"><span class="icon">⚠️</span>height の罠</h2>
+    <div class="callout primary">
+      <span class="label">🚨 重要</span>
+      <p style="margin:0; font-size:17px;"><strong>height をピクセル指定するのは基本NG。書かないのが安全。</strong></p>
+    </div>
+    <p>中の文章量が指定した高さを超えると<strong>テキストが箱からはみ出して</strong>レイアウトが崩壊します。<code>height</code> の初期値は <code>auto</code>（中身に合わせて自動で伸びる）。<mark>慣れるまで height はいじらない</mark>のが鉄則です。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="box-model">
+    <h2 class="section-title"><span class="icon">📐</span>ボックスモデル（図解あり）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        HTMLのすべての要素は<strong>4層の箱</strong>でできています。<br>
+        <mark>中身（content）→ 内側の余白（padding）→ 線（border）→ 外側の余白（margin）</mark>。プレゼント箱で例えると「商品→緩衝材→箱→ラッピングの隙間」。
+      </p>
+    </div>
+
+    <h3>図解（4層構造）</h3>
+    <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:32px; margin:24px 0; text-align:center;">
+      <div style="display:inline-block; padding:28px; background:#fdebeb; border:2px dashed #c53030; border-radius:8px;">
+        <div style="font-size:13px; color:#c53030; margin-bottom:10px; font-weight:700;">margin（外側の余白・透明）</div>
+        <div style="display:inline-block; padding:18px; background:white; border:6px solid #1a3a5c; border-radius:4px;">
+          <div style="font-size:13px; color:#1a3a5c; margin-bottom:8px; font-weight:700;">border（線）</div>
+          <div style="display:inline-block; padding:18px; background:#e7f5ec;">
+            <div style="font-size:13px; color:#2d7a4a; margin-bottom:8px; font-weight:700;">padding（内側の余白）</div>
+            <div style="display:inline-block; padding:18px 36px; background:#88d0ff; color:white; font-weight:700;">content（中身）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/box_model.png" alt="先生の板書：ボックスモデルの考え方（margin/border/padding/content の入れ子図）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：外から margin →（外側の余白）→ border（線）→ padding（内側の余白）→ content（中身）の4層。margin だけは透明</figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:130px">層</th><th>役割</th><th>透明？</th></tr></thead>
+        <tbody>
+          <tr><td><code>width/height</code></td><td>中身のサイズ</td><td>—</td></tr>
+          <tr><td><code>padding</code></td><td>内側の余白（要素の背景色がつく）</td><td>❌</td></tr>
+          <tr><td><code>border</code></td><td>線（太さ 種類 色）</td><td>—</td></tr>
+          <tr><td><code>margin</code></td><td>外側の余白（要素と要素の間）</td><td>✅ 透明</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="border-box">
+    <h2 class="section-title"><span class="icon">⭐</span>box-sizing: border-box（最重要）</h2>
+    <div class="callout primary">
+      <span class="label">🔥 サイトを作る限り絶対書く</span>
+      <p style="margin:0; font-size:18px;">CSSの<strong>1行目に必ず</strong>：<code>* { box-sizing: border-box; }</code></p>
+    </div>
+    <p><strong>初期値（content-box）</strong>だと <code>width:200px</code> と書いても、padding と border が足されて<mark>実際は240pxになってしまう</mark>（計算がズレる）。<code>border-box</code> にすると、paddingやborderを含めてちゃんと200pxに収まります。</p>
+<pre><span class="selector">*</span> <span class="punct">{</span> <span class="property">box-sizing</span><span class="punct">:</span> <span class="value">border-box</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* CSSの1行目に！ */</span></pre>
+  </section>
+
+  <hr class="divider">
+
+  <section id="padding-margin">
+    <h2 class="section-title"><span class="icon">🧭</span>余白の4方向指定</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>値の数</th><th>書き方</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>1値</td><td><code>padding: 16px;</code></td><td>4方向ぜんぶ16px</td></tr>
+          <tr><td>2値</td><td><code>padding: 16px 8px;</code></td><td>上下16px、左右8px</td></tr>
+          <tr><td>4値</td><td><code>padding: 8px 32px 16px 4px;</code></td><td><strong>上→右→下→左</strong>（時計回り）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>border</strong> の書き方：<code>border: 4px solid #1a3a5c;</code>（太さ・種類・色）。種類は solid（実線）/ dashed（破線）/ dotted（点線）。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="card">
+    <h2 class="section-title"><span class="icon">🎴</span>カードレイアウト演習</h2>
+    <p>今日習ったボックスモデル＋display＋余白を全部使って、横並びカードを作る演習。</p>
+    <ul class="bullet-pro">
+      <li>3つのカード、各300×300px、横並び</li>
+      <li>共通スタイル＝<strong>1つのクラスにまとめる</strong>（賢い書き方）</li>
+      <li>数字クラス名（box1/box2）は避け、<mark>意味のある名前</mark>を</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">💡 やさしく解説：共通と個別を分ける</span>
+      <p style="margin:0;"><code>class="item box-first"</code> のように<strong>クラスを2つ</strong>つける。共通（幅・余白）は <code>.item</code> で1回、色だけ <code>.box-first</code> で個別に。「ここ同じだな」と気づいたら共通化のチャンス。</p>
+    </div>
+    <figure style="margin:22px 0;">
+      <img src="img/card_layout.png" alt="先生の板書：カードレイアウト演習の見本（画像＋記事タイトル＋本文の3枚並び）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：1枚目の緑枠が「カード1個ぶんの箱」。画像エリア＋記事タイトル＋ダミーテキストで構成、間の斜線がカード同士の余白</figcaption>
+    </figure>
+  </section>
+
+  <hr class="divider">
+
+  <section id="typography">
+    <h2 class="section-title"><span class="icon">🔤</span>タイポグラフィ（文字の見せ方）</h2>
+    <p>教科書18p。<strong>美しく読みやすいサイトの基本</strong>。和文＝明朝/ゴシック、欧文＝セリフ/サンセリフ。</p>
+
+    <h3>① line-height（行間）</h3>
+<pre><span class="selector">p</span> <span class="punct">{</span> <span class="property">line-height</span><span class="punct">:</span> <span class="value">1.8</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* 1.5 = 150% */</span></pre>
+    <p>デフォルト1.5、欧文1.2、<strong>和文1.5〜2</strong>が読みやすい。先生おすすめ1.8。</p>
+
+    <h3>② font-size（メリハリ）</h3>
+    <p>長文で一部だけ大きくすると<mark>読み飽きない</mark>。デザインの対比原則と同じ。</p>
+
+    <h3>③ font-weight（太さ）</h3>
+<pre><span class="selector">.strong</span> <span class="punct">{</span> <span class="property">font-weight</span><span class="punct">:</span> <span class="value">bold</span><span class="punct">;</span> <span class="punct">}</span></pre>
+    <p>ただし<strong>そのフォントが太字を持っていないと効かない</strong>。Google Fontsなら問題なし。</p>
+
+    <h3>④ letter-spacing（字間）</h3>
+    <p><code>0.05em</code> 前後が自然。取りすぎると犯罪予告の手紙風になるので注意（笑）。</p>
+
+    <h3>text-align（揃え）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>値</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>left</code></td><td>左揃え（デフォルト）</td></tr>
+          <tr><td><code>center</code></td><td>中央揃え</td></tr>
+          <tr><td><code>right</code></td><td>右揃え</td></tr>
+          <tr><td><code>justify</code></td><td>両端揃え（雑誌風）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="font-map">
+    <h2 class="section-title"><span class="icon">🗺</span>フォント印象マップ</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">教科書の図を参考に、<strong>自分用のフォント表をFigJamで作る</strong>のが演習。<mark>一生使える資産</mark>になります。</p>
+    </div>
+    <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:20px; margin:20px 0;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0; border:2px solid var(--primary);">
+        <div style="padding:18px; background:#f0f7ff; border-right:1px solid var(--primary); border-bottom:1px solid var(--primary); text-align:center;"><strong style="color:var(--primary);">高級・信頼</strong>×<strong style="color:var(--success);">読みやすい</strong><br><span style="font-size:13px;color:var(--text-soft);">明朝・セリフ</span></div>
+        <div style="padding:18px; background:#fff4e0; border-bottom:1px solid var(--primary); text-align:center;"><strong style="color:var(--accent);">カジュアル</strong>×<strong style="color:var(--success);">読みやすい</strong><br><span style="font-size:13px;color:var(--text-soft);">ゴシック・サンセリフ</span></div>
+        <div style="padding:18px; background:#fdebeb; border-right:1px solid var(--primary); text-align:center;"><strong style="color:var(--primary);">高級・信頼</strong>×<strong style="color:var(--danger);">装飾的</strong><br><span style="font-size:13px;color:var(--text-soft);">スクリプト・行書</span></div>
+        <div style="padding:18px; background:#f8f4ed; text-align:center;"><strong style="color:var(--accent);">カジュアル</strong>×<strong style="color:var(--danger);">装飾的</strong><br><span style="font-size:13px;color:var(--text-soft);">手書き・ポップ</span></div>
+      </div>
+    </div>
+    <figure style="margin:22px 0;">
+      <img src="img/typography_map.png" alt="先生の板書：日本語フォント印象マップ（読みやすさ × 高級感/カジュアル の2軸）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：横軸＝読みやすさ、縦軸＝高級・伝統 ↔ カジュアル・親しみ。明朝系は上（信頼感）、丸ゴシック系は下（親しみ）に配置される</figcaption>
+    </figure>
+    <p>Google Fonts でフォントを探し、上のマップに配置→スクショ→FigJamに貼る。5〜10種類は揃える。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ボックスモデル</strong></td><td>content/padding/border/margin の4層構造</td></tr>
+          <tr><td><strong>padding</strong></td><td>内側の余白（背景色がつく）</td></tr>
+          <tr><td><strong>border</strong></td><td>線（太さ 種類 色）</td></tr>
+          <tr><td><strong>margin</strong></td><td>外側の余白（透明）</td></tr>
+          <tr><td><strong>box-sizing: border-box</strong></td><td>width指定にpadding/borderを含める。必須</td></tr>
+          <tr><td><strong>display</strong></td><td>block/inline/inline-block の切替</td></tr>
+          <tr><td><strong>line-height</strong></td><td>行間。和文1.5〜2推奨</td></tr>
+          <tr><td><strong>font-weight</strong></td><td>文字の太さ（bold等）</td></tr>
+          <tr><td><strong>letter-spacing</strong></td><td>字間（0.05em程度）</td></tr>
+          <tr><td><strong>text-align</strong></td><td>テキスト揃え（left/center/right/justify）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li><strong>ブロック要素の幅＝親いっぱい（最終body幅）</strong>を覚える</li>
+      <li><strong>heightはピクセル指定しない</strong>を絶対忘れない</li>
+      <li>display: block/inline/inline-block の違いを言える</li>
+      <li><strong>ボックスモデルの4層</strong>を口で説明できる</li>
+      <li>新規CSSの<strong>1行目に <code>* { box-sizing: border-box; }</code></strong></li>
+      <li>余白の1値/2値/4値の意味を覚える</li>
+      <li>カードレイアウト演習を完成（3枚・各300px・共通クラス）</li>
+      <li><strong>line-heightは和文1.5〜2</strong>を体に入れる</li>
+      <li>font-weight/letter-spacing/text-alignを試す</li>
+      <li><strong>自分のフォント表（FigJam）</strong>を作る</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言</h2>
+    <blockquote><strong>ブロック要素は幅・高さをCSSで指定できる。指定しないと親要素の幅いっぱいになる。</strong>今日これだけでも覚えてくれってぐらい大事。</blockquote>
+    <blockquote><code>height</code> は<strong>慣れるまであんまりいじらない</strong>ぐらいの気持ちで。むしろ書かない方が安全。</blockquote>
+    <blockquote><code>box-sizing: border-box</code> は<strong>ウェブサイトを作る限り絶対書く</strong>もの。お決まりで覚えて。</blockquote>
+    <blockquote>「ここ同じで書けるな」って思ったら、それは<strong>チャンス</strong>。共通設定として1箇所にまとめるのが賢い。</blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-19｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

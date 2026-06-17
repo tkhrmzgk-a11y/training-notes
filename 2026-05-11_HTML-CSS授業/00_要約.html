@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サイト設計・ワークフロー・デザイン4大原則・CSSセレクター基礎｜2026年5月11日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月11日｜講師：A先生</div>
+  <h1>サイト設計・ワークフロー・デザイン4大原則・CSSセレクター基礎</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間（初日まわり）</span>
+    <span>📖 ウェブデザイン本10-13p ＋ Figma板書</span>
+    <span>🎯 ワイヤーフレーム・ワークフロー・印象×機能・Z/F視線・紙vsWeb・CSS3点セット・クラス/ID</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="callout primary" style="margin-top: 40px;">
+    <span class="label">📌 今日のひとことまとめ</span>
+    <p style="margin:0; font-size:18px; line-height:1.85;">
+      訓練の初日まわり。テーマは <strong>「サイトを作る前の考え方」</strong> と <strong>「CSSの基本の書き方」</strong>。<br>
+      かんたんに言うと <mark>「いきなり作らず、まず設計図（ワイヤーフレーム）を描く」「人の目は Z や F の形に動くから、それに合わせて情報を置く」</mark>という話。後半は CSS の3点セット（セレクタ・プロパティ・値）を習いました。
+    </p>
+  </div>
+
+  <nav class="toc" style="margin-top: 40px;">
+    <h2>📑 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（1日の流れ）</a></li>
+      <li><a href="#must">今日おさえる10個</a></li>
+      <li><a href="#enshu">演習：喫茶つづる（サイトマップ）</a></li>
+      <li><a href="#school">欠席・遅刻の連絡フロー</a></li>
+      <li><a href="#workflow">サイト制作の流れ（ワークフロー）</a></li>
+      <li><a href="#wireframe">ワイヤーフレームとは</a></li>
+      <li><a href="#design">印象×機能＝ウェブデザイン</a></li>
+      <li><a href="#zf">人の視線の流れ（Z型・F型）</a></li>
+      <li><a href="#paper-web">紙デザイン vs ウェブデザイン</a></li>
+      <li><a href="#designer">ウェブデザイナーの本質</a></li>
+      <li><a href="#css-basic">CSSの基本の書き方</a></li>
+      <li><a href="#class-id">クラスとIDの違い</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">チェックリスト</a></li>
+      <li><a href="#quotes">先生の名言</a></li>
+    </ol>
+  </nav>
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <p>授業の流れを時間順に。行をクリックするとその説明へジャンプ。★が多いほど大事。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:90px">時刻</th><th>内容</th><th style="width:80px" class="center">大事さ</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><a href="#enshu">00:05</a></td><td><a href="#enshu"><strong>演習：喫茶つづるのサイトマップを考える</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#enshu">00:14</a></td><td><a href="#enshu">最低5ページ・2種類のユーザー両方が迷わない構成</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#school">00:45</a></td><td><a href="#school"><strong>欠席・遅刻・早退の連絡フロー</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">00:53</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#workflow">01:03</a></td><td><a href="#workflow"><strong>サイト制作のワークフロー（教科書13p）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#wireframe">01:10</a></td><td><a href="#wireframe"><strong>ワイヤーフレームとは（設計図）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#workflow">01:25</a></td><td><a href="#workflow">価格感（訓練校で250万 vs 150万）</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time">01:48</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#design">02:08</a></td><td><a href="#design"><strong>印象×機能＝ウェブデザイン（教科書10p）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#zf">02:25</a></td><td><a href="#zf"><strong>人の視線の流れ（Z型・F型）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#designer">02:30</a></td><td><a href="#designer">ウェブデザイナーの本質（2つのわがまま）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#paper-web">02:37</a></td><td><a href="#paper-web"><strong>紙デザイン vs ウェブデザイン</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#css-basic">02:52</a></td><td><a href="#css-basic"><strong>CSSの基本の書き方（セレクタ・プロパティ・値）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#class-id">02:56</a></td><td><a href="#class-id">クラスとIDの違い</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">03:00</td><td>休憩・演習タイム</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#css-basic">04:00</a></td><td><a href="#css-basic">CSSセレクターの種類の続き</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#enshu">04:30</a></td><td><a href="#enshu">演習：喫茶つづるの続き＋質疑応答</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">05:00</td><td>授業終了</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <div class="card-grid">
+      <a href="#wireframe" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">1</span><h4>設計図が先</h4><p>いきなり作らず<mark>ワイヤーフレーム</mark>から。</p></div></a>
+      <a href="#zf" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">2</span><h4>Z型・F型視線</h4><p>人の目は<strong>Z や F の形</strong>に動く。</p></div></a>
+      <a href="#design" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">3</span><h4>印象×機能</h4><p>かっこよさ＋使いやすさ＝ウェブデザイン。</p></div></a>
+      <a href="#zf" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">4</span><h4>情報の置く順</h4><p>導入→紹介→声→申込み。いきなり購入はNG。</p></div></a>
+      <a href="#designer" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">5</span><h4>2つのわがまま</h4><p>クライアントとユーザーのズレを埋める仕事。</p></div></a>
+      <a href="#paper-web" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">6</span><h4>紙とWebは別物</h4><p>Webはサイズ可変・色RGB・後で直せる。</p></div></a>
+      <a href="#css-basic" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">7</span><h4>CSSの3点セット</h4><p>セレクタ・プロパティ・値。</p></div></a>
+      <a href="#css-basic" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">8</span><h4>記号のルール</h4><p>{ } とコロン : とセミコロン ; を忘れない。</p></div></a>
+      <a href="#class-id" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">9</span><h4>クラスとID</h4><p>IDは1ページ1回。基本はクラス。</p></div></a>
+      <a href="#school" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">10</span><h4>欠席連絡フロー</h4><p>その日のうちに。給付金が遅れる。</p></div></a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="enshu">
+    <h2 class="section-title"><span class="icon">📝</span>演習：喫茶つづる（サイトマップ）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説：何をする演習？</span>
+      <p style="margin:0;">
+        架空のカフェ <strong>「喫茶つづる」</strong>（オーナー自家焙煎コーヒー＋厳選した本が買える店）の<mark>サイトの設計図（サイトマップ）</mark>を考える演習です。「どんなページを作る？」「各ページに何を載せる？」を紙でもFigmaでもOKで考えます。
+      </p>
+    </div>
+
+    <h3>条件</h3>
+    <ul class="bullet-pro">
+      <li><strong>最低5ページ</strong>（トップページ含む）</li>
+      <li>各ページに<strong>どんな情報を載せるか</strong>を箇条書きで</li>
+      <li>このサイトには<mark>2種類のお客さん</mark>がいる：①一人でゆっくりしたい人 ②本やコーヒーで交流したい人</li>
+      <li>その<strong>両方が迷わず目的にたどり着ける</strong>メニュー・階層の工夫を入れる</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">📌 ページ案の例</span>
+      <p style="margin:0;">トップ／アバウト（オーナー紹介）／コーヒー紹介／本（ブックス）／読書探訪イベント／アクセス／お問い合わせ … など。<br>
+      詰まったら<strong>似た喫茶店・本屋のサイトを5つ見て、いい所を真似る</strong>のがコツ（A先生談）。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="school">
+    <h2 class="section-title"><span class="icon">🏫</span>欠席・遅刻の連絡フロー</h2>
+    <p>学校生活の大事な手続き。これを怠ると給付金が遅れます。</p>
+    <ol style="font-size:17px; line-height:2;">
+      <li><strong>未履修時間記録簿（PDF）</strong>に随時記録する</li>
+      <li>クラスルーム ＞ 日誌各種届 にある<strong>「離職者など再就職訓練欠席フォーム（フローチャート）」</strong>をブックマーク</li>
+      <li>欠席・遅刻・早退したら、そのフローチャートで状況を選択 → 必要書類が自動で出てくる</li>
+      <li>病院の領収書などの<strong>証明書を画像/PDF化して添付</strong>、連絡用メールに送信</li>
+      <li><mark>必ずその日のうちに</mark>（遅れるとハローワークの給付金が遅延）</li>
+    </ol>
+  </section>
+
+  <hr class="divider">
+
+  <section id="workflow">
+    <h2 class="section-title"><span class="icon">🔄</span>サイト制作の流れ（ワークフロー）</h2>
+    <p>教科書13p。これが<strong>仕事の全体地図</strong>です。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:80px">工程</th><th>内容</th><th style="width:180px">担当</th></tr></thead>
+        <tbody>
+          <tr style="background:#fff4e0;"><td>1</td><td>受注（依頼が来る）</td><td>ディレクター</td></tr>
+          <tr style="background:#fff4e0;"><td>2</td><td>ヒアリング（目的・納期・予算・誰向けかを聞く）</td><td>ディレクター</td></tr>
+          <tr style="background:#fff4e0;"><td>3</td><td>調査分析（競合サイト調べ、アクセス解析）</td><td>ディレクター</td></tr>
+          <tr style="background:#fff4e0;"><td>4</td><td>サイト設計・サイトマップ</td><td>ディレクター</td></tr>
+          <tr style="background:#fff4e0;"><td>5</td><td>ワイヤーフレーム（設計図）</td><td>ディレクター</td></tr>
+          <tr style="background:#e8f0f8;"><td>6</td><td>デザイン（Figmaなどで見本作り）</td><td>ウェブデザイナー</td></tr>
+          <tr style="background:#e7f5ec;"><td>7</td><td>コーディング（HTML/CSS実装）</td><td>コーダー</td></tr>
+          <tr style="background:#e7f5ec;"><td>8〜10</td><td>テスト → 公開 → 運用</td><td>コーダー/全員</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">🔥 先生「絶対忘れないで」</span>
+      <p style="margin:0;"><strong>クライアントが目指すゴールをヒアリングでしっかり汲み取り、公開後の運用まで考えて設計する</strong>こと。サイトは作って終わりじゃなく<mark>運用が本番</mark>。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">参考：訓練校規模のサイト外注で約250万円、自社制作なら約150万円。「ミニマムスタート」で予算に合わせて削るのも現場のあるある。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="wireframe">
+    <h2 class="section-title"><span class="icon">📐</span>ワイヤーフレームとは</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ワイヤーフレーム＝<strong>「ウェブサイトの設計図」</strong>。<br>
+        家を建てる前に間取り図を描くのと同じ。<mark>「どこに何を置くか」を先に決める下書き</mark>です。色やデザインはまだ付けず、配置だけ。手書きでもFigmaでもOK。
+      </p>
+    </div>
+    <div class="callout">
+      <span class="label">⚠️ これが無いとデザイナーが詰む</span>
+      <p style="margin:0;">「リンクどこ置く？」「上から下に何を書く？」「色は決まったけどどう使う？」… 設計図が無いと質問だらけで進みません。<strong>先に設計図 → 迷いが消える</strong>。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">先生の板書（黄色ハイライト）でも「<strong>Webサイトの設計図 マジ重要</strong>」と強調されていました。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="design">
+    <h2 class="section-title"><span class="icon">🎨</span>印象×機能＝ウェブデザイン</h2>
+    <blockquote>
+      デザインとは単にどう見えるか・どう感じるかではない。<strong>どう機能するかだ。</strong>
+      <span class="citation">— スティーブ・ジョブズ</span>
+    </blockquote>
+
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説：公式は「印象 × 機能」</span>
+      <p style="margin:0;">
+        ウェブデザインは<strong>「印象（見たくなる・使いたくなる）」×「機能（分かりやすく伝える）」</strong>のかけ算。<br>
+        <mark>かっこいいだけでもダメ、使いやすいだけでもダメ。両方そろって初めてウェブデザイン</mark>です。
+      </p>
+    </div>
+
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--accent); border-bottom-color:var(--accent);">👁 印象</h4>
+        <ul><li>色の組み合わせ</li><li>写真の加工</li><li>フォント（タイポグラフィー）</li><li>あしらい（飾り）</li></ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--primary); border-bottom-color:var(--primary);">⚙ 機能</h4>
+        <ul><li>優先度をつける</li><li>グループ化する</li><li>分かりやすい配置</li><li>自然な視線の流れ</li></ul>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">トレンドより<strong>見やすさ・使いやすさ・問題解決</strong>が大事。流行りものが正義ではない。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="zf">
+    <h2 class="section-title"><span class="icon">👁</span>人の視線の流れ（Z型・F型）</h2>
+
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        人がサイトを見るとき、目は<strong>アルファベットの Z や F の形</strong>に動きます。<br>
+        <mark>この動きに合わせて大事な情報を置くと、自然に伝わる</mark>のです。
+      </p>
+    </div>
+
+    <div class="callout success">
+      <span class="label">🟠 先生の板書（Figma）の図解</span>
+      <p style="margin:0;">下の図が先生の手書き板書です。<strong>左＝Z型（start から Z を描くように右上→左下→右下）</strong>、<strong>右＝F型（縦長サイトを上から、各ブロックで左→右）</strong>。右の図では <mark>導入 → 紹介・お客様の声 → サイトの目的（ゴール＝お申し込み・購入・体験）</mark>と、下に行くほど「申し込みへ誘導」する流れが描かれています。</p>
+    </div>
+
+    <h3>図解（先生の板書をそのまま）</h3>
+    <figure style="margin:8px 0 22px;">
+    <img src="img/shisen_zf.png" alt="先生の板書：人の視線の流れ Z型F型" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：左＝Z型、右＝F型と「導入→紹介→ゴール」の流れ</figcaption>
+  </figure>
+
+    <div class="callout">
+      <span class="label">📌 大事なこと</span>
+      <ul class="bullet-pro" style="margin:0;">
+        <li>上から：<strong>① ファーストビュー → ② 導入・困りごと共感 → ③ 紹介・サービス → ④ お客様の声 → ⑤ 申し込み・購入</strong></li>
+        <li><mark>いきなり「料金3000円・購入はこちら」を最初に置くのはNG</mark>（ユーザーが離れる）</li>
+        <li>コンビニの陳列も同じ。左上が新商品、右下は売れにくいと言われる</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="paper-web">
+    <h2 class="section-title"><span class="icon">📄</span>紙デザイン vs ウェブデザイン</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>項目</th><th>紙</th><th>ウェブ</th></tr></thead>
+        <tbody>
+          <tr><td>サイズ</td><td>A4/B5など固定</td><td><mark>デバイスごとに変わる</mark></td></tr>
+          <tr><td>色</td><td>CMYK（印刷）</td><td>RGB（16進数 <code>#ff0000</code>）</td></tr>
+          <tr><td>単位</td><td>ミリ・ポイント</td><td>px / rem / em</td></tr>
+          <tr><td>修正</td><td>納品後は不可</td><td>公開後も直せる</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="label">🌐 レスポンシブの意識</span>
+      <p style="margin:0;">ウェブデザイナーは<strong>PC・スマホ・タブレット・大小モニター全部</strong>を考える必要あり。<mark>初心者あるある＝PCで気合い入れたらスマホで崩れる</mark>。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="designer">
+    <h2 class="section-title"><span class="icon">⚖️</span>ウェブデザイナーの本質</h2>
+    <blockquote>
+      <strong>クライアントのわがまま</strong>と<strong>ユーザーのわがまま</strong>のバランスを取る仕事。
+      <span class="citation">— A先生</span>
+    </blockquote>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        クライアント（お店）は<strong>「言いたいこと」</strong>を発信したい。ユーザーは<strong>「知りたいこと」</strong>だけ見たい。<br>
+        この2つは<mark>たいてい食い違う</mark>。そのズレを埋めて両方を満たすのがプロの腕の見せどころです。
+      </p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">「みんなに買ってほしい商品は、みんな買わない。分かりづらいから」— ターゲットを絞ることの大切さ。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="css-basic">
+    <h2 class="section-title"><span class="icon">🔺</span>CSSの基本の書き方</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説：CSSは3点セット</span>
+      <p style="margin:0;">
+        CSSは<strong>「どこを（セレクタ）」「何を（プロパティ）」「どうする（値）」</strong>の3つでできています。この形以外には絶対なりません。
+      </p>
+    </div>
+
+<pre><span class="selector">セレクタ</span> <span class="punct">{</span>
+    <span class="property">プロパティ</span><span class="punct">:</span> <span class="value">値</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout success">
+      <span class="label">🟠 先生の板書（Figma）の図解</span>
+      <p style="margin:0;">下の図が先生の手書き板書。<code>p { font-size: 200px; }</code> というコードに、<strong>「←セレクタ」「プロパティ」「値」</strong>と矢印で注釈。「<code>p{ font-size:16px; }</code> のように1行で書くのはしないよ」とも。</p>
+    </div>
+
+    <h3>図解（先生の板書をそのまま）</h3>
+    <figure style="margin:8px 0 22px;">
+    <img src="img/css_kihon.png" alt="先生の板書：CSSの基本の書き方" style="width:100%; max-width:760px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：セレクタ・プロパティ・値の手書き解説</figcaption>
+  </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:130px">要素</th><th>意味</th><th>例</th></tr></thead>
+        <tbody>
+          <tr><td><strong>セレクタ</strong></td><td>HTMLの「どこに」効かせるか</td><td><code>p</code> / <code>.classname</code></td></tr>
+          <tr><td><strong>プロパティ</strong></td><td>「何を」変えるか</td><td><code>font-size</code> / <code>color</code></td></tr>
+          <tr><td><strong>値</strong></td><td>「どう」するか</td><td><code>200px</code> / <code>#ff0000</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">⚠️ 記号のルール</span>
+      <ul class="bullet-pro" style="margin:0;">
+        <li>セレクタの後に<strong>波括弧 <code>{ }</code></strong></li>
+        <li>プロパティと値の間に<strong>コロン <code>:</code></strong></li>
+        <li>値の後に<strong>セミコロン <code>;</code></strong></li>
+        <li>1個でも忘れると効かない。最初の壁です</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="class-id">
+    <h2 class="section-title"><span class="icon">🏷</span>クラスとIDの違い</h2>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary); border-bottom-color:var(--primary);">クラス（.name）</h4>
+        <ul>
+          <li>自由な「あだ名」</li>
+          <li>同じ名前を<mark>何度でも</mark>使える</li>
+          <li>CSSのスタイル付けが主</li>
+          <li><strong>実務はほぼコレ</strong></li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent); border-bottom-color:var(--accent);">ID（#name）</h4>
+        <ul>
+          <li>自由な「あだ名」</li>
+          <li>同じ名前は<mark>1ページに1回だけ</mark></li>
+          <li>ページ内リンクのジャンプ先に使う</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout primary">
+      <span class="label">💡 覚え方</span>
+      <p style="margin:0;"><strong>「あだ名はクラスが基本、特殊な用途のときだけID」</strong>。スマホでボタンを押すとシュッと下にスクロールする、あれを作るのがID。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ワイヤーフレーム</strong></td><td>ウェブサイトの設計図（配置の下書き）</td></tr>
+          <tr><td><strong>サイトマップ</strong></td><td>どのページがあるかの一覧図</td></tr>
+          <tr><td><strong>ワークフロー</strong></td><td>受注→ヒアリング→…→運用の仕事の流れ</td></tr>
+          <tr><td><strong>ヒアリング</strong></td><td>クライアントに目的・予算などを聞くこと</td></tr>
+          <tr><td><strong>Z型・F型視線</strong></td><td>人の目が動くパターン</td></tr>
+          <tr><td><strong>ファーストビュー</strong></td><td>サイトを開いて最初に見える画面</td></tr>
+          <tr><td><strong>印象×機能</strong></td><td>ウェブデザインの公式</td></tr>
+          <tr><td><strong>CMYK / RGB</strong></td><td>紙の色 / Webの色</td></tr>
+          <tr><td><strong>セレクタ</strong></td><td>CSSを「どこに」効かせるかの指定</td></tr>
+          <tr><td><strong>プロパティ</strong></td><td>「何を」変えるか（color等）</td></tr>
+          <tr><td><strong>値</strong></td><td>「どう」するか（16px等）</td></tr>
+          <tr><td><strong>クラス / ID</strong></td><td>要素に付けるあだ名（IDは1回のみ）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li><strong>いきなり作らずワイヤーフレームから</strong>を覚える</li>
+      <li>ワークフロー（受注→…→運用）の流れを言える</li>
+      <li><strong>Z型・F型視線</strong>と情報の置く順（導入→紹介→声→申込み）を理解</li>
+      <li><strong>印象×機能</strong>の公式を覚える</li>
+      <li>クライアントとユーザーの<strong>2つのわがまま</strong>を説明できる</li>
+      <li>紙とウェブの違い（サイズ可変・RGB・後で直せる）を言える</li>
+      <li><strong>CSSの3点セット</strong>（セレクタ・プロパティ・値）を書ける</li>
+      <li>記号 <code>{ }</code> <code>:</code> <code>;</code> を忘れない</li>
+      <li><strong>クラスとIDの違い</strong>を3行で書ける</li>
+      <li><strong>欠席フローチャート</strong>をブックマーク・未履修記録簿を確保</li>
+      <li>喫茶つづるのサイトマップを5ページ以上で考える</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言</h2>
+    <blockquote>かっこいい雰囲気を勝手に出すんじゃなくて、<strong>使い手の目線でサイトの目的が達成できるよう手助けする</strong>のがウェブデザインの大事なところ。</blockquote>
+    <blockquote>クライアントは自己発信したい、ユーザーは欲しい情報が知りたい。<strong>そのズレを埋めるのがウェブデザイナーの本当のスキル。</strong></blockquote>
+    <blockquote><strong>みんなに買ってほしい商品は、みんな買わない。</strong>分かりづらいから。</blockquote>
+    <blockquote>最初からユニークやオリジナルを目指すと激ムズ。<strong>まずは模写しろ。</strong></blockquote>
+    <blockquote>自分でやるからいいやってなると、爪が甘くなる。<strong>違う人が見る前提で作れ。</strong></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-19｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

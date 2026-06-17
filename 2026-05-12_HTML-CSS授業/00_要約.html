@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブロック/インライン・色指定3種・DevTools・デザイン4大原則｜2026年5月12日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月12日｜講師：A先生</div>
+  <h1>ブロック/インライン・色指定3種・DevTools・デザイン4大原則</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 4時間40分</span>
+    <span>📖 HTML本70-71p / Webデザイン本10-17p ＋ Figma板書</span>
+    <span>🎯 ブロック/インライン・DevTools・ページ構造・4大原則・画像形式・色指定3種</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="callout primary" style="margin-top: 40px;">
+    <span class="label">📌 今日のひとことまとめ</span>
+    <p style="margin:0; font-size:18px; line-height:1.85;">
+      テーマは <strong>「ブロック要素とインライン要素」「色の指定3種類」「デベロッパーツール」</strong>。<br>
+      かんたんに言うと <mark>「タグには『塊タイプ（ブロック）』と『文中タイプ（インライン）』の2種類がある」「色は #ff0000 か rgb() か rgba() で指定する」「F12を押すとブラウザに開発者ツールが出て、その場でCSSを試せる」</mark>という話です。
+    </p>
+  </div>
+
+  <nav class="toc" style="margin-top: 40px;">
+    <h2>📑 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（1日の流れ）</a></li>
+      <li><a href="#must">今日おさえる10個</a></li>
+      <li><a href="#block-inline">ブロック要素 vs インライン要素</a></li>
+      <li><a href="#devtools">デベロッパーツール（F12）</a></li>
+      <li><a href="#page-structure">ウェブページの構造</a></li>
+      <li><a href="#four-principles">デザインの4大原則</a></li>
+      <li><a href="#zf">Z型・F型視線</a></li>
+      <li><a href="#image">画像の種類（ビットマップ vs ベクター）</a></li>
+      <li><a href="#monitor">モニターと画像サイズ</a></li>
+      <li><a href="#color">色の指定（3種類）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">チェックリスト</a></li>
+      <li><a href="#quotes">先生の名言</a></li>
+    </ol>
+  </nav>
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <p>行をクリックでその説明へジャンプ。★が多いほど大事。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:90px">時刻</th><th>内容</th><th style="width:80px" class="center">大事さ</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><a href="#block-inline">00:01</a></td><td><a href="#block-inline"><strong>ブロック要素・インライン要素</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#devtools">00:15</a></td><td><a href="#devtools"><strong>デベロッパーツール起動（F12）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#devtools">01:00</a></td><td><a href="#devtools">CSS実験・優先度の確認・日本語化</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">01:38</td><td>お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#page-structure">02:28</a></td><td><a href="#page-structure"><strong>ウェブページの構造（教科書14-15p）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#four-principles">02:31</a></td><td><a href="#four-principles"><strong>デザインの4大原則</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#zf">02:44</a></td><td><a href="#zf">Z型・F型視線</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#page-structure">02:57</a></td><td><a href="#page-structure">カラム数（1/2/3カラム）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#image">03:24</a></td><td><a href="#image"><strong>画像の種類（ビットマップ vs ベクター）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#monitor">03:32</a></td><td><a href="#monitor"><strong>モニターと画像サイズ（重い原因No.1）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#color">03:43</a></td><td><a href="#color"><strong>RGBの書き方</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">04:00</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#color">04:18</a></td><td><a href="#color"><strong>RGBA（透明度）・16進数</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#color">04:31</a></td><td><a href="#color">略記（#f00）・16進数では透明度不可</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">04:39</td><td>授業終了</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <div class="card-grid">
+      <a href="#block-inline" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">1</span><h4>ブロック要素</h4><p>塊タイプ。幅高さ指定可、無指定で<mark>親幅いっぱい</mark>。</p></div></a>
+      <a href="#block-inline" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">2</span><h4>インライン要素</h4><p>文中タイプ。テキスト分の幅、改行しない。</p></div></a>
+      <a href="#devtools" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">3</span><h4>F12でDevTools</h4><p>その場でCSSを試せる魔法のツール。</p></div></a>
+      <a href="#devtools" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">4</span><h4>CSS優先度の確認</h4><p>チェックを外して打ち消しチェーンを見る。</p></div></a>
+      <a href="#page-structure" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">5</span><h4>ページ構造</h4><p>ヘッダー・ナビ・メイン・フッター。カラム数。</p></div></a>
+      <a href="#four-principles" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">6</span><h4>デザイン4大原則</h4><p>近接・整列・反復・対比。</p></div></a>
+      <a href="#image" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">7</span><h4>画像2種類</h4><p>写真=JPEG等、ロゴ=SVG。</p></div></a>
+      <a href="#monitor" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">8</span><h4>重い原因No.1</h4><p>画像サイズ未調整。事前にリサイズ。</p></div></a>
+      <a href="#color" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">9</span><h4>色の3種類</h4><p>16進数 / rgb() / rgba()。</p></div></a>
+      <a href="#color" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">10</span><h4>透明度はrgbaのみ</h4><p>16進数では透明度を指定できない。</p></div></a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="block-inline">
+    <h2 class="section-title"><span class="icon">🧩</span>ブロック要素 vs インライン要素</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        タグには2つのタイプがあります。<br>
+        <strong>ブロック要素＝「四角い塊」</strong>（段ボール箱のイメージ）。<strong>インライン要素＝「文の中の一部分」</strong>（マーカーで引く感じ）。
+      </p>
+    </div>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary); border-bottom-color:var(--primary);">📦 ブロック要素</h4>
+        <ul>
+          <li><code>div p header main nav footer h1〜h6</code></li>
+          <li>幅・高さを<strong>CSSで指定できる</strong></li>
+          <li>指定しないと<mark>親要素の幅いっぱい</mark>（最終的にbody幅）</li>
+          <li>後ろで段落が落ちる</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent); border-bottom-color:var(--accent);">📝 インライン要素</h4>
+        <ul>
+          <li><code>span strong small</code></li>
+          <li>幅・高さ指定<strong>できない</strong>（一部例外）</li>
+          <li>テキストの分だけの幅</li>
+          <li><mark>改行されない</mark>（文中に並ぶ）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="label">⚠️ 例外タグ</span>
+      <p style="margin:0;"><code>img</code>＝インラインなのに幅高さ指定OK。<code>a</code>＝親のタイプを引き継ぐ。この2つだけ特別、と覚える。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="devtools">
+    <h2 class="section-title"><span class="icon">🛠</span>デベロッパーツール（F12）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ブラウザに最初から付いている<strong>「中身を調べる・その場で試す」道具</strong>。<br>
+        <mark>F12 か 右クリック→検証</mark>で出ます。コーディング力はこれの使いこなしで決まります。
+      </p>
+    </div>
+    <ul class="bullet-pro">
+      <li>左にHTML、右に効いているCSSが見える</li>
+      <li><strong>CSSを直接書き換えて実験</strong>できる（保存はされない＝安全）</li>
+      <li>チェックボックスを外すと一時的に無効化 → <mark>どのCSSが優先か（打ち消しチェーン）が見える</mark></li>
+      <li>歯車 → Language → Japanese で<strong>日本語化</strong>できる</li>
+      <li>表示位置は右/下/別ウィンドウから選べる（下が見やすい）</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">✅ プロのやり方</span>
+      <p style="margin:0;">DevToolsで色・余白をリアルタイム調整 → 「これだ」と決まったらVSCodeにコピペ。試行錯誤の時間が激減します。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="page-structure">
+    <h2 class="section-title"><span class="icon">🧱</span>ウェブページの構造</h2>
+    <div style="background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:22px; margin:20px 0;">
+      <div style="background:#fff4e0; padding:12px 18px; border-left:5px solid var(--accent); margin-bottom:8px; border-radius:0 6px 6px 0;"><strong>① ヘッダー</strong>：ロゴ・ナビ・検索窓</div>
+      <div style="background:#f0f7ff; padding:12px 18px; border-left:5px solid var(--primary); margin:8px 0; border-radius:0 6px 6px 0;"><strong>② グローバルナビ</strong>：サイト内リンク（基本ヘッダー内）</div>
+      <div style="background:#f0f7ff; padding:12px 18px; border-left:5px solid var(--primary); margin:8px 0; border-radius:0 6px 6px 0;"><strong>③ メインカラム</strong>：メイン内容（画像・カルーセル・地図など）</div>
+      <div style="background:#e7f5ec; padding:12px 18px; border-left:5px solid var(--success); margin-top:8px; border-radius:0 6px 6px 0;"><strong>④ フッター</strong>：コピーライト・リンク</div>
+    </div>
+    <h3>カラム数</h3>
+    <div class="card-grid">
+      <div class="card"><h4 style="color:var(--success);">1カラム</h4><p>1列。<strong>スマホ対応が楽</strong>。初心者推奨。</p></div>
+      <div class="card"><h4 style="color:var(--accent);">2カラム</h4><p>メイン＋サイド。コーポレートサイト。</p></div>
+      <div class="card"><h4 style="color:var(--danger);">3カラム</h4><p>情報量多いサイト。スマホ対応大変。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="four-principles">
+    <h2 class="section-title"><span class="icon">📐</span>デザインの4大原則</h2>
+    <p>デザインの<strong>土台中の土台</strong>。これを意識するだけで読みやすさが激変します。</p>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>近接（Proximity）</h4><p>関係ある要素は<strong>近づける</strong>、関係ないものは離す。</p></div>
+      <div class="card"><span class="num">2</span><h4>整列（Alignment）</h4><p>端や中心を<strong>そろえる</strong>。バラバラはNG。</p></div>
+      <div class="card"><span class="num">3</span><h4>反復（Repetition）</h4><p>同じパターンを<strong>くり返す</strong>。一貫性で信頼感。</p></div>
+      <div class="card"><span class="num">4</span><h4>対比（Contrast）</h4><p>差をつけて<strong>強弱</strong>。見出しは大きく太く。</p></div>
+    </div>
+    <blockquote>これはウェブに限らず<strong>部屋の整理整頓にも使えるレベル</strong>。引き出しのフォークとスプーンと箸が整理されてますか？それと同じ話。<span class="citation">— A先生</span></blockquote>
+  </section>
+
+  <hr class="divider">
+
+  <section id="zf">
+    <h2 class="section-title"><span class="icon">👁</span>Z型・F型視線</h2>
+    <p>人の目は <strong>Z や F の形</strong>に動きます（5/11で詳しくやった内容の復習）。</p>
+    <div class="compare">
+      <div class="compare-col"><h4 style="color:var(--accent);border-bottom-color:var(--accent);">Z型</h4><ul><li>初めて見るサイト全体をざっと見る</li><li>左上→右上→左下→右下</li></ul></div>
+      <div class="compare-col"><h4 style="color:var(--primary);border-bottom-color:var(--primary);">F型</h4><ul><li>記事など読むとき</li><li>左から右、少し下げてまた左から</li></ul></div>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">大事な情報は左上〜左寄りに。コンビニの陳列と同じ原則。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="image">
+    <h2 class="section-title"><span class="icon">🖼</span>画像の種類（ビットマップ vs ベクター）</h2>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--accent); border-bottom-color:var(--accent);">📷 ビットマップ（写真系）</h4>
+        <ul>
+          <li>JPEG / PNG / GIF / WebP</li>
+          <li>小さい点の集まり</li>
+          <li>拡大すると<mark>荒くなる</mark></li>
+          <li>写真・複雑な色が得意</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--primary); border-bottom-color:var(--primary);">📐 ベクター（図形系）</h4>
+        <ul>
+          <li>SVG</li>
+          <li>数式で描く</li>
+          <li>拡大しても<mark>荒れない</mark></li>
+          <li>ロゴ・アイコンが得意</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">Web用は解像度72dpi・RGB。CMYKは印刷用なので無視でOK。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="monitor">
+    <h2 class="section-title"><span class="icon">🖥</span>モニターと画像サイズ</h2>
+    <div class="callout primary">
+      <span class="label">🔥 サイトが重い原因 No.1</span>
+      <p style="margin:0;">
+        <strong>画像のサイズ調整をしていない</strong>こと。<br>
+        1500pxの画像をCSSで300pxに縮小して使うと、フォルダが膨らんで<mark>読み込みが遅くなる</mark>。「使うサイズに事前リサイズ」が鉄則。
+      </p>
+    </div>
+    <ul class="bullet-pro">
+      <li>サムネ等＝実寸サイズ（300pxなど）でOK</li>
+      <li>メインビジュアル＝モニターの1.5〜2倍を用意（3000px級）</li>
+      <li>主なモニター：フルHD 1920×1080 が最多</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="color">
+    <h2 class="section-title"><span class="icon">🎨</span>色の指定（3種類）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        CSSで色を指定する方法は3つ。<strong>① 16進数 <code>#ff0000</code>　② RGB <code>rgb(255,0,0)</code>　③ RGBA <code>rgba(255,0,0,0.5)</code>（透明度つき）</strong>。
+      </p>
+    </div>
+
+    <div class="callout success">
+      <span class="label">🟠 先生の板書（Figma）の図解</span>
+      <p style="margin:0;">下が先生の手書き板書です。<strong>rgb(赤の値, 緑の値, 青の値)</strong> で各0〜255。<code>rgb(255,0,0)=赤</code>、<code>rgb(255,255,255)=白</code>、<code>rgb(0,0,0)=黒</code>。RGBAの4つ目「アルファ」＝<mark>不透明度</mark>。16進数は <code>#000000=黒 / #ffffff=白 / #ff0000=赤</code>。</p>
+    </div>
+
+    <h3>図解（先生の板書をそのまま）</h3>
+    <figure style="margin:8px 0 22px;">
+    <img src="img/iro_kimekata.png" alt="先生の板書：色の決め方 rgb/16進数" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：rgb()と16進数の手書き解説（rgb(255,0,0)=赤 など）</figcaption>
+  </figure>
+
+    <h3>① 16進数（いちばん使う）</h3>
+<pre><span class="selector">p</span> <span class="punct">{</span> <span class="property">color</span><span class="punct">:</span> <span class="value">#ff0000</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* 赤 */</span></pre>
+    <p><code>#</code> の後 2桁ずつが R・G・B。各 <code>00〜FF</code>（＝0〜255）。略記もOK：<code>#ff0000</code> → <code>#f00</code>。</p>
+
+    <h3>② RGB</h3>
+<pre><span class="selector">.t</span> <span class="punct">{</span> <span class="property">color</span><span class="punct">:</span> <span class="value">rgb(255, 0, 0)</span><span class="punct">;</span> <span class="punct">}</span></pre>
+    <p><strong>RGBは混ぜると白くなる</strong>（光の三原色）。絵の具（CMYK）は混ぜると黒。逆です。</p>
+
+    <h3>③ RGBA（透明度つき）</h3>
+<pre><span class="selector">.overlay</span> <span class="punct">{</span> <span class="property">background</span><span class="punct">:</span> <span class="value">rgba(0, 0, 0, 0.5)</span><span class="punct">;</span> <span class="punct">}</span></pre>
+    <div class="callout">
+      <span class="label">⚠️ 透明度はRGBAのみ</span>
+      <p style="margin:0;">アルファ値：<code>0</code>＝透明、<code>0.5</code>＝半透明、<code>1</code>＝不透明。<strong>16進数では透明度を指定できない</strong>ので、透明にしたい時は <code>rgba()</code> を使う。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">色決めは Google「カラーピッカー」や Coolors が便利。モニターによって色は微妙に違って見えるので注意。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ブロック要素</strong></td><td>四角い塊。幅高さ指定可、後ろで改行</td></tr>
+          <tr><td><strong>インライン要素</strong></td><td>文中の一部。改行しない</td></tr>
+          <tr><td><strong>デベロッパーツール</strong></td><td>ブラウザの調査・実験ツール（F12）</td></tr>
+          <tr><td><strong>カラム</strong></td><td>列。1/2/3カラム</td></tr>
+          <tr><td><strong>近接・整列・反復・対比</strong></td><td>デザイン4大原則</td></tr>
+          <tr><td><strong>ビットマップ</strong></td><td>JPEG/PNG等。点の集まり</td></tr>
+          <tr><td><strong>ベクター</strong></td><td>SVG。数式で描く、荒れない</td></tr>
+          <tr><td><strong>16進数</strong></td><td><code>#ff0000</code> の色表記</td></tr>
+          <tr><td><strong>RGB</strong></td><td><code>rgb(255,0,0)</code>。混ぜると白</td></tr>
+          <tr><td><strong>RGBA</strong></td><td>RGB＋透明度。<code>rgba(0,0,0,0.5)</code></td></tr>
+          <tr><td><strong>アルファ</strong></td><td>不透明度（0=透明〜1=不透明）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li><strong>ブロック要素は無指定で親幅いっぱい</strong>を覚える</li>
+      <li>インライン要素はテキスト分の幅・改行しない</li>
+      <li><code>img</code> と <code>a</code> の例外を覚える</li>
+      <li><strong>F12でDevTools</strong>を起動して色を変えて遊ぶ</li>
+      <li>DevToolsを<strong>日本語化</strong>する</li>
+      <li><strong>デザイン4大原則</strong>を言える（近接・整列・反復・対比）</li>
+      <li>ビットマップとベクターの使い分けを1行で言える</li>
+      <li><strong>サイト重い原因No.1＝画像サイズ</strong>を意識</li>
+      <li><strong>色の3種類</strong>（#hex / rgb / rgba）を書ける</li>
+      <li><strong>透明度はrgbaのみ</strong>を覚える</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言</h2>
+    <blockquote>RGBは混ぜれば混ぜるほど<strong>白くなる</strong>。絵の具とは逆。デジタルの色は光の足し算。</blockquote>
+    <blockquote><strong>サイトが重たくなる理由の初心者第1位は、画像のサイズ調整をしてないこと。</strong>メモっといてください。</blockquote>
+    <blockquote>デザインの4大原則は<strong>部屋の整理整頓にも使える</strong>レベル。日常からアンテナを張って。</blockquote>
+    <blockquote>最新技術が正しいかというと<strong>そうでもない</strong>。ブラウザのバージョン違いで崩れることがある。一生付き合う話。</blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-19｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

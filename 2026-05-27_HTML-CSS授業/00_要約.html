@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS変数（カスタムプロパティ）とCSS関数（calc / min / max / clamp）｜2026年5月27日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月27日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>CSS変数（カスタムプロパティ）とCSS関数（calc / min / max / clamp）</h1>
+  <p class="subtitle">訓練校 IT スクール｜全2時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 1時間17分</span>
+    <span>📖 ポートフォリオ講師例＋CSS変数・関数の解説</span>
+    <span>🎯 カスタムプロパティ, CSS変数, :root, var(), --, リキッドレイアウト, calc, min, max, clamp, 100vh計算, リセットCSSと役割分担, 一括管理, わざと変数を使わない場所</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>今日の流れ</h2>
+    <div class="callout primary">
+      <span class="label">💡 今日のテーマ</span>
+      <p style="margin:0;">
+        昨日のポートフォリオ（Nekota Koharu）<strong>講師例の解説</strong>を入口に、新ネタは<mark>「CSS変数（カスタムプロパティ）」と「CSS関数（calc / min / max / clamp）」</mark>。どちらも<strong>サイト全体を一括管理する</strong>ための強力ツール。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>導入</td><td><a href="#review">ポートフォリオ講師例の見せ方（リセット／スタイル／顧問の3分割）</a></td></tr>
+          <tr><td>1時間目</td><td><a href="#var">CSS変数（カスタムプロパティ）</a></td></tr>
+          <tr><td>1時間目</td><td><a href="#var-rule">変数の書き方ルール（:root / -- / var）</a></td></tr>
+          <tr><td>2時間目</td><td><a href="#func">CSS関数 calc()</a></td></tr>
+          <tr><td>2時間目</td><td><a href="#minmax">min() / max() / clamp()</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li>CSS変数（カスタムプロパティ）＝<strong>サイト全体で使い回す値を1か所で管理</strong></li>
+      <li>定義は <code>:root { --name: value; }</code>（<code>:root</code>は<code>html</code>と同じ）</li>
+      <li>名前は<strong>ハイフン2つ <code>--</code></strong> から始める</li>
+      <li>適用は <code>var(--name)</code></li>
+      <li>書き場所はstyle.cssの<strong>上部</strong>（@charset直下）。<mark>リセットCSSには書かない</mark>（役割が違う）</li>
+      <li>色だけでなく <strong>px / rem / 余白</strong> も登録できる</li>
+      <li>⚠️ <strong>わざと適用しない場所</strong>もある（一括変更で巻き込まれたくない値）</li>
+      <li><code>calc()</code>＝CSS内で計算（<code>+ - * /</code>）。掛け算は<strong><code>*</code>（アスタリスク）</strong></li>
+      <li><code>min()</code> / <code>max()</code> / <code>clamp()</code> で<mark>画面幅に応じた可変サイズ</mark>（リキッドレイアウト）</li>
+      <li>これらが使えると<strong>修正・A案/B案・チーム作業</strong>が格段に楽になる</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="review">
+    <h2 class="section-title"><span class="icon">📂</span>ポートフォリオ講師例の見せ方</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        昨日コーディングしたポートフォリオ（Nekota Koharu）の講師例。先生のCSSは<strong>3ファイル構成</strong>：
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:160px">ファイル</th><th>役割</th></tr></thead>
+        <tbody>
+          <tr><td><code>reset.css</code></td><td>ブラウザの初期スタイルを打ち消す</td></tr>
+          <tr><td><code>style.css</code></td><td>各セクションの個別設定（上書き用）</td></tr>
+          <tr><td><code>common.css</code></td><td>全体設定寄り（このページの中から見られる共通CSS）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>ファイルの<strong>役割を自分で決めて、書くものをぶらさない</strong>のが現場のコツ。1枚にまとめてもOK、複数に分けてもOK。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="var">
+    <h2 class="section-title"><span class="icon">🎨</span>CSS変数（カスタムプロパティ）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        例えば緑 <code>#29556a</code> をサイト内の3〜4箇所で使うとき、<strong>毎回コピペするのではなく</strong>、<mark>「green」という名前で1か所に登録</mark>しておけば、そこを変えるだけで全部に反映される。これが<strong>カスタムプロパティ（CSS変数）</strong>。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/custom_properties.png" alt="先生の板書：CSSのカスタムプロパティの書き方（:root に色とサイズの変数を定義、var()で適用）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：<code>:root</code>（＝html）にハイフン2つ＋名前で色（--black/--white/--green等）とサイズ（--size-xs〜5xl）を定義。右の例は <code>var(--size-s)</code> や <code>var(--green1)</code> で使い回す</figcaption>
+    </figure>
+
+    <h3>なぜ便利？（メリット3つ）</h3>
+    <ul class="bullet-pro">
+      <li><strong>修正が一撃</strong>：色を変えたい時、変数の値を1か所変えるだけで全箇所反映</li>
+      <li><strong>A案・B案の出し分け</strong>：「やっぱり水色で」「次は赤で」が瞬時にできる</li>
+      <li><strong>チーム作業・大規模サイトの整理整頓</strong>：膨大なページ量でも統一できる</li>
+    </ul>
+    <div class="callout">
+      <span class="label">⚠️ VSコードの一括置換でいいんじゃない？ → ヒューマンエラーの温床</span>
+      <p style="margin:0;">「<code>#29556a</code> を全部置換」しようとして<strong>関係ないところまで変えちゃう</strong>事故が多い。変数なら最初から安全。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="var-rule">
+    <h2 class="section-title"><span class="icon">📜</span>変数の書き方ルール</h2>
+
+    <h3>① 定義（:root に書く）</h3>
+<pre><span class="selector">:root</span> <span class="punct">{</span>
+    <span class="property">--green</span><span class="punct">:</span> <span class="value">#29556a</span><span class="punct">;</span>       <span class="comment">/* 色 */</span>
+    <span class="property">--size-m</span><span class="punct">:</span> <span class="value">1rem</span><span class="punct">;</span>        <span class="comment">/* 16px（ブラウザ基準） */</span>
+    <span class="property">--size-xl</span><span class="punct">:</span> <span class="value">1.5rem</span><span class="punct">;</span>     <span class="comment">/* 24px */</span>
+<span class="punct">}</span></pre>
+    <ul class="bullet-pro">
+      <li><code>:root</code>＝<strong>html要素と同じ</strong>。プロジェクト全体で変数が使えるようになる定石</li>
+      <li>変数名は<strong>ハイフン2つ <code>--</code></strong> から始める（これがCSS変数の目印）</li>
+      <li>他のセレクター（<code>.section</code> 等）に書くこともできるが、<mark>適用範囲がそのセレクター内に限定</mark>されて使いづらい→基本<code>:root</code>でOK</li>
+    </ul>
+
+    <h3>② 適用（var() で呼び出す）</h3>
+<pre><span class="selector">.section-title span</span> <span class="punct">{</span>
+    <span class="property">font-size</span><span class="punct">:</span> <span class="value">var(--size-s)</span><span class="punct">;</span>
+    <span class="property">color</span><span class="punct">:</span> <span class="value">var(--green)</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout warn">
+      <span class="label">⚠️ リセットCSSには書かない！</span>
+      <p style="margin:0;">リセットCSSは「ブラウザの差をなくす」役割。変数はサイトのプロジェクト管理。<mark>役割が違うので混ぜない</mark>。書くなら<code>style.css</code>の<strong>上部</strong>（<code>@charset "UTF-8";</code>の直下）。「定義より下で使う」のが論理的。</p>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">⚠️ わざと適用しないところもある</span>
+      <p style="margin:0;">例：ボタンの <code>padding: 48px</code> を「絶対に変えたくない」場所では、<mark>あえて変数を使わず直書き</mark>。一括変更の巻き添えを防ぐため。「どこに変数を入れるか」はデザインを見ながら判断する。</p>
+    </div>
+
+    <div class="callout success">
+      <span class="label">📌 補足：Figmaから自動書き出しもできる</span>
+      <p style="margin:0;">Figmaの<strong>有料版＋プラグイン</strong>で、登録している色・フォントをCSS変数として一括書き出しできる。今は練習なので手書きだが、現場ではよく使うツール。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="func">
+    <h2 class="section-title"><span class="icon">🧮</span>CSS関数 calc()</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <code>calc()</code> はCSSの値の中で<strong>計算ができる</strong>関数。<mark>足し算・引き算・掛け算・割り算</mark>を組み合わせて、状況に応じた動的な値を作れる。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/calc_example.png" alt="先生の板書：css関数の例（mainvisualの高さを calc(100vh - 46px - var(--size-xl) * 2) で動的計算）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：<code>height: calc(100vh - 46px - (var(--size-xl) * 2))</code> ＝ 画面高さ − ヘッダー高さ − 上下paddingぶん。これで<strong>ヘッダーとメインビジュアルがちょうど画面いっぱい</strong>に収まる</figcaption>
+    </figure>
+
+    <h3>なぜcalc()が必要？</h3>
+    <p>「ヘッダーの下に画面いっぱいのメインビジュアル」を作りたい時、<strong>固定値（例：900px）では作れない</strong>。なぜなら：</p>
+    <ul class="bullet-pro">
+      <li>デバイス・モニターごとに画面の高さが違う</li>
+      <li>ブラウザのブックマークバーの有無で表示領域が変わる</li>
+      <li>「画面の高さ」は人によって違うので、<mark>引き算で動的に出す</mark>しかない</li>
+    </ul>
+<pre><span class="selector">.mainvisual</span> <span class="punct">{</span>
+    <span class="comment">/* header と mv を画面いっぱいに表示させている */</span>
+    <span class="property">height</span><span class="punct">:</span> <span class="value">calc(100vh - 46px - (var(--size-xl) * 2))</span><span class="punct">;</span>
+    <span class="comment">/*           画面高 − ヘッダー − padding分(24px×2) */</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout">
+      <span class="label">📌 掛け算は <code>*</code>（アスタリスク）</span>
+      <p style="margin:0;">JSやプログラミング言語と同じで、CSSの<code>calc()</code>内でも<strong>掛け算は <code>*</code></strong>。<code>×</code> ではない。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">※CSS変数と組み合わせると <code>calc(100vh - var(--header-h))</code> のようにさらに柔軟に。なお完全ピッタリにはJSが必要（CSSだけだと数pxのズレは残る）。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="minmax">
+    <h2 class="section-title"><span class="icon">📏</span>min() / max() / clamp()</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        画面幅に応じてサイズを<strong>柔軟に変える</strong>関数たち。これらが使えると「リキッドレイアウト」（様々な画面幅にぬるっと対応するデザイン）が作れる。今すぐ全部使えなくてOK、まず<code>calc</code>から。
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:180px">関数</th><th>意味</th><th>例</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>min(a, b)</code></td>
+            <td><strong>引数の最小値</strong>を取る → <mark>最大値の設定</mark>として使える</td>
+            <td><code>width: min(500px, 50%);</code><br><span style="font-size:13px;color:var(--text-soft);">＝最大500pxで50%保持</span></td>
+          </tr>
+          <tr>
+            <td><code>max(a, b)</code></td>
+            <td><strong>引数の最大値</strong>を取る → <mark>最小値の設定</mark>として使える</td>
+            <td><code>width: max(500px, 50%);</code><br><span style="font-size:13px;color:var(--text-soft);">＝最小500pxで50%保持</span></td>
+          </tr>
+          <tr>
+            <td><code>clamp(最小, 推奨, 最大)</code></td>
+            <td>3つの間で<strong>挟む</strong>。最小〜最大の範囲で推奨値を取る</td>
+            <td><code>font-size: clamp(2.375rem, 5%, 5.125rem);</code><br><span style="font-size:13px;color:var(--text-soft);">＝最小〜最大の範囲で画面幅に応じた文字サイズ</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <span class="label">🔑 clamp() でフォントサイズを可変に</span>
+      <p style="margin:0;">「<strong>200pxは下回らない・1000pxは超えない・その間は50%</strong>」のように、画面幅に追従しつつ上限下限を持つ柔軟なサイズが書ける。<code>width: clamp(200px, 50%, 1000px);</code></p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">「むず」レベルなのは事実。今すぐ全部使えなくてOK、まず<code>calc</code>→慣れたら<code>clamp</code>あたりが書けると一気にデザインの幅が広がる。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:240px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>カスタムプロパティ / CSS変数</strong></td><td>再利用可能な値を1か所で管理する仕組み</td></tr>
+          <tr><td><strong>:root</strong></td><td>html要素と同じ。変数定義の定石セレクター</td></tr>
+          <tr><td><strong>-- (ハイフン2つ)</strong></td><td>CSS変数の名前の頭につける目印</td></tr>
+          <tr><td><strong>var(--name)</strong></td><td>定義した変数を呼び出す関数</td></tr>
+          <tr><td><strong>calc()</strong></td><td>CSSの値内で計算（+ - * /）</td></tr>
+          <tr><td><strong>* (アスタリスク)</strong></td><td>掛け算の記号（×ではない）</td></tr>
+          <tr><td><strong>min(a, b)</strong></td><td>引数の最小値＝最大値の設定として使える</td></tr>
+          <tr><td><strong>max(a, b)</strong></td><td>引数の最大値＝最小値の設定として使える</td></tr>
+          <tr><td><strong>clamp(min, 推奨, max)</strong></td><td>3値で挟み込み。リキッドレイアウトの主役</td></tr>
+          <tr><td><strong>リキッドレイアウト</strong></td><td>画面幅に応じて柔軟に変わるレイアウト</td></tr>
+          <tr><td><strong>100vh</strong></td><td>ビューポート（画面）の高さ100%</td></tr>
+          <tr><td><strong>reset / style / common.css</strong></td><td>CSS3分割の役割：初期化／個別／全体</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>CSS変数は <code>:root { --name: value; }</code> で定義、<code>var(--name)</code> で適用</li>
+      <li>変数名は<strong>ハイフン2つ</strong>から始める</li>
+      <li>定義場所は <code>style.css</code> の<strong>上部</strong>（リセットCSSには書かない）</li>
+      <li>色だけでなく <code>px / rem / 余白</code> も変数化できる</li>
+      <li><strong>わざと変数を使わない場所</strong>もある（一括変更の巻き添え防止）</li>
+      <li><code>calc()</code> で計算（掛け算は <code>*</code>）</li>
+      <li>「画面いっぱい」は <code>height: calc(100vh - ヘッダー − padding)</code> で作れる</li>
+      <li><code>min()</code> ＝最大値の設定として使える</li>
+      <li><code>max()</code> ＝最小値の設定として使える</li>
+      <li><code>clamp(min, 推奨, max)</code> でフォントサイズを画面幅に追従させる</li>
+      <li>残り時間は引き続きポートフォリオ制作＋できた人は変数で書き直し</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>リセットCSSにこいつ（カスタムプロパティ）を書いてる人がいたら、センスないと思ってください。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 役割を混ぜるな、という戒め。リセットは初期化、変数はプロジェクト管理。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>定義したものを適用するので、書くなら上の方かなと思いますね。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ プログラミングの基本：先に宣言してから使う。論理の自然な順序。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>calc関数を使わずにどうやってやるか分かる人がいたら是非教えてほしい。私には分からないので。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 画面ぴったり高さの実装はcalcなしには無理、ということ。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-29｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

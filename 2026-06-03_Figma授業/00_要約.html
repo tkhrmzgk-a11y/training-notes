@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma 4日目：ポートフォリオ完成（タグ・マスク・CSS設計）｜2026年6月3日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月3日｜講師：A先生</div>
+  <h1>Figma 4日目：ポートフォリオ完成（タグ・マスク・CSS設計）</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 1時間48分（実習デー・前半）</span>
+    <span>📖 教科書 124〜148p</span>
+    <span>🎯 タグ/バリアント・ネストインスタンス・マスク・CSS設計</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    Figma 4日目は、昨日の続きで<strong>ポートフォリオサイトを完成</strong>させた回。<strong>ワークス（カード＋タグのバリアント）→ アバウト（マスク）→ 仕上げ</strong>まで。
+    そして今日の山場は、デザインそのものより<strong>「このデザインをHTML/CSSでどう書くか」というコーディング設計の話</strong>。
+    とくに<strong>共通クラス＋ユニーククラスで余白を上書きする考え方</strong>と、<strong>「Figmaの数字（480px）を鵜呑みにしない」</strong>が重要。
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#works-tag">ワークス：タグをバリアントで切り替え</a></li>
+      <li><a href="#nested-instance">ネストされたインスタンス（新機能）</a></li>
+      <li><a href="#works-layout">3カラムの配置・ラッパーとコンテナ</a></li>
+      <li><a href="#mask">アバウト：マスク（画像の切り抜き）</a></li>
+      <li><a href="#about-text">480pxは絶対指定しない</a></li>
+      <li><a href="#css-design">CSS設計：共通クラス＋ユニーク上書き</a></li>
+      <li><a href="#class-vs-id">class と id の使い分け</a></li>
+      <li><a href="#finishing">仕上げ（サイズの自動調整・最終チェック）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>時刻をクリックすると、その内容の詳しい解説に飛べます。<span class="star">★★★</span>＝特に重要。<br>
+    ※録画は約1時間48分（ワークス〜アバウト〜仕上げ）。3時間目以降は制作時間のため録画停止。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#works-tag">00:01</a></td><td><a href="#works-tag">ワークスセクション（教科書124p〜）昨日の続き</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#works-tag">00:02</a></td><td><a href="#works-tag">タグの作り方2通り（教科書方式 vs カード直接バリアント）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#works-tag">00:04</a></td><td><a href="#works-tag">カードに直接バリアント＋テキストプロパティ</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#works-tag">00:07</a></td><td><a href="#works-tag">バリアントを横並びにするテク・名前をリアルに</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#works-layout">00:10</a></td><td><a href="#works-layout">カード6つを3カラムで配置</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#works-layout">00:13</a></td><td><a href="#works-layout">グリッドだと1FRで伸びる→横並び2つが楽</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#works-layout">00:20</a></td><td><a href="#works-layout">画像はエクスポート→塗りで配置</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#works-layout">00:25</a></td><td><a href="#works-layout">ワークスラッパー→セクション（上下160）・ラッパーとコンテナ</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">00:38</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#nested-instance">00:49</a></td><td><a href="#nested-instance">ネストされたインスタンス（新機能の紹介）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#mask">00:56</a></td><td><a href="#mask">アバウトセクション（138p）・マスク（139p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#mask">01:00</a></td><td><a href="#mask">レイヤー移動ショートカット・マスクとしての使用</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#about-text">01:04</a></td><td><a href="#about-text">タイトル32／説明16・幅480px</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#about-text">01:09</a></td><td><a href="#about-text">★480pxは絶対指定しない（鵜呑みにしない）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#css-design">01:16</a></td><td><a href="#css-design">★CSS設計：共通クラス＋ユニークで上書き</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#class-vs-id">01:23</a></td><td><a href="#class-vs-id">class と id の使い分け（質問）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#finishing">01:27</a></td><td><a href="#finishing">フッター配置・制作順は人それぞれ</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#finishing">01:29</a></td><td><a href="#finishing">サイズの自動調整（148p）・最終チェック</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">01:33</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#homework">01:44</a></td><td><a href="#homework">3時間目以降は制作時間（MDN Tours等の再現課題）</a></td><td class="center"><span class="star">★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>タグはバリアントで切替</h4><p>カードのタグ（グラフィック/ウェブ/UI）を<strong>バリアント</strong>で切り替え、文言は<strong>テキストプロパティ</strong>で。</p></div>
+      <div class="card"><span class="num">2</span><h4>バリアントを横並びに</h4><p>バリアントは下に増える。大枠のコンポーネントに<strong>オートレイアウトを横付け</strong>すると横並びにできる。</p></div>
+      <div class="card"><span class="num">3</span><h4>ネストされたインスタンス</h4><p>カードもタグもコンポーネント化すると、<strong>カードの外から中のタグも切り替え</strong>られる新機能。</p></div>
+      <div class="card"><span class="num">4</span><h4>3カラムは横並び2つで</h4><p>グリッドのオートレイアウトは中身が <code>1FR</code> で伸びて扱いづらい。<strong>横並び2列の方が楽</strong>。</p></div>
+      <div class="card"><span class="num">5</span><h4>ラッパーとコンテナ</h4><p><strong>コンテナ＝意味的に囲う</strong>／<strong>ラッパー＝とりあえず囲う</strong>。名前で役割を示す。</p></div>
+      <div class="card"><span class="num">6</span><h4>マスク</h4><p>円などの形で<strong>画像を切り抜いて表示</strong>。プロフィールアイコンに使う（マスクグループ）。</p></div>
+      <div class="card"><span class="num">7</span><h4>480pxは絶対指定しない</h4><p>Figmaの幅はあくまで目安。コーディングで <code>width:480px</code> と固定すると小さい画面で破綻する。</p></div>
+      <div class="card"><span class="num">8</span><h4>共通＋ユニークで上書き</h4><p><code>section-container</code>で共通の余白、<code>section-about</code>で<strong>そこだけ上書き</strong>。</p></div>
+      <div class="card"><span class="num">9</span><h4>基本は class、id は限定</h4><p>idは優先度が強すぎて上書きしづらい。<strong>JS連携・ページ内リンク</strong>など限定的に使う。</p></div>
+      <div class="card"><span class="num">10</span><h4>仕上げチェック</h4><p>「サイズの自動調整」で余分な余白を消し、<strong>「範囲の色」</strong>でスタイル抜け（ただの黒）を点検。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== ワークス：タグ ===== -->
+  <section id="works-tag">
+    <h2 class="section-title"><span class="icon">🏷️</span>ワークス：タグをバリアントで切り替え</h2>
+    <p>昨日作った<strong>ワークスアイテム（カード）</strong>の続き（教科書124p〜）。カードには「グラフィックデザイン」などの<strong>タグ</strong>が付く。この作り方には2通りある。</p>
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>① 教科書の方式（126p）</h4>
+        <ul>
+          <li><strong>タグだけ</strong>をコンポーネント化＆バリアント</li>
+          <li>カードにそのインスタンスを入れる</li>
+          <li>タグを他の場所でも使うならこっち</li>
+        </ul>
+      </div>
+      <div class="compare-col right">
+        <h4>② カードに直接バリアント（今回）</h4>
+        <ul>
+          <li><strong>カード自体</strong>にバリアントを3つ持たせる</li>
+          <li>カードを他ページでよく使うならこっち</li>
+          <li>文言は<strong>テキストプロパティ</strong>で変更</li>
+        </ul>
+      </div>
+    </div>
+    <p>今回は②で作成。グラフィック／ウェブ／UIデザインの3パターンをバリアントで用意。<mark>どちらが正解でもなく、使い回し方しだい</mark>。</p>
+    <div class="callout">
+      <span class="label">小ワザ＆注意</span>
+      <ul style="margin:8px 0 0;">
+        <li>バリアントは<strong>下に増えていく</strong>。横並びにしたい時は大枠のコンポーネントに<strong>オートレイアウトを横付け</strong>するとスッキリ。</li>
+        <li>「バリアント2」「プロジェクト1」のままだと分かりにくいので、<strong>必ずリアルな文言に変える</strong>（タグ名・プロジェクト名）。</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== ネストされたインスタンス ===== -->
+  <section id="nested-instance">
+    <h2 class="section-title"><span class="icon">🪆</span>ネストされたインスタンス（新機能）</h2>
+    <p>2時間目に、先生が休憩中に調べてくれた<strong>もっと効率の良い作り方</strong>。教科書が書かれた頃にはなかった、<strong>ここ1年ほどで使えるようになった機能</strong>。</p>
+    <div class="callout primary">
+      <span class="label">仕組み</span>
+      <strong>タグもコンポーネント＋バリアント</strong>にし、<strong>カードもコンポーネント化</strong>。カードの中にタグの<strong>インスタンス</strong>を入れておくと、右パネルに<strong>「ネストされたインスタンス」</strong>が出てくる。
+    </div>
+    <p>これを使うと、<strong>カードのインスタンスの外側から、中に入っているタグのバリアントを直接切り替え</strong>られる。テキストプロパティ（プロジェクト名）とネストされたタグ切り替えが、カード1つの右パネルでまとめて操作できる。</p>
+    <p style="font-size:14px; color:var(--text-soft);">→ メリット：カードもタグも別々に使い回せて、管理が細かくできる。今日は「こういう機能がある」という紹介まで。</p>
+  </section>
+
+  <!-- ===== 3カラム配置 ===== -->
+  <section id="works-layout">
+    <h2 class="section-title"><span class="icon">🔲</span>3カラムの配置・ラッパーとコンテナ</h2>
+    <ul class="bullet-pro">
+      <li>カード6枚を<strong>3カラム×2列</strong>で配置。アイテム幅300・間隔64で揃える。</li>
+      <li><strong>グリッドのオートレイアウトは要注意</strong>：中身が <code>1FR</code> 扱いになって勝手に伸びる。<mark>横並び（フレックス）2列にした方が作りやすい</mark>（コーディングではグリッドでもOK）。</li>
+      <li>画像は6枚<strong>エクスポート→塗りでアップロード</strong>（一括貼り付けは今回うまくいかず、手動で）。</li>
+      <li>全体を <code>ワークスラッパー</code> でまとめ、さらに <code>ワークス</code> セクションで囲んで<strong>上下160・幅1440</strong>。ボタン（View More）も配置（136p）。</li>
+    </ul>
+    <div class="callout">
+      <span class="label">ラッパー と コンテナ の違い</span>
+      どちらも「囲うもの」だが、ニュアンスが違う。<strong>コンテナ＝意味のある囲い方</strong>、<strong>ラッパー＝とりあえず包む</strong>（ラップ＝包む、と同じ）。名前で役割の意図を伝える。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== マスク ===== -->
+  <section id="mask">
+    <h2 class="section-title"><span class="icon">🎭</span>アバウト：マスク（画像の切り抜き）</h2>
+    <p>アバウトセクション（教科書138p〜）。プロフィールの丸いアイコンは<strong>マスク</strong>で作る（139p）。</p>
+    <div class="callout primary">
+      <span class="label">マスクとは</span>
+      <strong>ある形の部分だけを表示して、それ以外を隠す</strong>機能。Photoshopでも多用する。「一部分だけ切り抜いて表示」または「その形以外を隠す」イメージ。
+    </div>
+    <h3>作り方</h3>
+    <ul class="bullet-pro">
+      <li>200pxの円（楕円ツール）を作り、画像の上に置く</li>
+      <li>円を画像の<strong>下のレイヤー（最背面）</strong>に移動 → 円と画像の2つを選択</li>
+      <li>プロパティパネルから<strong>「マスクとしての使用」</strong> → <strong>マスクグループ</strong>になる</li>
+      <li>マスクグループの中の画像を動かせば、<strong>切り抜く位置を後から調整</strong>できる</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">地味に便利なショートカット（レイヤー移動）</span>
+      <code>⌘ + [ ]</code>（Ctrl+[ ]）で1段ずつ前後に移動、<code>[ ]</code> だけで最前面・最背面へ。
+    </div>
+  </section>
+
+  <!-- ===== 480px ===== -->
+  <section id="about-text">
+    <h2 class="section-title"><span class="icon">⚠️</span>480pxは絶対指定しない</h2>
+    <p>アバウトのタイトル（32 Regular）と説明文（16 Regular）。説明文の<strong>テキストボックス幅を480px</strong>にした。ここで超重要なコーディングの注意。</p>
+    <blockquote>480と書いてあるからといって、それを信じちゃいけない。実際にコーディングする時、この説明文（Pタグ）に <code>width: 480px</code> と絶対指定はしません。<span class="citation">── A先生</span></blockquote>
+    <div class="callout">
+      <span class="label">なぜ固定幅にしないのか</span>
+      <code>width:480px</code> と<strong>絶対指定</strong>すると、画面幅が小さいデバイスで<strong>横スクロールが生まれる</strong>。実際は幅を指定せず、<strong>ブレイクポイント</strong>でカラム落ちさせたり、<strong>%（相対指定）</strong>で画面に合わせて折り返す。<mark>Figmaの数字はあくまで目安</mark>。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== CSS設計 ===== -->
+  <section id="css-design">
+    <h2 class="section-title"><span class="icon">🧩</span>CSS設計：共通クラス＋ユニーク上書き</h2>
+    <p>今日いちばんの山場。サービス・ワークスのセクション余白は上下<strong>160px</strong>。でもアバウトだけ<strong>上80／下120</strong>。この「ほとんど同じ、でも1つだけ違う」をHTML/CSSでどう書くか。</p>
+
+    <figure style="margin:22px 0;">
+      <img src="img/css_section_design.png"
+           alt="先生の板書：serviceとworksのsectionは上下160px、aboutは上80下120。section-containerクラスで共通160を付け、aboutにはsection-aboutというユニークなクラスを追加して上80下120で上書きする"
+           style="width:100%; max-width:760px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：共通クラス＋ユニーククラスで余白を上書きする考え方
+      </figcaption>
+    </figure>
+
+    <h3>答え：共通クラスで揃え、1つだけ別クラスで上書き</h3>
+    <pre><span class="punct">&lt;</span><span class="selector">section</span> class=<span class="value">"section-container"</span><span class="punct">&gt;</span>サービス<span class="punct">&lt;/</span><span class="selector">section</span><span class="punct">&gt;</span>
+<span class="punct">&lt;</span><span class="selector">section</span> class=<span class="value">"section-container"</span><span class="punct">&gt;</span>制作実績<span class="punct">&lt;/</span><span class="selector">section</span><span class="punct">&gt;</span>
+<span class="punct">&lt;</span><span class="selector">section</span> class=<span class="value">"section-about section-container"</span><span class="punct">&gt;</span>私について<span class="punct">&lt;/</span><span class="selector">section</span><span class="punct">&gt;</span></pre>
+    <pre><span class="selector">.section-container</span> <span class="punct">{</span>      <span class="comment">/* 共通：全セクション */</span>
+  <span class="property">padding</span><span class="punct">:</span> <span class="value">160px 0</span><span class="punct">;</span>
+  <span class="property">margin</span><span class="punct">:</span> <span class="value">0 auto</span><span class="punct">;</span>          <span class="comment">/* 左右の共通設定もここ */</span>
+<span class="punct">}</span>
+<span class="selector">.section-about</span> <span class="punct">{</span>          <span class="comment">/* アバウトだけ上書き */</span>
+  <span class="property">padding-top</span><span class="punct">:</span> <span class="value">80px</span><span class="punct">;</span>
+  <span class="property">padding-bottom</span><span class="punct">:</span> <span class="value">120px</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout primary">
+      <span class="label">「ユニーク」の意味＆対人間の書き方</span>
+      ここでの<strong>ユニーク＝「被らない・重複しない」</strong>（日常の"おもしろい"ではない）。<br>
+      アバウトに <code>section-about</code> だけ書けばコンピュータ的には動くが、<strong>あえて <code>section-container</code> も併記</strong>する。こうすると人が見て「これは共通のセクションだな」「ここだけ何か上書きしてるな」と分かる。<mark>コードは対コンピュータでなく対人間（チーム）で書く</mark>。
+    </div>
+  </section>
+
+  <!-- ===== class vs id ===== -->
+  <section id="class-vs-id">
+    <h2 class="section-title"><span class="icon">🆔</span>class と id の使い分け</h2>
+    <p>「id と class、2つ並べる書き方とどう違う？」という質問への回答。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>属性</th><th>性質と使いどころ</th></tr></thead>
+        <tbody>
+          <tr><td><strong>class</strong></td><td>基本はこっちで管理。何個でも付けられて上書きしやすい</td></tr>
+          <tr><td><strong>id</strong></td><td><strong>CSSの優先度（詳細度）が強すぎて上書きしづらい</strong>＝管理が難しくなる。使うのは <strong>JSと絡める時／意図的に優先度を上げたい時／ページ内リンク</strong>など限定的な理由がある場合</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>つまり、<strong>普段の見た目の管理はクラスでやる</strong>のが基本。idは特別な理由があるときだけ。</p>
+  </section>
+
+  <!-- ===== 仕上げ ===== -->
+  <section id="finishing">
+    <h2 class="section-title"><span class="icon">🧹</span>仕上げ（サイズの自動調整・最終チェック）</h2>
+    <ul class="bullet-pro">
+      <li><strong>フッター</strong>のインスタンスを配置。現場では<strong>ヘッダー・フッターを先に作る</strong>ことも多い（が、制作順に正解はない。ラフから上から順／部品から作る、どちらもアリ）。</li>
+      <li>下に余分な余白が残ったら、大枠の <code>トップPC</code> フレームを選んで<strong>「サイズの自動調整」</strong>（148p）→ 余分が消える。</li>
+      <li><strong>最終チェック</strong>：<strong>「範囲の色」</strong>で変な色やスタイル抜け（<code>#000</code>のままの黒）がないか点検し、登録した<strong>ブラックスタイルを当て直す</strong>。レイヤー名・重なり順も整理。</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">これでポートフォリオ完成！</span>
+      ヘッダー → ファーストビュー → サービス → ワークス → アバウト → フッター が揃って、猫田小春のポートフォリオサイトが完成。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味（このクラスでの理解）</th></tr></thead>
+        <tbody>
+          <tr><td>ネストされたインスタンス</td><td>コンポーネントの中に入れたインスタンスのバリアントを、外側から切り替えられる機能（比較的新しい）</td></tr>
+          <tr><td>ラッパー / コンテナ</td><td>どちらも囲うもの。ラッパー＝とりあえず包む／コンテナ＝意味的に囲う</td></tr>
+          <tr><td>マスク / マスクグループ</td><td>ある形で画像を切り抜き表示する機能／その結果できるレイヤー</td></tr>
+          <tr><td>レイヤー移動ショートカット</td><td><code>⌘+[ ]</code>＝1段前後／<code>[ ]</code>＝最前面・最背面</td></tr>
+          <tr><td>絶対指定 / 相対指定</td><td>px固定（絶対）／%など画面幅に応じる（相対）。本文幅は相対が基本</td></tr>
+          <tr><td>ブレイクポイント</td><td>画面幅で表示を切り替える境目。カラム落ちなどに使う</td></tr>
+          <tr><td>section-container（共通クラス）</td><td>全セクション共通の余白などをまとめるクラス</td></tr>
+          <tr><td>ユニークなクラス</td><td>被らない・重複しない名前。1か所だけ上書きする用（例 <code>section-about</code>）</td></tr>
+          <tr><td>class / id</td><td>基本はclassで管理／idは優先度が強く限定用途（JS・ページ内リンク等）</td></tr>
+          <tr><td>優先度（詳細度）</td><td>CSSでどのセレクターが勝つか。idはclassより強い</td></tr>
+          <tr><td>サイズの自動調整</td><td>フレームの余分な余白を中身に合わせて消す機能（教科書148p）</td></tr>
+          <tr><td>範囲の色</td><td>選択した要素の中で使われている色一覧。スタイル抜けの点検に使う</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <p>ポートフォリオを完成まで仕上げる。3時間目以降は各自の制作時間だった。</p>
+    <ul class="check-list">
+      <li><strong>ワークス</strong>：カードにバリアント（タグ）＋テキストプロパティ、6枚を3カラム（幅300・間64）で配置</li>
+      <li>余裕があれば<strong>ネストされたインスタンス</strong>でカード＋タグを作り直してみる</li>
+      <li><strong>アバウト</strong>：マスクでプロフィールアイコン、タイトル/説明文（幅480は<strong>目安</strong>と理解）</li>
+      <li><strong>CSS設計の考え方</strong>：共通160＋アバウトだけ80/120を「<code>section-container</code>＋<code>section-about</code>で上書き」と書けるイメージを持つ</li>
+      <li><strong>仕上げ</strong>：サイズの自動調整・「範囲の色」でスタイル抜け点検・レイヤー名整理</li>
+      <li>【制作時間の課題】<strong>MDN Tours やレッスン5/6/7をFigmaで再現</strong>（HTML/CSSの教材をFigmaで作り直す／8の倍数ベースで。レッスン5は余裕で作れるのが目安）</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>480と書いてあるからといって、それを信じちゃいけない。Figmaの数字はあくまで目安です。<span class="citation">── 絶対指定をしない</span></blockquote>
+    <blockquote>コンピュータだけだったら、これはいらないんです。でもコーディングはチームでやるから、他の人が見ても分かるように書く。<span class="citation">── 共通クラスを併記する理由</span></blockquote>
+    <blockquote>ユニークって日常だと「おもろい」みたいなイメージかもしれないけど、実際は「被らない」の意味の方が強いです。<span class="citation">── ユニークなクラス名</span></blockquote>
+    <blockquote>制作順に不正解はないです。ラフを書いて上から順でも、部品から作るのでも、どちらもアリ。<span class="citation">── デザインを組む順番</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-04｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

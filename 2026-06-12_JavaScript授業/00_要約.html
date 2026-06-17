@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 1日目：JSの基礎（オブジェクト・メソッド・変数）｜2026年6月12日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月12日｜講師：A先生</div>
+  <h1>JavaScript 1日目：JSの基礎（オブジェクト・メソッド・変数）</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間11分</span>
+    <span>📖 JavaScript入門（導入〜変数）</span>
+    <span>🎯 JS導入・defer・コンソール・オブジェクト/メソッド/パラメーター・データ型・変数</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    Figmaが一区切りし、今日から<strong>JavaScript（JS）＝プログラミング言語</strong>に突入。先生いわく<strong>「このカリキュラムでトップ3に入る激ムズ」</strong>。
+    5日間では入り口だけ覚えればOK、という心構えからスタート。<strong>HTML=情報／CSS=見た目／JS=動きの部分</strong>という役割整理に始まり、
+    JSの導入方法・<strong>コンソール</strong>・<strong>オブジェクト/メソッド/パラメーター</strong>・<strong>データ型</strong>・<strong>変数</strong>まで、基礎を一気に駆け抜けた。
+  </div>
+
+  <div class="callout success">
+    <span class="label">🧘 まず持っておくべきマインドセット（先生の最初の言葉）</span>
+    JSは外国語学習と同じで、短期間でなく長いスパン（最低数ヶ月〜1年）で慣れていくもの。<strong>5日間は「触り」を覚えれば十分</strong>。難しすぎてメンタルをやられないために、まず入り口を知る気持ちで。<br>
+    <strong>※重要アドバイス：</strong>もしJSが1週間たっても分からないなら、<strong>中途半端にJSをやるよりCSSに集中した方が就職的にもスキル的にも良い</strong>。1週間後にこの言葉を思い出して。
+  </div>
+
+  <h3 style="border:none; padding:0; margin-bottom:6px;">🎯 今日の核：JSの基本となる書き方（先生の板書）</h3>
+  <figure style="margin:14px 0 30px;">
+    <img src="img/js_basic_syntax.png"
+         alt="先生の板書：jsの基本となる書き方。window/console＝オブジェクト、alert/log＝メソッド、('hoge')＝パラメーター。object.method(parameter)の構文図。オブジェクトとメソッドの間に.（ドット）、パラメーターは()の中、文字列はクォートで囲う"
+         style="width:100%; max-width:920px; display:block; margin:0 auto;
+                border:1px solid var(--border); border-radius:10px;
+                box-shadow:0 2px 8px rgba(0,0,0,.06);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+      ▲ 先生の板書：JSの基本構文 <code>object.method(parameter)</code> と、オブジェクト／メソッド／パラメーターの3要素
+    </figcaption>
+  </figure>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#what-is-js">JSとは何か（HTML/CSSとの違い）</a></li>
+      <li><a href="#js-role">JSの役割＝動きの部分</a></li>
+      <li><a href="#import">JSの導入方法（scriptタグ・外部ファイル）</a></li>
+      <li><a href="#defer">読み込みタイミングとdefer属性</a></li>
+      <li><a href="#console">コンソール（JSの実験場所）</a></li>
+      <li><a href="#omp">オブジェクト・メソッド・パラメーター</a></li>
+      <li><a href="#data-type">データ型（文字列・数値・ブール値・オブジェクト）</a></li>
+      <li><a href="#rules">JSを書くときのルール3つ</a></li>
+      <li><a href="#variable">変数（let）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>時刻をクリックすると詳しい解説に飛べます。<span class="star">★★★</span>＝特に重要。全6時間（約5時間）。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#what-is-js">00:00</a></td><td><a href="#what-is-js">JS導入・激ムズ宣言・マインドセット</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#what-is-js">00:03</a></td><td><a href="#what-is-js">JS＝プログラミング言語（HTML/CSSとの違い）・JavaとJSは別物</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#js-role">00:08</a></td><td><a href="#js-role">HTML=情報／CSS=見た目／JS=動きの部分</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#js-role">00:18</a></td><td><a href="#js-role">★アドバイス：JSが難しければCSSに集中した方がいい</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#js-role">00:22</a></td><td><a href="#js-role">動きの部分＝ユーザーのアクションで何かを起こす</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">00:39</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#console">00:51</a></td><td><a href="#js-role">JSはブラウザをエンジンに動く・ブラウザゲームも作れる</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#import">00:57</a></td><td><a href="#import">VS Codeでディレクトリ整理（HTML-CSS / JavaScript）・6/17は登校日</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#import">01:02</a></td><td><a href="#import">導入①：HTMLに直接書く（scriptタグ・短いコード用）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#import">01:11</a></td><td><a href="#import">導入②：JSファイル（script.js）を作って読み込む</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#defer">01:22</a></td><td><a href="#defer">読み込みタイミングの罠（JSが先に走るとHTML要素が無い）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#defer">01:25</a></td><td><a href="#defer">defer属性をつける（昔はbody閉じタグ直前）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">01:36</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#console">01:47</a></td><td><a href="#console">コンソール（console.log・デベロッパーツール）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#console">01:56</a></td><td><a href="#console">console.logでエラー箇所を絞り込む</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#omp">02:03</a></td><td><a href="#omp">JSの基本＝オブジェクト・メソッド・パラメーターの3つ</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#omp">02:06</a></td><td><a href="#omp">オブジェクト＝情報の箱（window/console/document/location）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#omp">02:25</a></td><td><a href="#omp">メソッド＝命令・指示（ハリポタの呪文のイメージ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">02:30</td><td>お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#omp">03:20</a></td><td><a href="#omp">パラメーター＝メソッドの詳細設定（表示内容）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#data-type">03:27</a></td><td><a href="#data-type">データ型4種（文字列・数値・ブール値・オブジェクト）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#data-type">03:34</a></td><td><a href="#data-type">文字列はクォートで囲う（シングル推奨）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#data-type">03:40</a></td><td><a href="#data-type">数値は計算できる・"10"+"10"は文字連結</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#rules">03:58</a></td><td><a href="#rules">書くルール：半角英数字・大文字小文字を区別・文末セミコロン</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">04:06</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#variable">04:18</a></td><td><a href="#variable">変数（let 変数名 = 値;）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#variable">04:28</a></td><td><a href="#variable">イコールは右→左へ代入・変数を使う理由</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#variable">04:32</a></td><td><a href="#variable">演習1：文字列を変数に入れて表示／演習2：5変数で四則演算→100</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#homework">05:10</a></td><td><a href="#homework">ラスト：ノートまとめ・復習タイム</a></td><td class="center"><span class="star">★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>JSはプログラミング言語</h4><p>HTML=マークアップ言語、CSS=スタイルシート言語。<strong>JSだけがコンピュータに「指示・命令」</strong>する言語。</p></div>
+      <div class="card"><span class="num">2</span><h4>JS＝動きの部分</h4><p>HTML=情報／CSS=見た目／<strong>JS=動き</strong>。ユーザーのアクション（クリック等）で何かを起こす。</p></div>
+      <div class="card"><span class="num">3</span><h4>JavaとJSは別物</h4><p>名前は似てるが<strong>全く別の言語</strong>。「メロンとメロンパンくらい違う」。</p></div>
+      <div class="card"><span class="num">4</span><h4>JSファイル＋defer</h4><p>外部 <code>.js</code> を <code>&lt;script src deferⓍⓎ&gt;</code> で読む。<strong>deferは必ずつける</strong>。</p></div>
+      <div class="card"><span class="num">5</span><h4>読み込みタイミングが命</h4><p>JSが先に走るとHTML要素がまだ無くエラー。<strong>deferでHTML完了後に実行</strong>。</p></div>
+      <div class="card"><span class="num">6</span><h4>コンソールは実験場</h4><p><code>console.log()</code>でブラウザのコンソールに表示。<strong>エラー箇所の絞り込み</strong>にも使う。</p></div>
+      <div class="card"><span class="num">7</span><h4>3点構造</h4><p><strong>オブジェクト.メソッド(パラメーター)</strong>。例：<code>console.log('hoge')</code>。</p></div>
+      <div class="card"><span class="num">8</span><h4>オブジェクト＝情報の箱</h4><p><code>window</code>（画面全部）／<code>console</code>／<code>document</code>（HTML）／<code>location</code>（URL）。</p></div>
+      <div class="card"><span class="num">9</span><h4>データ型4種</h4><p>文字列（クォートで囲う）・数値（計算できる）・ブール値（true/false）・オブジェクト。</p></div>
+      <div class="card"><span class="num">10</span><h4>変数はlet</h4><p><code>let 名前 = 値;</code>。イコールは<strong>右の値を左へ代入</strong>。使い回し＆一括変更に便利。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== JSとは ===== -->
+  <section id="what-is-js">
+    <h2 class="section-title"><span class="icon">🟨</span>JSとは何か（HTML/CSSとの違い）</h2>
+    <p><strong>JavaScript（略してJS）＝プログラミング言語</strong>。今まで学んだHTML・CSSとは種類が違う。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>言語</th><th>種類</th><th>役割</th></tr></thead>
+        <tbody>
+          <tr><td>HTML</td><td>マークアップ言語</td><td>情報（文字・画像・音声・動画）を記述</td></tr>
+          <tr><td>CSS</td><td>スタイルシート言語</td><td>見た目（色・大きさ・レイアウト）を指定</td></tr>
+          <tr><td><strong>JavaScript</strong></td><td><strong>プログラミング言語</strong></td><td><strong>コンピュータ・ブラウザに指示／命令する</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>プログラミング言語はJS以外にもたくさんある（Python・Ruby・C・C#・Java など）。その中で<strong>JSはブラウザとの相性が良い</strong>ので、Webデザイナー／フロントエンドを目指すなら学ぶ価値がある。</p>
+    <div class="callout">
+      <span class="label">豆知識：JavaとJavaScriptは別物</span>
+      名前が似ているが<strong>全く別の言語</strong>。「メロンとメロンパンくらい違う」。Javaは業務システム・銀行系などで使われることが多い。
+    </div>
+  </section>
+
+  <!-- ===== JSの役割 ===== -->
+  <section id="js-role">
+    <h2 class="section-title"><span class="icon">🎬</span>JSの役割＝動きの部分</h2>
+    <p>HTMLとCSSだけでもWebサイトはOK作れる。では<strong>なぜJSが必要か</strong>。それは<strong>「動きの部分」</strong>を作るため。</p>
+    <div class="callout primary">
+      <span class="label">JSの動き＝ユーザーのアクションで何かを起こす</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>クリックしたら</strong>何かが起きる</li>
+        <li><strong>スクロールしたら</strong>何かが起きる（ふわっと出てくる等）</li>
+        <li><strong>ページを読み込んだら</strong>何かが起きる</li>
+      </ul>
+      こういう「動き」が必要な場面が、JSの出番。逆に必要なければJSを書く必要はない。
+    </div>
+    <p>例：ハンバーガーメニューをクリックでナビが出る、スライダー、フォームの選択で表示項目が変わる——これらはJSで実装する。</p>
+    <blockquote>もしJSが向こう1週間で分からないぐらいだったら、もうCSSに集中して勉強した方がよっぽどいいです。中途半端にJSを学ぶぐらいなら、しっかりCSSが書けた方が就職的にもスキルセット的にも全然いい。1週間後にこの言葉をもう一度思い出してください。<span class="citation">── A先生</span></blockquote>
+    <p style="font-size:14px; color:var(--text-soft);">※余談：JSはブラウザをエンジンにして動く言語。ブラウザゲーム（インベーダー風など）も作れる。練習にはいい題材。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 導入方法 ===== -->
+  <section id="import">
+    <h2 class="section-title"><span class="icon">📥</span>JSの導入方法</h2>
+    <p>HTMLにJSを取り込む方法は主に2つ。</p>
+
+    <h3>① HTMLに直接書く（scriptタグ）</h3>
+    <p>新しいタグ <code>&lt;script&gt;</code> の中にJSのコードを直接書ける。HTMLとJSは相性がいいので書ける。</p>
+    <pre><span class="punct">&lt;</span><span class="selector">script</span><span class="punct">&gt;</span>
+  <span class="property">window</span>.<span class="property">alert</span>(<span class="value">'こんにちは'</span>)<span class="punct">;</span>
+<span class="punct">&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span></pre>
+    <p>これを使う場面は<strong>コードがかなり短いとき（5〜10行以内）・実験で書くとき</strong>。コードが長くなるとHTMLが見づらくなるのでNG。</p>
+
+    <h3>② JSファイルを作って読み込む（一般的）</h3>
+    <p>CSSと同じ感覚で、<code>script.js</code> という外部ファイルを作って読み込む。<strong>こちらが基本</strong>。</p>
+    <pre><span class="comment">&lt;!-- HTML側で読み込む --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"script.js"</span> <span class="property">defer</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span></pre>
+    <div class="callout">
+      <span class="label">ポイント</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>JSファイルの中身にはscriptタグは不要</strong>（書くとエラー）。JSコードだけ書く</li>
+        <li>ファイル名は <code>script.js</code> が定番（CSSの<code>style.css</code>と同じ感覚）</li>
+        <li>大きいサイトは <code>common.js</code> <code>top.js</code> のように複数に分けて管理する</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== defer ===== -->
+  <section id="defer">
+    <h2 class="section-title"><span class="icon">⏳</span>読み込みタイミングとdefer属性</h2>
+    <p>JS特有の落とし穴。HTMLは<strong>上から順に読み込まれる</strong>。途中でJSを読み込むと、JSがそこで実行され、<strong>まだ読み込まれていない下のHTML要素は「無い」扱い</strong>になる。</p>
+    <div class="callout">
+      <span class="label">よくあるエラー</span>
+      JSの読み込みが10行目、ボタンが17行目にある場合。JSが「ボタンを探す」コードでも、10行目時点では17行目のボタンはまだ存在せず、<strong>「ボタンが無い」エラー</strong>になる。
+    </div>
+    <h3>解決策：defer属性</h3>
+    <ul class="bullet-pro">
+      <li><strong>昔のやり方</strong>：<code>&lt;/body&gt;</code> の直前でJSを読み込む（HTMLを先に全部読ませる）。今もこのサイトは多い</li>
+      <li><strong>今のやり方</strong>：scriptタグに <code>defer</code> をつける。<strong>HTML読み込みと並行してJSをダウンロードし、HTML完了後にJSを実行</strong>してくれる</li>
+    </ul>
+    <p class="callout primary" style="font-size:14px;"><span class="label">お決まり</span> JSファイルを読み込むときは<strong>必ず <code>defer</code> をつける</strong>。これが今いちばんよく使われる読み込み方。</p>
+  </section>
+
+  <!-- ===== コンソール ===== -->
+  <section id="console">
+    <h2 class="section-title"><span class="icon">🖥️</span>コンソール（JSの実験場所）</h2>
+    <p><strong>コンソール＝ブラウザに標準装備されたJSの実験場所</strong>。デベロッパーツールの中の「Console」タブ。エラーチェックやJSの実行テストができる。</p>
+    <pre><span class="property">console</span>.<span class="property">log</span>(<span class="value">'初めてのjavascript'</span>)<span class="punct">;</span>
+<span class="comment">// → コンソールに「初めてのjavascript」と表示される</span></pre>
+    <div class="callout primary">
+      <span class="label">プロの使い方：エラー箇所の絞り込み</span>
+      コードが何百行にもなると、どこでエラーが起きたか分からなくなる。そこで<strong>要所要所に <code>console.log(1)</code> <code>console.log(2)</code> と「石（マーカー）」を置く</strong>。表示されない番号があれば、その手前でエラーが起きていると分かる。優秀な人ほどこれを使う。
+    </div>
+    <p style="font-size:14px; color:var(--text-soft);">※余談：JSが分かると「500万円当たりました」系のブラウザ詐欺（偽のダイアログ）に引っかからなくなる。あれもJSで作られている。</p>
+  </section>
+
+  <!-- ===== オブジェクト・メソッド・パラメーター ===== -->
+  <section id="omp">
+    <h2 class="section-title"><span class="icon">🧱</span>オブジェクト・メソッド・パラメーター</h2>
+    <p>JSの基本構文は、この<strong>3つの組み合わせ</strong>でできている（冒頭の板書参照）。</p>
+    <pre><span class="property">object</span>.<span class="property">method</span>(<span class="value">parameter</span>)<span class="punct">;</span>
+<span class="comment">// 例：</span>
+<span class="property">console</span>.<span class="property">log</span>(<span class="value">'hoge'</span>)<span class="punct">;</span>
+<span class="property">window</span>.<span class="property">alert</span>(<span class="value">'hoge'</span>)<span class="punct">;</span></pre>
+
+    <div class="compare">
+      <div class="compare-col right">
+        <h4>① オブジェクト</h4>
+        <ul>
+          <li>データの一種＝<strong>情報が入った「箱」</strong></li>
+          <li>既存のもの／自作のものの2種類</li>
+        </ul>
+      </div>
+      <div class="compare-col right">
+        <h4>② メソッド</h4>
+        <ul>
+          <li>オブジェクトの中にある<strong>命令・指示</strong></li>
+          <li>呼び出しキーワード（呪文のイメージ）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="label">③ パラメーター</span>
+      メソッドに対する<strong>詳細設定</strong>。例：<code>alert</code>が「ダイアログを表示する」指示なら、<strong>表示内容を決めるのがパラメーター</strong>。<code>()</code>の中に入れる。
+    </div>
+
+    <h3>主な「既存のオブジェクト」（情報の箱）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>オブジェクト</th><th>中身（その箱に入っている情報）</th></tr></thead>
+        <tbody>
+          <tr><td><code>window</code></td><td>画面上の情報すべて（横幅・高さ・URLなど）</td></tr>
+          <tr><td><code>console</code></td><td>コンソール画面を操作する</td></tr>
+          <tr><td><code>document</code></td><td>HTMLの情報（=DOM）。JSからHTMLを操るときに使う</td></tr>
+          <tr><td><code>location</code></td><td>アドレス（URL）情報</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <blockquote>メソッドは、ハリーポッターの呪文と一緒です。「ルーモス」と唱えると光るように、「log」と唱えるとコンソールに表示する、という処理に名前をつけたものがメソッドです。<span class="citation">── A先生</span></blockquote>
+
+    <h3>書き方のルール</h3>
+    <ul class="bullet-pro">
+      <li>オブジェクトとメソッドの間に <strong><code>.</code>（ドット／ピリオド）</strong></li>
+      <li>パラメーターは <strong><code>()</code>（カッコ）</strong> の中に入れる</li>
+      <li>文字列データを入れるときは <strong>クォートで囲う</strong></li>
+    </ul>
+  </section>
+
+  <!-- ===== データ型 ===== -->
+  <section id="data-type">
+    <h2 class="section-title"><span class="icon">🔤</span>データ型（4種類）</h2>
+    <p>JSが扱うデータには種類（性質）がある。大きく4つ。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>データ型</th><th>英語</th><th>中身</th></tr></thead>
+        <tbody>
+          <tr><td><strong>文字列</strong></td><td>string</td><td>テキスト。<strong>クォートで囲う</strong>（例 <code>'こんにちは'</code>）</td></tr>
+          <tr><td><strong>数値</strong></td><td>number</td><td>数字。<strong>計算できる</strong>（例 <code>10</code>）</td></tr>
+          <tr><td><strong>ブール値</strong></td><td>boolean</td><td>true / false の2択（処理を分けるとき）</td></tr>
+          <tr><td><strong>オブジェクト</strong></td><td>object</td><td>様々なデータをまとめた箱</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">文字列はクォートで囲う（シングル推奨）</span>
+      <code>'10'</code> と <code>10</code> は別物。クォートで囲うと<strong>文字</strong>、囲わないと<strong>数値</strong>。
+      <ul style="margin:8px 0 0;">
+        <li><code>10 + 10</code> → <strong>20</strong>（数値の足し算）</li>
+        <li><code>'10' + '10'</code> → <strong>'1010'</strong>（文字の連結）</li>
+      </ul>
+      四則演算の記号：<code>+</code> 足し算／<code>-</code> 引き算／<code>*</code> 掛け算／<code>/</code> 割り算
+    </div>
+
+    <p class="callout" style="font-size:14px;"><span class="label">なぜシングルクォート推奨か</span> ① CSSと重複しない ② ダブルクォートの中でHTMLを出力するとき、中にシングルを使い分けられる（ダブルの中にダブルだと途中で途切れてエラーになる）。対ブラウザではどちらでもOKだが、<strong>対人間の分かりやすさ</strong>でシングルがおすすめ。</p>
+  </section>
+
+  <!-- ===== 書くルール ===== -->
+  <section id="rules">
+    <h2 class="section-title"><span class="icon">📏</span>JSを書くときのルール3つ</h2>
+    <ul class="check-list">
+      <li><strong>半角英数字で書く</strong>（JSは英語ベース。出力する文字列だけは日本語OK）</li>
+      <li><strong>大文字・小文字を区別する</strong>（<code>log</code>を<code>Log</code>と書くとエラー。メソッド名は決まっている）</li>
+      <li><strong>文末にセミコロン <code>;</code></strong>（文章の句点「。」と同じ。区切りを示す）</li>
+    </ul>
+  </section>
+
+  <!-- ===== 変数 ===== -->
+  <section id="variable">
+    <h2 class="section-title"><span class="icon">📦</span>変数（let）</h2>
+    <p><strong>変数＝値を入れて使い回す箱</strong>。CSS変数も習ったが、JSはもっと色々なものを入れられる。</p>
+    <pre><span class="selector">let</span> <span class="property">rain</span> = <span class="value">'今から雨が降りそうです'</span><span class="punct">;</span>
+<span class="property">console</span>.<span class="property">log</span>(<span class="property">rain</span>)<span class="punct">;</span>
+<span class="comment">// → 「今から雨が降りそうです」と表示</span></pre>
+
+    <div class="callout">
+      <span class="label">3つのポイント</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>let</strong>＝変数を作る宣言（「今から変数を定義します」）</li>
+        <li><strong>変数名</strong>＝自分で決める（クラス名のような感覚。使えないキーワードはある）</li>
+        <li><strong>イコールは右→左</strong>：右の値を左の変数名に<strong>代入</strong>する（数学の「=」とは逆向き）</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">変数を使う理由</span>
+      ① 同じ値を何度も書くのが面倒 → 一度入れれば使い回せる<br>
+      ② <strong>元の値を変えると、使っている箇所が一括で変わる</strong>（CSS変数と同じ。管理がラク）
+    </div>
+
+    <h3>演習2題</h3>
+    <ul class="bullet-pro">
+      <li><strong>演習1</strong>：文字列を変数に入れて <code>console.log</code> で表示（※変数名をクォートで囲うと、ただの文字になってしまうので注意）</li>
+      <li><strong>演習2</strong>：5つの変数に数値を入れ、<strong>四則演算（+−×÷）を全部使って「100」</strong>を出す。数字そのものでなく<strong>変数を計算式に当てはめる</strong>のがポイント</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>JavaScript（JS）</td><td>ブラウザに指示を出すプログラミング言語。Webの「動き」を担当</td></tr>
+          <tr><td>scriptタグ</td><td>HTMLにJSを書く／読み込むためのタグ</td></tr>
+          <tr><td>src属性</td><td>読み込むJSファイルのパスを指定する属性</td></tr>
+          <tr><td>defer</td><td>HTML読み込みと並行し、完了後にJSを実行する属性。お決まりでつける</td></tr>
+          <tr><td>コンソール（console）</td><td>ブラウザ標準のJS実験場所。デベロッパーツール内</td></tr>
+          <tr><td>console.log()</td><td>コンソールに値を表示するメソッド。デバッグの基本</td></tr>
+          <tr><td>オブジェクト</td><td>情報が入った箱（window/console/document/location等）</td></tr>
+          <tr><td>メソッド</td><td>オブジェクトの中の命令・指示（呪文のイメージ）</td></tr>
+          <tr><td>パラメーター</td><td>メソッドの詳細設定。()の中に入れる値</td></tr>
+          <tr><td>DOM</td><td>documentオブジェクトの中のHTML構造。JSからHTMLを操る対象</td></tr>
+          <tr><td>データ型</td><td>文字列(string)／数値(number)／ブール値(boolean)／オブジェクト</td></tr>
+          <tr><td>クォート</td><td>文字列を囲う記号。シングル <code>' '</code> 推奨</td></tr>
+          <tr><td>変数 / let</td><td>値を入れて使い回す箱／変数を宣言するキーワード</td></tr>
+          <tr><td>代入</td><td>右の値を左の変数に入れること（イコールは右→左）</td></tr>
+          <tr><td>セミコロン;</td><td>文の終わりを示す記号（句点の役割）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li>VS Codeで <code>JavaScript</code> ディレクトリを作り、<code>index.html</code>＋<code>script.js</code>を用意</li>
+      <li><code>&lt;script src="script.js" defer&gt;</code> でJSを読み込む（<strong>deferを忘れない</strong>）</li>
+      <li><code>console.log()</code>でコンソールに文字を表示してみる</li>
+      <li><code>object.method(parameter)</code>の形を意識して書く</li>
+      <li>データ型（文字列はクォート／数値は計算できる）を試す</li>
+      <li><strong>演習1</strong>：文字列を変数に入れて表示</li>
+      <li><strong>演習2</strong>：5つの変数＋四則演算で「100」を出す</li>
+      <li>最後の1時間でノートをまとめ、自分のコードを見直す</li>
+    </ul>
+    <div class="callout">
+      <span class="label">📣 連絡事項</span>
+      <strong>6月17日（水）は登校日</strong>（先日の台風休講の振替）。正式決定はGoogle Classroomでお知らせ。<br>
+      <strong>JSが苦しければ無理せずCSSに集中する選択もアリ</strong>。隙間時間にA先生・B先生に質問もできる。
+    </div>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>激ムズです。このカリキュラムの中でもトップ3ぐらいの難しさになると思います。まずは軽く触りを覚えておけばいいかな、ぐらいの気持ちで受けてください。そうでもしないとメンタルがやられちゃうんですよ、難しすぎて。<span class="citation">── JS初日のマインドセット</span></blockquote>
+    <blockquote>中途半端にJSを学ぶぐらいだったら、しっかりCSSが書けた方が就職的にもいいし、自分のスキルセット的にも全然いい。1週間後にこの言葉をもう一度思い出してください。<span class="citation">── 正直なアドバイス</span></blockquote>
+    <blockquote>メソッドは、ハリーポッターの呪文と一緒です。「ルーモス」と唱えると光る。処理に名前をつけているのがメソッドです。<span class="citation">── オブジェクト・メソッドの説明</span></blockquote>
+    <blockquote>JavaScriptがしっかり理解できるようになると、ブラウザの詐欺とかに引っかからなくなりますからね。これは嘘だな、ってのが大体分かるようになってくるんで。<span class="citation">── JSを学ぶ思わぬ効能</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-13｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

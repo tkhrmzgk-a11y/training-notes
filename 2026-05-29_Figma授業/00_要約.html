@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma初日：階層構造・インターフェース・基本操作・テキスト・エフェクト｜2026年5月29日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月29日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>Figma初日：階層構造・インターフェース・基本操作・テキスト・エフェクト</h1>
+  <p class="subtitle">訓練校 IT スクール｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間12分</span>
+    <span>📖 Figma教科書 20-32p（基礎操作）</span>
+    <span>🎯 Figma初日, 自動保存, チーム/プロジェクト/ファイル/ページ/レイヤー, ドラフト, Community, デザインシステム, ツールバー, 左右パネル, レイヤーパネル, V/R/O/L, Shift正方形, Option中央拡大, 画像配置2種, Google Fonts, 幅/高さ自動調整, ドロップシャドウ, レイヤー名, アンパンマン演習</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>今日の流れ</h2>
+    <div class="callout primary">
+      <span class="label">💡 今日から Figma カリキュラム（約1週間）</span>
+      <p style="margin:0;">
+        HTML/CSSはひと段落、ここから<strong>デザインツール「Figma」の基礎</strong>を覚えていく。<mark>操作方法のカリキュラム</mark>なので、「どんなサイトを作りたいか」は普段から自分で考えておく必要あり。Figmaはアップデートがえげつないので、教科書と現バージョンに差がある→<strong>先生の画面が真</strong>。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>1時間目</td><td><a href="#home">ホーム画面・Community・デザインシステム</a></td></tr>
+          <tr><td>1〜2時間目</td><td><a href="#hierarchy">ファイルの階層構造（チーム→プロジェクト→ファイル）</a></td></tr>
+          <tr><td>2時間目</td><td><a href="#interface">インターフェース（ツールバー／左右パネル）</a></td></tr>
+          <tr><td>3時間目</td><td><a href="#select">選択ツール・移動・拡大縮小</a></td></tr>
+          <tr><td>3時間目</td><td><a href="#shape">シェイプ・色塗り・複製</a></td></tr>
+          <tr><td>4時間目</td><td><a href="#image">画像配置（2種類）</a></td></tr>
+          <tr><td>4時間目</td><td><a href="#text">テキストツール・タイポグラフィ</a></td></tr>
+          <tr><td>5時間目</td><td><a href="#effect">エフェクト（影・ぼかし）・アンパンマン演習</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li>Figmaは<strong>自動保存</strong>（全データがサーバー上）。保存ボタンはない</li>
+      <li>階層：<strong>チーム → プロジェクト → ファイル → ページ → レイヤー</strong></li>
+      <li>ドラフト＝個人用 / プロジェクト＝共同編集（無料は3ファイル/3ページ制限）</li>
+      <li>インターフェース：<strong>ツールバー（上）／左パネル／右パネル／中央ワークスペース</strong></li>
+      <li><mark>レイヤーパネルから目をそらすな</mark>（うまい人は絶対見ている）</li>
+      <li>選択＝Vキー、シェイプ＝R/O/L、Shiftで正方形、Optionで中央から拡大</li>
+      <li>画像配置は<strong>①ドラッグ&ドロップ（実寸）／②塗りから配置（枠に合わせる）</strong>の2種類</li>
+      <li>フォントは<strong>Googleフォント</strong>を選ぶ（実装時のミス防止）</li>
+      <li>テキスト：<strong>幅の自動調整（タイトル系）/ 高さの自動調整（カード内）</strong></li>
+      <li><strong>レイヤー名を必ず変える</strong>（プロのデザイナーは必ずやる）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="home">
+    <h2 class="section-title"><span class="icon">🏠</span>ホーム画面・Community・デザインシステム</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        Figmaの起動直後の画面。<strong>左にメニュー、右にダッシュボード</strong>。タブはChromeと同じ感覚（固定・複数開ける）。アカウントは複数登録できる（会社用＋個人用など）。
+      </p>
+    </div>
+
+    <h3>Community（コミュニティ）＝世界のクリエイターの作品庫</h3>
+    <ul class="bullet-pro">
+      <li>デザインシステム・UIキット・アイコン集など、<strong>世界中の公開作品</strong>が見られる</li>
+      <li>iOS / Apple Watch / Material（Google）など、<mark>公式系の完成度高いもの</mark>も多数</li>
+      <li>デザインに詰まった時は、Google検索より<strong>Community で調べる癖</strong>を</li>
+    </ul>
+
+    <h3>デザインシステム＝ブランディングを保つルール集</h3>
+    <ul class="bullet-pro">
+      <li>大手企業（Apple/Google/SmartHR/デジタル庁等）が自社の<strong>「使う色・フォント・余白・角丸・コンポーネント」</strong>をまとめた決まり</li>
+      <li>製品やサービスに<strong>一貫性</strong>を持たせるため</li>
+      <li>参考書：<strong>「小さく始めるデザインシステム」（SmartHR）</strong>がおすすめ。リーダー志向の人向け</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="hierarchy">
+    <h2 class="section-title"><span class="icon">📁</span>ファイルの階層構造</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        Figmaのファイル管理は<strong>Figma上で完結</strong>する（FinderやVS Codeではいじらない）。<mark>全部Figmaのサーバーに保管・自動保存</mark>。「保存ボタン」はない。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/file_hierarchy.png" alt="先生の板書：チーム→プロジェクトA/B/C→ファイル の階層図、アカウント作成時に自動でチームが作成される説明つき" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：<strong>チーム → プロジェクトA/B/C → ファイル</strong>。アカウント作成時に自動でチームが作られ、最初は<mark>1人だけのチームがある状態</mark></figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:160px">階層</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>チーム</strong></td><td>組織的なもの。アカウント作成時に自動で1つ作られる（最初は1人だけ）</td></tr>
+          <tr><td><strong>プロジェクト</strong></td><td>ディレクトリ感覚。<mark>仕事ごと・クライアントごと</mark>に分ける</td></tr>
+          <tr><td><strong>デザインファイル</strong></td><td>Figmaのデザインデータ</td></tr>
+          <tr><td><strong>FigJamファイル</strong></td><td>ホワイトボード形式のファイル</td></tr>
+          <tr><td><strong>ドラフト</strong></td><td><strong>個人用</strong>（自分だけ触る）。プロジェクトとは別管理</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">⚠️ 無料プランの制限</span>
+      <p style="margin:0;"><strong>プロジェクトで共同編集する場合</strong>：3ファイルまで・各ファイル3ページまで。<mark>ドラフトなら無制限</mark>。チームへのメンバー招待は有料プラン。</p>
+    </div>
+
+    <p>ファイル＞ページ＞レイヤー の構造で、<strong>各ページにはレイヤー（オブジェクト）</strong>が並ぶ。訓練校のカンプは「PC / SP / ワイヤーフレーム」の3ページ構成。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="interface">
+    <h2 class="section-title"><span class="icon">🖥</span>インターフェース（ツールバー／左右パネル）</h2>
+
+    <figure style="margin:22px 0;">
+      <img src="img/figma_interface.png" alt="先生の板書：Figmaのインターフェース解説（左のパネル・右のパネル・閉じ方など）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：<strong>左のパネル（ページ・コンポーネント・レイヤー）</strong>と<strong>右のパネル（プロパティ）</strong>、中央のワークスペース。レイヤーパネル＝オブジェクトの重なり順を操作する場所</figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:160px">場所</th><th>役割</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ツールバー（上）</strong></td><td>移動・シェイプ・テキスト・ペン等のツール</td></tr>
+          <tr><td><strong>左のパネル</strong></td><td>ページ／コンポーネント（アセット）／<strong>レイヤー</strong>／検索</td></tr>
+          <tr><td><strong>右のパネル</strong></td><td>選択中のオブジェクトの<strong>プロパティ（編集可能項目）</strong>。選択するものによって表示が変わる</td></tr>
+          <tr><td><strong>中央</strong></td><td>ワークスペース（作業画面）</td></tr>
+          <tr><td><strong>共有ボタン</strong></td><td>右上の目立つ色のボタン。閲覧共有 or 編集共有</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout success">
+      <span class="label">🔑 レイヤーパネルから目をそらすな！</span>
+      <p style="margin:0;">うまく使いこなしている人は<strong>必ずレイヤーパネルを見ている</strong>。見えてるものだけで作業しようとすると、レイヤーが汚くなったり、選択解除を見落としたりする。<mark>選択状態は右パネルで青くハイライト</mark>される。</p>
+    </div>
+
+    <h3>右パネルの主な項目（プロパティ）</h3>
+    <ul class="bullet-pro">
+      <li><strong>整列</strong>＝オブジェクトの揃え</li>
+      <li><strong>位置（フレーム）</strong>＝X/Y座標・角度・反転（transformっぽい）</li>
+      <li><strong>オートレイアウト</strong>＝flexのイメージで横並び・縦並び＋ギャップ</li>
+      <li><strong>外見</strong>＝角丸（border-radius）・透明度（opacity）</li>
+      <li><strong>塗りや線</strong>＝背景色・ボーダー</li>
+      <li><strong>エフェクト</strong>＝box-shadow・ぼかし</li>
+      <li><strong>エクスポート</strong>＝画像書き出し（SVG/PNG/JPEG）</li>
+    </ul>
+    <p style="font-size:14px;color:var(--text-soft);">プロトタイプ（リンク疑似実装）・開発モード（有料・エンジニア向け）もあるが、今は触れる程度でOK。Figma Drawは新機能だがおまけ程度。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="select">
+    <h2 class="section-title"><span class="icon">👆</span>選択ツール・移動・拡大縮小</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">操作</th><th>やり方</th></tr></thead>
+        <tbody>
+          <tr><td>選択ツール（移動ツール）</td><td><kbd>V</kbd></td></tr>
+          <tr><td>複数選択</td><td><kbd>Shift</kbd> + クリック / ドラッグで<strong>範囲選択（青枠）</strong></td></tr>
+          <tr><td>選択済みを部分解除</td><td><kbd>Shift</kbd> + 該当オブジェクトをクリック</td></tr>
+          <tr><td>選択解除</td><td>何もないところをクリック</td></tr>
+          <tr><td>拡大縮小</td><td><kbd>Cmd</kbd> + マウスホイール（Macトラックパッドはピンチイン/アウト）</td></tr>
+          <tr><td>横方向スクロール</td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + ホイール</td></tr>
+          <tr><td><strong>手のひツール</strong>（画面移動）</td><td><kbd>Space</kbd>を押し込み中 → ドラッグ</td></tr>
+          <tr><td>ショートカット一覧</td><td>ヘルプ → キーボードショートカット</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="label">📌 デザインツールはマウス推奨</span>
+      <p style="margin:0;">トラックボール民はFigmaなら大丈夫だが、<mark>Illustrator等になると一癖あって厳しい</mark>ので、安物のマウスでも1個持っておくと便利。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="shape">
+    <h2 class="section-title"><span class="icon">🔷</span>シェイプ・色塗り・複製</h2>
+    <h3>シェイプツール（図形作成）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:180px">図形</th><th>ショートカット</th></tr></thead>
+        <tbody>
+          <tr><td>長方形（Rectangle）</td><td><kbd>R</kbd></td></tr>
+          <tr><td>楕円（楕円系）</td><td><kbd>O</kbd></td></tr>
+          <tr><td>ライン</td><td><kbd>L</kbd></td></tr>
+          <tr><td>多角形・星・矢印</td><td>トグルから（あまり使わない）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="bullet-pro">
+      <li>普通は<strong>左上→右下にドラッグ</strong>で描画</li>
+      <li><kbd>Shift</kbd>押しながら描画＝<strong>正方形・正円（1:1）</strong></li>
+      <li><kbd>Option</kbd>(<kbd>Alt</kbd>)押しながら＝<strong>カーソルを中心に広がる</strong></li>
+      <li>削除＝<kbd>Delete</kbd>、元に戻す＝<kbd>Cmd</kbd>+<kbd>Z</kbd>（基本無限）、やり直し＝<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></li>
+    </ul>
+
+    <h3>色塗り（カラーピッカー）</h3>
+    <ul class="bullet-pro">
+      <li>右パネルの<strong>「塗り」</strong>から色変更</li>
+      <li>カラーパレット・RGB・<strong>16進数</strong>のいずれで入力可</li>
+      <li>横の<strong>%</strong>＝不透明度（0%透明、100%不透明）</li>
+      <li><strong>重ね塗り</strong>＝塗り追加で何枚も重ねられる（実装は難しいので普段は使わない）</li>
+    </ul>
+
+    <h3>複製</h3>
+    <ul class="bullet-pro">
+      <li>普通の<strong>コピペ</strong>＝<kbd>Cmd</kbd>+<kbd>C</kbd>/<kbd>V</kbd></li>
+      <li><strong>Option（Alt）+ドラッグ</strong>でその場で複製（先生はこっち派）</li>
+    </ul>
+
+    <div class="callout warn">
+      <span class="label">⚠️ 統合（Union）よりフレーム化</span>
+      <p style="margin:0;">複数レイヤーを1つにまとめる時、先生は<mark>「統合」はしない</mark>。編集ファイル中は編集しづらくなるから。Figmaでは「グループ化」ではなく<strong>「フレームでまとめる」</strong>と呼ぶ。納品時にどうしてもと言われた場合のみ統合。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="image">
+    <h2 class="section-title"><span class="icon">🖼</span>画像配置（2種類）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        Figmaの画像配置は<strong>2パターン</strong>あって特殊。シーンによって使い分ける。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">方法</th><th>挙動・使い所</th></tr></thead>
+        <tbody>
+          <tr><td><strong>① ドラッグ&ドロップ</strong></td><td>FinderからFigmaへドラッグ → <strong>画像の実寸サイズで配置</strong>。メインビジュアル等、大きめの画像</td></tr>
+          <tr><td><strong>② 塗りから配置</strong></td><td>四角を描く → 塗り→画像でアップロード → <strong>枠に合わせてカバー表示</strong>（CSSの object-fit: cover 相当）。サムネ・カード画像</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn">
+      <span class="label">⚠️ 塗りがないと画像配置できない</span>
+      <p style="margin:0;">②の塗りから配置する方法は、<strong>塗りが先に存在していないと使えない</strong>。塗りを削除してしまうと画像も配置できなくなる。覚えておく。</p>
+    </div>
+    <p>配置後は<strong>ダブルクリック</strong>で画像内の位置・拡大率を調整可能（background-positionのニュアンス）。簡単な画像加工（コントラスト等）も可能だが本格的にはPhotoshop。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="text">
+    <h2 class="section-title"><span class="icon">🔤</span>テキストツール・タイポグラフィ</h2>
+    <p><kbd>T</kbd>でテキストツール。打ち込みたい場所でクリック→入力。右パネルの<strong>「タイポグラフィ」</strong>でフォント・サイズ・ウェイト・行間・字間を編集。</p>
+
+    <div class="callout warn">
+      <span class="label">🔑 フォントは Google Fonts を選ぶのが鉄則</span>
+      <p style="margin:0;">
+        Figmaで選んだフォントは<mark>そのままコーディングで使えないといけない</mark>。マイナーフォントを選ぶとエンジニアから「このフォント無いぞ」と言われる。<strong>Google Fonts（Noto Sans JP 等）</strong>を選んでおけば間違いない。
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">項目</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>ラインハイト</td><td>150% ＝ <code>line-height: 1.5</code></td></tr>
+          <tr><td>レタースペーシング</td><td>5% ＝ <code>letter-spacing: 0.05em</code></td></tr>
+          <tr><td><strong>幅の自動調整</strong></td><td>開業しない限り横に伸びる。<mark>タイトル系</mark>に使う</td></tr>
+          <tr><td><strong>高さの自動調整</strong></td><td>幅を固定して縦に伸びる。<mark>カード内テキスト</mark>に使う（テキストボックス感覚）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>テキストのテクニック</h3>
+    <ul class="bullet-pro">
+      <li><strong>部分的に色を変える</strong>（spanタグ的）＝ダブルクリック→該当部分を選択→塗り変更</li>
+      <li><strong>ロック</strong>＝右クリックまたはレイヤーパネルの南京錠アイコン。誤操作防止</li>
+      <li>2色以上ある場合は塗り表示が「混合」になる</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="effect">
+    <h2 class="section-title"><span class="icon">✨</span>エフェクト・アンパンマン演習</h2>
+    <h3>エフェクト4種</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">エフェクト</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ドロップシャドウ</strong></td><td>影。X/Y/ぼかし/広がり/色を指定（box-shadow相当）</td></tr>
+          <tr><td><strong>インナーシャドウ</strong></td><td>内側に影</td></tr>
+          <tr><td><strong>レイヤーブラー</strong></td><td>オブジェクト自体をぼかす</td></tr>
+          <tr><td><strong>背景のぼかし</strong></td><td>重なっている背面をぼかす（<mark>すりガラス効果</mark>）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>🍞 アンパンマン演習</h3>
+    <p>楕円と重なり順を駆使してアンパンマンの顔を作る練習。<strong>レイヤー名を必ず変える</strong>のがポイント（eyes-left / eyes-right / outline / nose / mouth など）。</p>
+
+    <figure style="margin:22px 0;">
+      <img src="img/anpanman_exercise.png" alt="先生のお手本：Figmaで楕円と重なり順を使って描いたアンパンマンの顔" style="width:100%; max-width:380px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生のお手本（Figma）：楕円系のレイヤーを重ね合わせて作るアンパンマン。曲線（ペンツール／ベジェ）は今回は無理にチャレンジしなくてOK</figcaption>
+    </figure>
+
+    <div class="callout success">
+      <span class="label">🔑 レイヤー名を必ず変える（最重要）</span>
+      <p style="margin:0;">「フレーム」「フレーム」みたいに同名だらけだと<mark>どれがどれだか分からない</mark>。プロは絶対やっている。教科書ですらできていない例として紹介。<strong>癖をつける</strong>のが今のうち。やり過ぎぐらいでOK。</p>
+    </div>
+
+    <p style="font-size:14px;color:var(--text-soft);">余裕がある人は曲線をペンツール（<kbd>P</kbd>）でチャレンジ。<strong>クリックではなくドラッグから始める</strong>と方向線（ハンドル）が出てベジェ曲線になる。難しいのでイラレ授業まで保留でOK。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>チーム / プロジェクト / ファイル</strong></td><td>Figmaの階層（組織/仕事単位/データ）</td></tr>
+          <tr><td><strong>ドラフト</strong></td><td>個人用ファイル置き場（共同編集しないもの）</td></tr>
+          <tr><td><strong>FigJam</strong></td><td>ホワイトボード形式のFigmaファイル</td></tr>
+          <tr><td><strong>Community（コミュニティ）</strong></td><td>世界中のクリエイター作品庫</td></tr>
+          <tr><td><strong>デザインシステム</strong></td><td>色・フォント・余白などのルール集</td></tr>
+          <tr><td><strong>レイヤー</strong></td><td>オブジェクトの重なり順を操作する単位</td></tr>
+          <tr><td><strong>ツールバー</strong></td><td>上部のツール選択欄</td></tr>
+          <tr><td><strong>プロパティパネル（右）</strong></td><td>選択オブジェクトの編集項目（変動）</td></tr>
+          <tr><td><strong>オートレイアウト</strong></td><td>flex的な横並び・縦並び＋ギャップ</td></tr>
+          <tr><td><strong>シェイプツール</strong></td><td>図形作成（R/O/L）</td></tr>
+          <tr><td><strong>ベジェ曲線</strong></td><td>ペンツールで描く曲線（点と方向線で制御）</td></tr>
+          <tr><td><strong>幅 / 高さの自動調整</strong></td><td>テキストボックスの伸縮方向</td></tr>
+          <tr><td><strong>ドロップシャドウ</strong></td><td>影のエフェクト（box-shadow相当）</td></tr>
+          <tr><td><strong>背景のぼかし</strong></td><td>すりガラス効果</td></tr>
+          <tr><td><strong>フレーム化</strong></td><td>Figmaでの「グループ化」</td></tr>
+          <tr><td><strong>プロトタイプ</strong></td><td>リンクやホバーの疑似的な実装</td></tr>
+          <tr><td><strong>開発モード（Dev Mode）</strong></td><td>有料・エンジニア向けの仕様確認画面</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>Figmaは自動保存、データはサーバー上</li>
+      <li>階層＝チーム→プロジェクト→ファイル→ページ→レイヤー</li>
+      <li>ドラフト（個人）／プロジェクト（共同編集）の使い分け</li>
+      <li>ツールバー＋左パネル＋右パネル＋ワークスペースの4区画</li>
+      <li>レイヤーパネルから目を離さない</li>
+      <li>選択V／拡大Cmd+ホイール／手のひSpace</li>
+      <li>シェイプR/O/L、Shift正方形、Option中央拡大</li>
+      <li>色塗りは16進数で確実に</li>
+      <li>画像は<strong>ドラッグ＝実寸／塗りから＝カバー</strong></li>
+      <li>フォントは<strong>Google Fonts</strong>を選ぶ</li>
+      <li>テキストは幅の自動調整（タイトル）／高さの自動調整（カード）</li>
+      <li>エフェクト：影・ぼかし・すりガラス</li>
+      <li><strong>レイヤー名を必ず変える</strong>（プロは絶対）</li>
+      <li>「どんなサイトを作りたいか」を普段から考えておく（操作だけでは作れない）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>レイヤーパネルから目をそらすな。うまい人は絶対そらしていない。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 今日いちばんのメモ。プロは見えてるものだけで判断しない。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>レイヤー名を変えないデザイナーは、厳しいこと言いますけど仕事ができない。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 「フレーム」「フレーム」だらけのレイヤーパネルはNG。最初のうちにクセを。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>Figmaのアップデートはえぐいぐらい早い。数年前までは毎日アップデートでした。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 教科書とUIに差が出るのはしょうがない。先生の画面を真とする。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>結論Googleフォントを選んでおけば間違いないです。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ コーディング時にフォントが無くて困る事故を回避する一番確実な対策。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-30｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

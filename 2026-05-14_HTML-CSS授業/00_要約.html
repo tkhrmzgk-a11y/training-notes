@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リセットCSS・フォルダ構成・画像配置・色彩/配色｜2026年5月14日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月14日｜講師：A先生</div>
+  <h1>リセットCSS・フォルダ構成・画像配置・色彩/配色</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 4時間45分</span>
+    <span>📖 HTML本74-82p / Webデザイン本20-26p</span>
+    <span>🎯 リセットCSS・複数クラス・コメントアウト・index.html・相対絶対パス・img/alt・object-fit・RGB/CMYK・補色・3色設計</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="callout primary" style="margin-top: 40px;">
+    <span class="label">📌 今日のひとことまとめ</span>
+    <p style="margin:0; font-size:18px; line-height:1.85;">
+      テーマは <strong>「フォルダの整理・パス」「画像の置き方」「色彩・配色の基礎」</strong>。<br>
+      かんたんに言うと <mark>「index.html は直下に置くとURLが短くなる」「画像は img タグ＋alt、背景は CSS の background」「サイトの色は ベース70%・メイン25%・アクセント5% の3色で設計する」</mark>という話です。
+    </p>
+  </div>
+
+  <nav class="toc" style="margin-top: 40px;">
+    <h2>📑 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（1日の流れ）</a></li>
+      <li><a href="#must">今日おさえる10個</a></li>
+      <li><a href="#reset">リセットCSS・複数クラス</a></li>
+      <li><a href="#comment">コメントアウト</a></li>
+      <li><a href="#folder">フォルダ構成・index.html（図解あり）</a></li>
+      <li><a href="#path">相対パス vs 絶対パス</a></li>
+      <li><a href="#section">セクションタグ・H1ルール</a></li>
+      <li><a href="#image">画像の置き方（img / background）</a></li>
+      <li><a href="#color">色彩の基礎（RGB / CMYK）</a></li>
+      <li><a href="#color-access">色覚特性への配慮</a></li>
+      <li><a href="#scheme">配色の3色設計（図解あり）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">チェックリスト</a></li>
+      <li><a href="#quotes">先生の名言</a></li>
+    </ol>
+  </nav>
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:90px">時刻</th><th>内容</th><th style="width:80px" class="center">大事さ</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><a href="#reset">00:00</a></td><td><a href="#reset"><strong>リセットCSS・複数クラスでカード作成</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#comment">00:15</a></td><td><a href="#comment">コメントアウト（Cmd/Ctrl + /）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#folder">01:03</a></td><td><a href="#folder"><strong>フォルダ構成・index.html（教科書74p）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#section">01:18</a></td><td><a href="#section">セクションタグ・H1は1回</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#path">01:24</a></td><td><a href="#path"><strong>相対パス vs 絶対パス</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#image">01:39</a></td><td><a href="#image"><strong>画像の置き方（img/alt/figure/picture）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#image">02:11</a></td><td><a href="#image">background・object-fit: cover</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">02:25</td><td>お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#color">03:14</a></td><td><a href="#color"><strong>色彩の基礎（RGB加法/CMYK減法）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#color-access">03:22</a></td><td><a href="#color-access"><strong>色覚特性への配慮</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#scheme">03:27</a></td><td><a href="#scheme">補色・色のイメージ</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">04:00</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#scheme">04:09</a></td><td><a href="#scheme"><strong>配色の基礎（ベース/メイン/アクセント）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">04:45</td><td>授業終了</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <div class="card-grid">
+      <a href="#reset" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">1</span><h4>リセットCSS</h4><p>ブラウザの初期余白を消す。reset→styleの順。</p></div></a>
+      <a href="#reset" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">2</span><h4>複数クラス</h4><p>共通＋個別の2クラス。意味のある名前を。</p></div></a>
+      <a href="#comment" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">3</span><h4>コメントアウト</h4><p>Cmd/Ctrl + /。秘密は書かない（丸見え）。</p></div></a>
+      <a href="#folder" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">4</span><h4>index.html</h4><p>直下に置くと<mark>URLが短くなる</mark>。</p></div></a>
+      <a href="#path" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">5</span><h4>相対/絶対パス</h4><p>相対＝今の場所から、絶対＝フルURL。</p></div></a>
+      <a href="#section" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">6</span><h4>H1は1回</h4><p>1ページにh1は1つ。入れ子はクロス禁止。</p></div></a>
+      <a href="#image" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">7</span><h4>img / alt</h4><p>src=パス、alt=代替テキスト。閉じタグなし。</p></div></a>
+      <a href="#image" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">8</span><h4>object-fit: cover</h4><p>画像をゆがめず枠に収める。</p></div></a>
+      <a href="#color" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">9</span><h4>RGB加法</h4><p>RGB＝混ぜると白、CMYK＝混ぜると黒。</p></div></a>
+      <a href="#scheme" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">10</span><h4>3色設計</h4><p>ベース70%・メイン25%・アクセント5%。</p></div></a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="reset">
+    <h2 class="section-title"><span class="icon">🧹</span>リセットCSS・複数クラス</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ブラウザは勝手に余白などを付けます。それを<strong>打ち消すCSS＝リセットCSS</strong>。<br>
+        <code>reset.css</code>（打ち消し担当）と <code>style.css</code>（デザイン担当）に分け、<mark>reset → style の順</mark>で読み込む（下が優先なので後で上書き）。
+      </p>
+    </div>
+    <pre><span class="punct">&lt;</span><span class="selector">link rel</span><span class="punct">=</span><span class="value">"stylesheet"</span> <span class="selector">href</span><span class="punct">=</span><span class="value">"css/reset.css"</span><span class="punct">&gt;</span>
+<span class="punct">&lt;</span><span class="selector">link rel</span><span class="punct">=</span><span class="value">"stylesheet"</span> <span class="selector">href</span><span class="punct">=</span><span class="value">"css/style.css"</span><span class="punct">&gt;</span></pre>
+    <div class="callout">
+      <span class="label">📌 数字クラス名はNG</span>
+      <p style="margin:0;">「box1」だと<strong>何の1か伝わらない</strong>＆順番が固定される。<mark>primary / secondary など意味のある名前</mark>を。共通スタイルは1クラスにまとめるのが賢い。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="comment">
+    <h2 class="section-title"><span class="icon">💬</span>コメントアウト</h2>
+    <p>コードを一時的に無効化＆メモする機能。<strong>Cmd + /（Mac）/ Ctrl + /（Win）</strong>。</p>
+<pre><span class="comment">/* CSSのコメント */</span>
+<span class="punct">&lt;!--</span> HTMLのコメント <span class="punct">--&gt;</span></pre>
+    <div class="callout primary">
+      <span class="label">⚠️ 注意</span>
+      <p style="margin:0;">HTMLのコメントは<strong>DevToolsで丸見え</strong>。<mark>未公開情報・大事なことは書かない</mark>（2ヶ月後のセール情報を隠す→バレる）。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="folder">
+    <h2 class="section-title"><span class="icon">📁</span>フォルダ構成・index.html（図解あり）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説：index.html を直下に置く理由</span>
+      <p style="margin:0;">
+        サーバーは<strong>直下の index.html を自動で開く</strong>機能を持っています。だから <code>example.com/</code> だけでトップが表示され<mark>URLが短くなる</mark>。<code>top.html</code> だと <code>example.com/top.html</code> まで打つ必要があります。
+      </p>
+    </div>
+
+    <h3>フォルダ構成の図解</h3>
+<pre><span class="comment">プロジェクト/</span>
+├── index.html        <span class="comment">← 直下に置く（自動で開かれる）</span>
+├── about/
+│   └── index.html    <span class="comment">→ example.com/about/</span>
+├── css/
+│   ├── reset.css
+│   └── style.css
+└── img/
+    └── photo.jpg</pre>
+    <p style="font-size:14px;color:var(--text-soft);">CSSは <code>css/</code>、画像は <code>img/</code> にまとめる。正解はなく就職先のルールに従う。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="path">
+    <h2 class="section-title"><span class="icon">🧭</span>相対パス vs 絶対パス</h2>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary);border-bottom-color:var(--primary);">相対パス</h4>
+        <ul><li>今のファイルから見た位置</li><li><code>css/style.css</code> / <code>../img/a.png</code></li><li>プロジェクト内の参照</li></ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent);border-bottom-color:var(--accent);">絶対パス</h4>
+        <ul><li>フルURL</li><li><code>https://.../style.css</code></li><li>外部サーバー・Webフォント</li></ul>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);"><code>../</code> ＝1つ上の階層に戻る。「ドサッ／」と覚える（先生ネタ）。</p>
+    <figure style="margin:22px 0;">
+      <img src="img/relative_path.png" alt="先生の板書：相対パスのたどり方（index.html から ../../css/common/common.css まで）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：赤い線が <code>href="../../css/common/common.css"</code> の道のり。<code>../</code> で上の階層へ戻り、フォルダ名で下りていく</figcaption>
+    </figure>
+  </section>
+
+  <hr class="divider">
+
+  <section id="section">
+    <h2 class="section-title"><span class="icon">🏗</span>セクションタグ・H1ルール</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;"><code>&lt;h1&gt;</code> は<strong>1ページに1回だけ</strong>（一番大きな見出し＝サイトのタイトル）。2つ目以降は h2, h3 と下げる。<code>&lt;section&gt;</code> の中には<strong>必ず見出し（h*）を1つ</strong>入れる。</p>
+    </div>
+    <p>タグは<strong>入れ子（親子）</strong>が基本。<mark>クロスさせるのはNG</mark>：</p>
+<pre><span class="comment">/* ○ OK */</span>
+<span class="punct">&lt;</span><span class="selector">div</span><span class="punct">&gt;&lt;</span><span class="selector">p</span><span class="punct">&gt;</span>文<span class="punct">&lt;/</span><span class="selector">p</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+<span class="comment">/* ✕ NG（クロス） */</span>
+<span class="punct">&lt;</span><span class="selector">div</span><span class="punct">&gt;&lt;</span><span class="selector">p</span><span class="punct">&gt;</span>文<span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;&lt;/</span><span class="selector">p</span><span class="punct">&gt;</span></pre>
+  </section>
+
+  <hr class="divider">
+
+  <section id="image">
+    <h2 class="section-title"><span class="icon">🖼</span>画像の置き方（img / background）</h2>
+<pre><span class="punct">&lt;</span><span class="selector">img src</span><span class="punct">=</span><span class="value">"img/shinjuku.jpg"</span> <span class="selector">alt</span><span class="punct">=</span><span class="value">"新宿の夜景"</span><span class="punct">&gt;</span></pre>
+    <ul class="bullet-pro">
+      <li><strong>閉じタグなし</strong></li>
+      <li><code>src</code>＝画像までのパス、<code>alt</code>＝代替テキスト（音声読み上げ用。<mark>できる限り入れる</mark>）</li>
+      <li>意味のある画像＝<code>img</code>、背景＝CSSの<code>background</code></li>
+      <li><strong>figure/figcaption</strong>＝独立した画像＋キャプション、<strong>picture/source</strong>＝画面幅で画像切替</li>
+    </ul>
+    <div class="callout">
+      <span class="label">💡 object-fit: cover</span>
+      <p style="margin:0;">width/heightを無理に指定すると画像が<strong>潰れる</strong>。<code>object-fit: cover</code> で<mark>アスペクト比を保ったままトリミング</mark>。フリー素材はUnsplashなど、ダウンロードしたらリネームして img/ にまとめる。</p>
+    </div>
+    <figure style="margin:22px 0;">
+      <img src="img/image_usage.png" alt="先生の板書：背景としての画像 と 情報としての画像 の違い" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：左＝雰囲気づくりの「背景としての画像」（CSSの background）、右＝中身を伝える「情報としての画像」（<code>img</code> ＋ alt）</figcaption>
+    </figure>
+  </section>
+
+  <hr class="divider">
+
+  <section id="color">
+    <h2 class="section-title"><span class="icon">🎨</span>色彩の基礎（RGB / CMYK）</h2>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary);border-bottom-color:var(--primary);">RGB（加法混色）</h4>
+        <ul><li>Red/Green/Blue（光の三原色）</li><li>モニター表示</li><li><strong>混ぜるほど明るく→白</strong></li><li>Webは必ずこれ</li></ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent);border-bottom-color:var(--accent);">CMYK（減法混色）</h4>
+        <ul><li>シアン/マゼンタ/イエロー/黒</li><li>印刷物</li><li><strong>混ぜるほど暗く→黒</strong></li><li>Webでは使わない</li></ul>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="label">📌 色の3属性</span>
+      <p style="margin:0;"><strong>色相</strong>（色の種類）・<strong>明度</strong>（明るさ）・<strong>彩度</strong>（鮮やかさ）。無彩色＝白黒灰、有彩色＝色味のあるもの。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="color-access">
+    <h2 class="section-title"><span class="icon">♿</span>色覚特性への配慮</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        日本人の<strong>男性は約20人に1人</strong>、女性は約500人に1人が色覚特性を持ちます。<br>
+        → <mark>色だけに頼らないデザイン</mark>（アイコン・形・動きでも区別できるように）が大切。検査は病院の「石原式」。Web画面では正確に測れません。
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="scheme">
+    <h2 class="section-title"><span class="icon">🎯</span>配色の3色設計（図解あり）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説：補色</span>
+      <p style="margin:0;">
+        色相環で<strong>正反対の色＝補色</strong>（黄↔紫、青↔オレンジ）。<mark>馴染ませたい→近い色、目立たせたい→補色</mark>。例：NBAレイカーズは黄×紫（補色）で文字がくっきり。
+      </p>
+    </div>
+
+    <h3>サイトの3色設計（図解）</h3>
+    <div style="display:grid; grid-template-columns:7fr 2.5fr 0.5fr; gap:0; margin:20px 0; border-radius:10px; overflow:hidden; border:1px solid var(--border);">
+      <div style="background:#f0e6d2; padding:24px 16px; text-align:center;"><strong>ベースカラー</strong><br><span style="font-size:13px;">約70%（背景・土台）</span></div>
+      <div style="background:#1a3a5c; color:white; padding:24px 16px; text-align:center;"><strong>メインカラー</strong><br><span style="font-size:13px;">約25%（ブランド色）</span></div>
+      <div style="background:#e07b00; color:white; padding:24px 4px; text-align:center; font-size:11px;">5%</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>役割</th><th>割合</th><th>使い所</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ベースカラー</strong></td><td>約70%</td><td>背景など土台。彩度低めが多い</td></tr>
+          <tr><td><strong>メインカラー</strong></td><td>約25%</td><td>サイトの印象＝ブランド色。ボタン等</td></tr>
+          <tr><td><strong>アクセントカラー</strong></td><td>約5%</td><td>強調したい所だけ。補色で視線を奪う</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure style="margin:22px 0;">
+      <img src="img/color_ratio.png" alt="先生の板書：webサイトの配色の割合（ベース／メイン／アクセント）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：色の帯がそのまま割合のイメージ。土台のベース、ブランド色のメイン、ここぞで効かせるアクセントの3層</figcaption>
+    </figure>
+    <p style="font-size:14px;color:var(--text-soft);">配色パターン：モノクロ／ダイアード（補色2色）／トライアド（3色）／類似色／スプリットコンプリメンタリー。配色サイトはあくまで「きっかけ」、そのまま使わず微調整を。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>リセットCSS</strong></td><td>ブラウザの初期スタイルを打ち消すCSS</td></tr>
+          <tr><td><strong>index.html</strong></td><td>サーバーが自動表示するトップ用ファイル名</td></tr>
+          <tr><td><strong>相対パス</strong></td><td>今のファイルから見た位置（<code>../img/a.png</code>）</td></tr>
+          <tr><td><strong>絶対パス</strong></td><td>フルURL</td></tr>
+          <tr><td><strong>section / h1</strong></td><td>塊タグ / 最大見出し（1ページ1回）</td></tr>
+          <tr><td><strong>img / alt</strong></td><td>画像タグ / 代替テキスト</td></tr>
+          <tr><td><strong>object-fit: cover</strong></td><td>比率を保ってトリミング</td></tr>
+          <tr><td><strong>RGB / CMYK</strong></td><td>光の三原色（加法）/ 印刷の色（減法）</td></tr>
+          <tr><td><strong>色相・明度・彩度</strong></td><td>色の3属性</td></tr>
+          <tr><td><strong>補色</strong></td><td>色相環で正反対の色。コントラスト強</td></tr>
+          <tr><td><strong>ベース/メイン/アクセント</strong></td><td>サイトの3色設計（約70/25/5%）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>リセットCSSとstyle.cssの<strong>読み込み順</strong>（reset→style）を理解</li>
+      <li>数字クラス名を避け<strong>意味のある名前</strong>をつける</li>
+      <li>コメントアウト（Cmd/Ctrl+/）を使う・秘密は書かない</li>
+      <li><strong>index.htmlを直下に置く理由</strong>を説明できる</li>
+      <li><strong>相対パスと絶対パス</strong>の違いを言える</li>
+      <li><strong>H1は1ページ1回</strong>・section内に見出し必須</li>
+      <li>imgの src/alt を正しく書ける</li>
+      <li><code>object-fit: cover</code> で画像の歪みを防ぐ</li>
+      <li><strong>RGB=加法（白へ）/ CMYK=減法（黒へ）</strong>を覚える</li>
+      <li><strong>3色設計（ベース70/メイン25/アクセント5）</strong>を意識</li>
+      <li>色だけに頼らないデザインを心がける</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言</h2>
+    <blockquote>数字を好まない理由は<strong>意味が伝わりづらいから</strong>。「box1」って、それって何の1なの？</blockquote>
+    <blockquote>コメントアウトに大事なことは書かない。<strong>DevToolsで丸見え</strong>。</blockquote>
+    <blockquote>RGBは混ぜれば混ぜるほど明るくなって<strong>白</strong>。印刷のCMYKは混ぜると<strong>黒</strong>。逆なんですね。</blockquote>
+    <blockquote>馴染ませたい時は近い色、<strong>パキッと差をつけたい時は補色</strong>。何か作る時にとても役立つので覚えて。</blockquote>
+    <blockquote>色だけに頼らないデザインが大事。日本人男性は<strong>20人に1人</strong>が色覚特性を持つ。</blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-19｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

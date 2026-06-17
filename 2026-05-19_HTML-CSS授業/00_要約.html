@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中央配置の本当の方法・ヘッダー/フッター構築・address/tel/small｜2026年5月19日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月19日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>中央配置の本当の方法・ヘッダー/フッター構築・address/tel/small</h1>
+  <p class="subtitle">訓練校 IT スクール｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間42分</span>
+    <span>📖 HTML本123-124p（フッタータグ・address/small）</span>
+    <span>🎯 position absolute中央配置, transform translate, z-index, ヘッダー構築, position fixed, :not(:last-of-type), address, tel:リンク, small, &copy;, セレクター応用</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>1〜2時間目</td><td><a href="#center">前回演習の解説：中央配置（flex / position absolute / transform）</a></td></tr>
+          <tr><td>休憩前</td><td><a href="#zindex">z-index で重なり順を制御</a></td></tr>
+          <tr><td>4時間目</td><td><a href="#header">ヘッダーを作る（ロゴ＋ナビゲーション）</a></td></tr>
+          <tr><td>4時間目後半</td><td><a href="#fixed">ヘッダーを上部固定（position: fixed）</a></td></tr>
+          <tr><td>5時間目</td><td><a href="#exercise">教科書123pの演習：自力でレイアウトを組む</a></td></tr>
+          <tr><td>6時間目</td><td><a href="#footer">フッターを作る（address / tel: / small / &amp;copy;）</a></td></tr>
+          <tr><td>終盤</td><td><a href="#selector">セレクター応用：<code>:not(:last-of-type)</code> で一括指定</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li><strong>position: absolute + top:50% + left:50%</strong> だけでは中央にならない。<code>transform: translate(-50%, -50%)</code> でやっと真の中央</li>
+      <li><strong>z-index</strong> ＝重なり順。大きい数字ほど前面。<code>9999</code> 入れときゃ大体OK</li>
+      <li>ヘッダーは <code>&lt;header&gt;</code>＋中に <code>div.header-container</code> をかぶせる癖（CSS書きやすい）</li>
+      <li>ロゴは <code>&lt;h1&gt;</code>、ナビは <code>nav &gt; ul &gt; li &gt; a</code></li>
+      <li><strong>display: flex + justify-content: space-between + align-items: center</strong> で左右両端＆縦中央</li>
+      <li><code>:not(:last-of-type)</code>＋<code>margin-right</code> で「最後以外」に余白</li>
+      <li>ヘッダー上部固定＝<strong>position: fixed</strong>（親はrelative不要）。z-index: 9999 で前面に</li>
+      <li>連絡先のかたまりは <strong>&lt;address&gt;</strong>（自動でイタリック、戻すなら <code>font-style: normal</code>）</li>
+      <li>電話番号リンクは <strong><code>&lt;a href="tel:0000-0000"&gt;</code></strong> でクリックすると電話が起動</li>
+      <li>コピーライトは <strong>&lt;small&gt;</strong>、マルシは <strong><code>&amp;copy;</code></strong> の特殊文字で書く</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="center">
+    <h2 class="section-title"><span class="icon">🎯</span>position absolute で中央にならない問題</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        親に <code>position: relative</code>、子に <code>position: absolute; top:50%; left:50%</code> を書いた時、<strong>子の左上の角</strong>が親の中央に置かれます。<mark>子の中心ではない</mark>のがミソ。だから「タイトル」が右下にズレて見える。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/position_center.png" alt="先生の板書：position absolute だけでは真ん中にならない理由を示す図" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：右のCSSを書いただけだと、青矢印の場所＝子要素の「ここが基準」になっているので、タイトルが右下にズレる</figcaption>
+    </figure>
+
+    <h3>解決法は <code>transform: translate(-50%, -50%)</code></h3>
+    <p>子要素を自分の幅・高さの半分ぶん左上に戻すと、ようやく真の中央になります。</p>
+<pre><span class="comment">/* 親 */</span>
+<span class="selector">.mv</span> <span class="punct">{</span> <span class="property">position</span><span class="punct">:</span> <span class="value">relative</span><span class="punct">;</span> <span class="punct">}</span>
+
+<span class="comment">/* 子（真の中央配置） */</span>
+<span class="selector">.mv h1</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">absolute</span><span class="punct">;</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">50%</span><span class="punct">;</span>
+    <span class="property">left</span><span class="punct">:</span> <span class="value">50%</span><span class="punct">;</span>
+    <span class="property">transform</span><span class="punct">:</span> <span class="value">translate(-50%, -50%)</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout">
+      <span class="label">📌 もう1つの中央配置法（フレックスボックス）</span>
+      <p style="margin:0;">親に <code>display: flex; justify-content: center; align-items: center;</code> でも真ん中に置けます。シンプルなのでこちらが多用される。<strong>positionは「カンプから座標で位置を取りたい時」</strong>に強い。</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">手法</th><th>使い所</th></tr></thead>
+        <tbody>
+          <tr><td><strong>flex で中央</strong></td><td>普通の中央配置。シンプル＆レスポンシブに強い</td></tr>
+          <tr><td><strong>position absolute + translate</strong></td><td>カンプの座標どおりに置きたい時／重ねたい時</td></tr>
+          <tr><td><strong>margin: 0 auto</strong></td><td>横方向のみ中央。ブロック要素＋widthが必要</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="zindex">
+    <h2 class="section-title"><span class="icon">🃏</span>z-index で重なり順を決める</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <code>position</code> を付けた要素同士はレイヤー（重ね順）が発生します。<mark>あとに書いた要素ほど前面</mark>。これだとヘッダーがメインビジュアルに隠れちゃう。<strong>z-index</strong> で順番を上書きできます。
+      </p>
+    </div>
+<pre><span class="selector">.header-container</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">fixed</span><span class="punct">;</span>
+    <span class="property">z-index</span><span class="punct">:</span> <span class="value">9999</span><span class="punct">;</span>  <span class="comment">/* 絶対に前面に出したい */</span>
+<span class="punct">}</span></pre>
+    <ul class="bullet-pro">
+      <li>数字が<strong>大きいほど前面</strong>（小さい数字は後ろ）</li>
+      <li><code>z-index</code> は <code>position</code>（relative/absolute/fixed/sticky）が付いた要素にしか効かない</li>
+      <li>現場で <code>9999</code> がよく使われる。「とにかく一番前」のおまじない</li>
+      <li>細かく管理するなら <code>1, 2, 3</code> や <code>10, 20, 30</code> で段組み</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="header">
+    <h2 class="section-title"><span class="icon">🧭</span>ヘッダーを作る（ロゴ＋ナビゲーション）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <code>&lt;header&gt;</code> の<strong>中にもう1個</strong> <code>&lt;div class="header-container"&gt;</code> を作って、CSSは中の <code>div</code> に書く——これが現場の癖。ヘッダー自体に直接書かないのは、後で位置調整や背景色を分けやすくするため。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/hero_mockup.png" alt="先生の板書：ヘッダー＋メインビジュアル完成例（キャンプをしよう！）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：今日作る完成形。上部にロゴ＋ナビ（top / about / service / access / contact）、下に背景画像と「キャンプをしよう！」のタイトル＋説明文</figcaption>
+    </figure>
+
+    <h3>HTML構造</h3>
+<pre><span class="punct">&lt;</span><span class="selector">header</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">div class</span><span class="punct">=</span><span class="value">"header-container"</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">h1</span><span class="punct">&gt;&lt;</span><span class="selector">img src</span><span class="punct">=</span><span class="value">"img/logo.png"</span> <span class="selector">alt</span><span class="punct">=</span><span class="value">"ロゴ"</span><span class="punct">&gt;&lt;/</span><span class="selector">h1</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">nav class</span><span class="punct">=</span><span class="value">"h-nav"</span><span class="punct">&gt;</span>
+      <span class="punct">&lt;</span><span class="selector">ul</span><span class="punct">&gt;</span>
+        <span class="punct">&lt;</span><span class="selector">li</span><span class="punct">&gt;&lt;</span><span class="selector">a href</span><span class="punct">=</span><span class="value">"#"</span><span class="punct">&gt;</span>top<span class="punct">&lt;/</span><span class="selector">a</span><span class="punct">&gt;&lt;/</span><span class="selector">li</span><span class="punct">&gt;</span>
+        <span class="punct">&lt;</span><span class="selector">li</span><span class="punct">&gt;&lt;</span><span class="selector">a href</span><span class="punct">=</span><span class="value">"#"</span><span class="punct">&gt;</span>about<span class="punct">&lt;/</span><span class="selector">a</span><span class="punct">&gt;&lt;/</span><span class="selector">li</span><span class="punct">&gt;</span>
+        <span class="comment">/* … 5個ぶん繰り返し */</span>
+      <span class="punct">&lt;/</span><span class="selector">ul</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;/</span><span class="selector">nav</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+<span class="punct">&lt;/</span><span class="selector">header</span><span class="punct">&gt;</span></pre>
+
+    <h3>CSS（フレックスで左右両端＋縦中央）</h3>
+<pre><span class="selector">.header-container</span> <span class="punct">{</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">padding</span><span class="punct">:</span> <span class="value">8px 64px</span><span class="punct">;</span>      <span class="comment">/* 上下8px、左右64px */</span>
+    <span class="property">display</span><span class="punct">:</span> <span class="value">flex</span><span class="punct">;</span>
+    <span class="property">justify-content</span><span class="punct">:</span> <span class="value">space-between</span><span class="punct">;</span>  <span class="comment">/* ロゴとnav を左右両端に */</span>
+    <span class="property">align-items</span><span class="punct">:</span> <span class="value">center</span><span class="punct">;</span>          <span class="comment">/* 縦方向ど真ん中 */</span>
+<span class="punct">}</span>
+<span class="selector">.h-nav ul</span> <span class="punct">{</span> <span class="property">display</span><span class="punct">:</span> <span class="value">flex</span><span class="punct">;</span> <span class="punct">}</span>     <span class="comment">/* ナビのli を横並びに */</span></pre>
+
+    <div class="callout success">
+      <span class="label">🔑 :not(:last-of-type) で「最後以外」に余白</span>
+      <p style="margin:0;">リンクとリンクの間に <code>64px</code> 開けたい時、最後の <code>li</code> だけ余白なし＝の書き方：</p>
+    </div>
+<pre><span class="selector">.h-nav li:not(:last-of-type)</span> <span class="punct">{</span>
+    <span class="property">margin-right</span><span class="punct">:</span> <span class="value">64px</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+    <p><strong>:not(セレクタ)</strong>＝「○○以外」を選ぶ。<code>:last-of-type</code>＝「同じタグの最後のやつ」。組み合わせて<mark>「最後以外」</mark>を一括指定。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="fixed">
+    <h2 class="section-title"><span class="icon">📌</span>ヘッダーを上部固定（position: fixed）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        スクロールしてもヘッダーが画面の上に張り付くやつ。<strong>position: fixed</strong> で実現します。<mark>fixed は親のrelativeに左右されない</mark>（ブラウザ画面が基準）のがabsoluteとの違い。
+      </p>
+    </div>
+<pre><span class="selector">.header-container</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">fixed</span><span class="punct">;</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span>
+    <span class="property">left</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">z-index</span><span class="punct">:</span> <span class="value">9999</span><span class="punct">;</span>   <span class="comment">/* 絶対前面 */</span>
+<span class="punct">}</span></pre>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">値</th><th>基準</th><th>スクロール時</th></tr></thead>
+        <tbody>
+          <tr><td><code>fixed</code></td><td><strong>ブラウザ画面</strong></td><td>位置が動かない（張り付く）</td></tr>
+          <tr><td><code>absolute</code></td><td>親の relative</td><td>スクロールと一緒に動く</td></tr>
+          <tr><td><code>relative</code></td><td>元あった位置</td><td>スクロールと一緒に動く</td></tr>
+          <tr><td><code>sticky</code></td><td>スクロール位置</td><td>ある場所まで来たら張り付く</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">訓練校の公式サイトのヘッダーも fixed。今いる場所にヘッダーが追従するタイプ。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="mainvisual">
+    <h2 class="section-title"><span class="icon">🖼</span>メインビジュアル（背景画像＋中央タイトル）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        画面いっぱいの背景画像の上にタイトルを<strong>カンプ通りの位置</strong>に配置する。<mark>カンプを見て「上から160px、左から120px、幅600px」</mark>のように数字を読み取り、<code>position: absolute</code> で座標指定する流れ。
+      </p>
+    </div>
+<pre><span class="selector">.mv</span> <span class="punct">{</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">height</span><span class="punct">:</span> <span class="value">100vh</span><span class="punct">;</span>             <span class="comment">/* 画面高さいっぱい */</span>
+    <span class="property">background</span><span class="punct">:</span> <span class="value">url(img/hero.jpg) center/cover no-repeat</span><span class="punct">;</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">relative</span><span class="punct">;</span>          <span class="comment">/* 中の要素の基準にする */</span>
+<span class="punct">}</span>
+<span class="selector">.mv-content</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">absolute</span><span class="punct">;</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">160px</span><span class="punct">;</span>
+    <span class="property">left</span><span class="punct">:</span> <span class="value">120px</span><span class="punct">;</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">600px</span><span class="punct">;</span>
+    <span class="property">color</span><span class="punct">:</span> <span class="value">white</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+    <p>背景指定のショートハンド：<code>background: 画像URL 位置 / サイズ 繰り返し;</code>。今回は <code>url(...) center/cover no-repeat</code>＝中央配置・はみ出してでも全面を覆う・繰り返さない。</p>
+
+    <div class="callout">
+      <span class="label">📐 ピクセルパーフェクトは追わない</span>
+      <p style="margin:0;">ブラウザ幅とカンプ幅が違うので<strong>完全一致は不可能</strong>。<mark>ほぼ一緒なら大丈夫</mark>。Figma側で <code>Option</code>キーを押しながら要素をホバーすると、要素間の距離が表示される（スマートガイド）。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="exercise">
+    <h2 class="section-title"><span class="icon">✏️</span>5時間目の演習（教科書123p）</h2>
+    <p>1時間で<strong>自力で</strong>レイアウトを組む練習。教科書から画像だけ引っ張ってきて、HTML/CSSは今までの知識で書く。</p>
+    <ul class="bullet-pro">
+      <li>背景色は茶色系（好きな色でOK）</li>
+      <li>リンクの色も自由</li>
+      <li>ナビゲーション全体に <strong>60px のパディング</strong></li>
+      <li>各リンクに <strong>0.5em（半文字分）のパディング</strong>＝クリック領域を広げる</li>
+      <li>その他の余白は気にしすぎなくてOK、数字が書いてある所だけ守る</li>
+    </ul>
+    <div class="callout">
+      <span class="label">💡 演習のコツ</span>
+      <p style="margin:0;"><mark>外側から内側へ</mark>書いていく。footerタグ → footer-containerの位置決め → 中の各要素の見た目 → 細かい余白。完成形を頭に入れてからCSSを書き始めると迷子にならない。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="footer">
+    <h2 class="section-title"><span class="icon">🦶</span>フッターを作る（address / tel: / small / &amp;copy;）</h2>
+
+    <figure style="margin:22px 0;">
+      <img src="img/footer_mockup.png" alt="先生の板書：フッター完成例（Natural Coffee）、20px間隔の余白注釈つき" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：1000px幅の白い枠の中にロゴ→住所→ナビ→コピーライトが並ぶ。各ブロック間が <strong>20px</strong>、リンクのまわりは <strong>0.5rem</strong> のパディング</figcaption>
+    </figure>
+
+    <h3>今日の新しいタグ・テクニック</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:180px">タグ／属性</th><th>意味・使い所</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;address&gt;</code></td><td>ページ制作者・会社の連絡先（住所・電話・メール）。<strong>自動でイタリック表示</strong>になる</td></tr>
+          <tr><td><code>font-style: normal</code></td><td>address のイタリックを戻したい時</td></tr>
+          <tr><td><code>&lt;a href="tel:00-0000-0000"&gt;</code></td><td>クリック／タップで電話アプリ起動。スマホなら直接かけられる</td></tr>
+          <tr><td><code>&lt;small&gt;</code></td><td>コピーライト表記の慣習。日本のサイトはほぼこれで囲う（海外は span が多い）</td></tr>
+          <tr><td><code>&amp;copy;</code></td><td>マルシ（©）の<strong>特殊文字</strong>。直接「©」を書くと文字化けの可能性。<code>&amp;copy;</code> のほうが安全</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>HTML構造</h3>
+<pre><span class="punct">&lt;</span><span class="selector">footer</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">div class</span><span class="punct">=</span><span class="value">"footer-container"</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">img src</span><span class="punct">=</span><span class="value">"img/logo.png"</span> <span class="selector">alt</span><span class="punct">=</span><span class="value">"Natural Coffee"</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">address</span><span class="punct">&gt;</span>
+      <span class="punct">&lt;</span><span class="selector">p</span><span class="punct">&gt;&lt;</span><span class="selector">span</span><span class="punct">&gt;</span>〒101-0051<span class="punct">&lt;/</span><span class="selector">span</span><span class="punct">&gt;</span> 東京都千代田区神田神保町1丁目105<span class="punct">&lt;/</span><span class="selector">p</span><span class="punct">&gt;</span>
+      <span class="punct">&lt;</span><span class="selector">p</span><span class="punct">&gt;&lt;</span><span class="selector">a href</span><span class="punct">=</span><span class="value">"tel:00-0000-0000"</span><span class="punct">&gt;</span>00-0000-0000<span class="punct">&lt;/</span><span class="selector">a</span><span class="punct">&gt;&lt;/</span><span class="selector">p</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;/</span><span class="selector">address</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">ul class</span><span class="punct">=</span><span class="value">"f-address"</span><span class="punct">&gt;</span>
+      <span class="punct">&lt;</span><span class="selector">li</span><span class="punct">&gt;&lt;</span><span class="selector">a href</span><span class="punct">=</span><span class="value">"#"</span><span class="punct">&gt;</span>トップ<span class="punct">&lt;/</span><span class="selector">a</span><span class="punct">&gt;&lt;/</span><span class="selector">li</span><span class="punct">&gt;</span>
+      <span class="comment">/* … 6個ぶん */</span>
+    <span class="punct">&lt;/</span><span class="selector">ul</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">small</span><span class="punct">&gt;&amp;copy;</span> MdN Corporation.<span class="punct">&lt;/</span><span class="selector">small</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+<span class="punct">&lt;/</span><span class="selector">footer</span><span class="punct">&gt;</span></pre>
+    <div class="callout">
+      <span class="label">📌 nav タグはフッターでは使わない（慣例）</span>
+      <p style="margin:0;"><code>&lt;nav&gt;</code> は<strong>サイトのメインのナビゲーション</strong>（＝ヘッダー側のグローバルナビ）に使うのが通例。フッターのリンク一覧は <code>nav</code> を使わず直接 <code>ul</code>。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="selector">
+    <h2 class="section-title"><span class="icon">🎯</span>セレクター応用：最後以外を一括指定</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        フッターは「ロゴ・住所・ナビ・コピーライト」のかたまりが縦に並んでいて、間隔がすべて <strong>20px</strong>。<mark>1個ずつmarginを書くのは面倒</mark>。子要素全部に「margin-bottom:20px、ただし最後だけ0」を一括で指定できる書き方が便利。
+      </p>
+    </div>
+<pre><span class="comment">/* footer-container の直下の全要素、ただし最後の type 以外 */</span>
+<span class="selector">.footer-container &gt; *:not(:last-of-type)</span> <span class="punct">{</span>
+    <span class="property">margin-bottom</span><span class="punct">:</span> <span class="value">20px</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+    <ul class="bullet-pro">
+      <li><code>&gt;</code>＝<strong>直接の子要素のみ</strong>（孫まではいかない）</li>
+      <li><code>*</code>＝あらゆる要素（全部）</li>
+      <li><code>:not(:last-of-type)</code>＝最後のタグ以外</li>
+      <li>組み合わせて<strong>「直下の子要素ぜんぶ、ただし最後以外」</strong>を1行でカバー</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">🔑 セレクターを使いこなすほどCSSが短くなる</span>
+      <p style="margin:0;">先生から共有されている<strong>CSSセレクター チートシート</strong>をブックマークしてすぐ見れるようにしておくと、こういうテクニカルな選び方ができるようになる。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="link-padding">
+    <h2 class="section-title"><span class="icon">👆</span>Aタグの padding でクリック領域を広げる</h2>
+    <p>リンクの周りに <code>padding</code> を付けると、<strong>その範囲もクリックできる</strong>ようになる（リンクのアタリ判定が大きくなる）。</p>
+<pre><span class="selector">.f-address a</span> <span class="punct">{</span>
+    <span class="property">padding</span><span class="punct">:</span> <span class="value">0.5rem</span><span class="punct">;</span>   <span class="comment">/* 上下左右に半文字分 */</span>
+<span class="punct">}</span></pre>
+    <ul class="bullet-pro">
+      <li>パソコンだけならそこまで気にしなくてOK</li>
+      <li><strong>スマホの時こそ大事</strong>＝指でタップしやすい大きさにする（ユーザーフレンドリー）</li>
+      <li>緑のハイライト部分（DevToolsで見える padding 範囲）まで反応する</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="text-center">
+    <h2 class="section-title"><span class="icon">📐</span>テキスト・要素の中央寄せまとめ</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:230px">目的</th><th>書き方</th></tr></thead>
+        <tbody>
+          <tr><td>テキスト・インライン要素を中央</td><td><code>text-align: center;</code> を親に</td></tr>
+          <tr><td>ブロック要素を横方向中央</td><td><code>margin: 0 auto;</code>＋<code>width</code> 指定</td></tr>
+          <tr><td>子要素を縦横ど真ん中（flex）</td><td><code>display: flex; justify-content: center; align-items: center;</code></td></tr>
+          <tr><td>絶対座標で真ん中（position）</td><td><code>top:50%; left:50%; transform: translate(-50%,-50%);</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>フッターの白い枠を中央に置く時は <code>margin: 0 auto</code>、中の文字を中央揃えにする時は <code>text-align: center</code>。両方使う場面が多い。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>position: relative</strong></td><td>子の absolute の基準になる。自分の位置はそのまま</td></tr>
+          <tr><td><strong>position: absolute</strong></td><td>親の relative を基準に座標で配置。スクロールと一緒に動く</td></tr>
+          <tr><td><strong>position: fixed</strong></td><td>ブラウザ画面が基準。スクロールしても張り付く</td></tr>
+          <tr><td><strong>transform: translate(-50%, -50%)</strong></td><td>自分の幅・高さの半分ぶん左上に戻す。真の中央配置の決め手</td></tr>
+          <tr><td><strong>z-index</strong></td><td>重なり順。大きいほど前面。<code>9999</code> がよく使われる</td></tr>
+          <tr><td><strong>justify-content: space-between</strong></td><td>フレックスで左右両端配置</td></tr>
+          <tr><td><strong>align-items: center</strong></td><td>フレックスで縦方向中央</td></tr>
+          <tr><td><strong>:not(:last-of-type)</strong></td><td>「同じタグの最後以外」を選ぶ疑似クラス</td></tr>
+          <tr><td><strong>&gt; *</strong></td><td>直下の子要素ぜんぶ</td></tr>
+          <tr><td><strong>&lt;address&gt;</strong></td><td>連絡先用タグ。自動でイタリック</td></tr>
+          <tr><td><strong>href="tel:..."</strong></td><td>クリックで電話アプリ起動するリンク</td></tr>
+          <tr><td><strong>&lt;small&gt;</strong></td><td>コピーライト等の小さい注釈。日本のサイトは慣習でよく使う</td></tr>
+          <tr><td><strong>&amp;copy;</strong></td><td>マルシ（©）の特殊文字</td></tr>
+          <tr><td><strong>特殊文字</strong></td><td><code>&amp;◯◯;</code> で文字を表現するエスケープ記法</td></tr>
+          <tr><td><strong>ピクセルパーフェクト</strong></td><td>カンプとブラウザを完全一致させる考え方（今は現実的でない）</td></tr>
+          <tr><td><strong>スマートガイド</strong></td><td>Figma でOptionキー＋ホバーで出る要素間距離表示</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li><strong>position absolute だけでは中央にならない</strong>理由を説明できる（左上が基準）</li>
+      <li><code>transform: translate(-50%, -50%)</code> で真の中央配置</li>
+      <li>flex と position の<strong>使い分け</strong>を意識する</li>
+      <li><strong>z-index: 9999</strong> でヘッダーを前面に</li>
+      <li><code>position: fixed</code> で上部固定（親relative不要、ブラウザ画面が基準）</li>
+      <li>ヘッダーは <code>header &gt; div.header-container</code> の二重構造</li>
+      <li><code>display: flex + justify-content: space-between + align-items: center</code>＝両端＆縦中央</li>
+      <li><code>:not(:last-of-type)</code>＋<code>margin-right</code> で「最後以外」に余白</li>
+      <li><code>&lt;address&gt;</code> 連絡先タグ＝自動イタリック、<code>font-style: normal</code> で戻せる</li>
+      <li><code>&lt;a href="tel:..."&gt;</code> で電話リンク</li>
+      <li><code>&lt;small&gt;</code> ＋ <code>&amp;copy;</code> でコピーライト表記</li>
+      <li><code>.parent &gt; *:not(:last-of-type)</code> で子要素全部に一括指定（最後だけ除外）</li>
+      <li>Aタグの padding でクリック領域を広げる（特にスマホ）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>9999なんて入れときゃ、絶対前面に来るんで。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ z-index の現場あるある。細かく管理せず一発で前に出す技。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>ピクセルパーフェクト、昨今の時代ちょっと難しいので、ほとんど一緒なら大丈夫です。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 完璧主義を脱却するアドバイス。ブラウザもデバイスも違うから完全一致は不可能。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>ふわちゃんのサイト、divだらけで作られてたみたいな話</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ セマンティックなタグを使わなくても作れるけど、可読性・保守性のために <code>header / main / footer</code> を使う方が綺麗。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-20｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

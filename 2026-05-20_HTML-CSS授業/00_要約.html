@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>テーブル・グリッドレイアウト・フォーム（input/select/textarea）｜2026年5月20日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月20日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>テーブル・グリッドレイアウト・フォーム（input/select/textarea）</h1>
+  <p class="subtitle">訓練校 IT スクール｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間42分</span>
+    <span>📖 HTML本132-151p（テーブル/グリッド/フォーム）</span>
+    <span>🎯 table/tr/th/td, border-collapse, colspan/rowspan, CSS Grid, grid-template-columns/rows, gap, fr単位, form, input+type, label/for, name, select/option, textarea, submit, placeholder, 属性セレクター, SSL/https</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>1時間目</td><td><a href="#table">テーブル（表組）を作る</a></td></tr>
+          <tr><td>2時間目</td><td><a href="#table-merge">セルの結合（colspan / rowspan）</a></td></tr>
+          <tr><td>2〜3時間目</td><td><a href="#grid">グリッドレイアウト（CSS Grid）</a></td></tr>
+          <tr><td>3時間目</td><td><a href="#grid-fr">fr単位でレスポンシブ</a></td></tr>
+          <tr><td>4時間目</td><td><a href="#form-mechanism">フォームの仕組み（フロントとサーバー）</a></td></tr>
+          <tr><td>4時間目</td><td><a href="#form-tags">フォームのタグ（input / label / select / textarea）</a></td></tr>
+          <tr><td>5時間目</td><td><a href="#form-design">フォームのデザイン（CSS）</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li><strong>テーブル</strong>＝<code>table &gt; tr &gt; th / td</code>。<code>tr</code>の中のセル数は<mark>全行そろえる</mark></li>
+      <li>セル間の隙間消し＝<code>border-collapse: collapse;</code> ＋ <code>border-spacing: 0;</code></li>
+      <li>セル結合＝<code>colspan</code>（横）/ <code>rowspan</code>（縦）。結合した分セルを減らす</li>
+      <li><strong>グリッド</strong>＝<code>display: grid</code>。flexと違い<mark>縦横2次元</mark>で配置できる</li>
+      <li><code>grid-template-columns</code>（列）/ <code>grid-template-rows</code>（行）で枠を作る</li>
+      <li>すき間は <code>gap</code>（flexでも使える）。<code>fr</code> 単位は割合指定（1fr 1fr 1fr＝均等）</li>
+      <li><strong>グリッドは最悪覚えなくてOK、まず flex を完璧に</strong>（先生の方針）</li>
+      <li>フォーム＝見た目はHTML/CSS、<mark>処理はプログラミング＋サーバー</mark>（セキュリティ重要）</li>
+      <li><code>input</code> の <strong>type属性</strong>で部品が変わる（text/email/radio/checkbox…）</li>
+      <li><code>label</code> の <strong>for</strong> と <code>input</code> の <strong>id</strong> を一致させると<mark>クリックで反応</mark></li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="table">
+    <h2 class="section-title"><span class="icon">▦</span>テーブル（表組）を作る</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        表は<strong>4種類のタグ</strong>を組み合わせて作ります。<mark>先に「どんな表か」を紙やFigmaで描いてから</mark>タグに置き換えると迷いません。なお、テーブルは昔レイアウト作りに使われましたが、<strong>今はflex/gridがあるのであまり使いません</strong>。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:130px">タグ</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;table&gt;</code></td><td>表全体をまとめる</td></tr>
+          <tr><td><code>&lt;caption&gt;</code></td><td>表のタイトル</td></tr>
+          <tr><td><code>&lt;tr&gt;</code></td><td>テーブルロー＝1行。<strong>trの数＝行数</strong></td></tr>
+          <tr><td><code>&lt;th&gt;</code></td><td>テーブルヘッド＝見出しセル</td></tr>
+          <tr><td><code>&lt;td&gt;</code></td><td>テーブルデータ＝通常セル</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><code>th</code> / <code>td</code> は<strong>必ず <code>tr</code> の中</strong>に入れる（行の中のセルだから）。</p>
+<pre><span class="punct">&lt;</span><span class="selector">table</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">caption</span><span class="punct">&gt;</span>バーベキュー料金比較<span class="punct">&lt;/</span><span class="selector">caption</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">tr</span><span class="punct">&gt;&lt;</span><span class="selector">th</span><span class="punct">&gt;</span> <span class="punct">&lt;/</span><span class="selector">th</span><span class="punct">&gt;&lt;</span><span class="selector">th</span><span class="punct">&gt;</span>コスパ<span class="punct">&lt;/</span><span class="selector">th</span><span class="punct">&gt;&lt;</span><span class="selector">th</span><span class="punct">&gt;</span>ボリューム<span class="punct">&lt;/</span><span class="selector">th</span><span class="punct">&gt;&lt;/</span><span class="selector">tr</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">tr</span><span class="punct">&gt;&lt;</span><span class="selector">th</span><span class="punct">&gt;</span>金額<span class="punct">&lt;/</span><span class="selector">th</span><span class="punct">&gt;&lt;</span><span class="selector">td</span><span class="punct">&gt;</span>3,000円<span class="punct">&lt;/</span><span class="selector">td</span><span class="punct">&gt;&lt;</span><span class="selector">td</span><span class="punct">&gt;</span>5,000円<span class="punct">&lt;/</span><span class="selector">td</span><span class="punct">&gt;&lt;/</span><span class="selector">tr</span><span class="punct">&gt;</span>
+<span class="punct">&lt;/</span><span class="selector">table</span><span class="punct">&gt;</span></pre>
+
+    <div class="callout">
+      <span class="label">🔑 セル間の隙間をなくす2行（リセットの定番）</span>
+      <p style="margin:0;">テーブルに <code>border</code> をつけると線が二重になる。これを整えるお決まりの記述：</p>
+    </div>
+<pre><span class="selector">table</span> <span class="punct">{</span>
+    <span class="property">border-collapse</span><span class="punct">:</span> <span class="value">collapse</span><span class="punct">;</span>   <span class="comment">/* 隣り合う線を1本にまとめる */</span>
+    <span class="property">border-spacing</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span>        <span class="comment">/* セル間の余白を0に */</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout">
+      <span class="label">⚠️ テーブルの注意点</span>
+      <p style="margin:0;"><strong>各trのセル数は必ずそろえる</strong>（1行だけ2個や4個はNG＝表が崩れてCSSも効かなくなる）。これがテーブルが嫌われる理由の1つ。THに幅を指定すると<mark>同じ列の下のセルも連動して伸びる</mark>。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="table-merge">
+    <h2 class="section-title"><span class="icon">⊞</span>セルの結合（colspan / rowspan）</h2>
+    <p>Excelやスプレッドシートのようにセルをくっつけられます。<code>th</code> / <code>td</code> の<strong>属性</strong>で指定。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:150px">属性</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>colspan="2"</code></td><td><strong>横</strong>に2セル分結合（→ 同じtrのセルを1つ減らす）</td></tr>
+          <tr><td><code>rowspan="2"</code></td><td><strong>縦</strong>に2セル分結合</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">イメージは「結合」というより<strong>セルを伸ばす</strong>感じ。先生いわく、昔の訓練校のサイトはテーブル＋colspan/rowspanだけでレイアウトしていて、1か所間違えると全体が崩れて編集が大変だった——だから今は無理に使わない。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="grid">
+    <h2 class="section-title"><span class="icon">▥</span>グリッドレイアウト（CSS Grid）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <strong>flexの2.0版</strong>のようなもの。flexが「横並び（1次元）」が得意なのに対し、グリッドは<mark>縦と横の両方（2次元）</mark>をマス目で一気に組めます。写真ギャラリーのような格子状の配置が得意。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/grid_layout.png" alt="先生の板書：グリッドレイアウトの完成例（3列×2行に1〜6の箱が並ぶ）" style="width:100%; max-width:760px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：<code>grid-template-columns</code> で3列、<code>grid-template-rows</code> で2行を作り、6個の箱を格子状に配置。箱の間のすき間は <code>gap</code></figcaption>
+    </figure>
+
+    <h3>flex と grid の違い</h3>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary);border-bottom-color:var(--primary);">flexbox</h4>
+        <ul><li><strong>1次元</strong>（横並びが基本）</li><li>横3つ＋横3つにしたい時は<mark>親要素を2個</mark>に分ける</li><li>シンプルで使いやすい</li></ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent);border-bottom-color:var(--accent);">grid</h4>
+        <ul><li><strong>2次元</strong>（縦横同時）</li><li>親要素1個で<mark>縦横まとめて</mark>配置できる</li><li>覚える量が多い・概念が難しい</li></ul>
+      </div>
+    </div>
+
+    <h3>基本の書き方</h3>
+<pre><span class="selector">.container</span> <span class="punct">{</span>
+    <span class="property">display</span><span class="punct">:</span> <span class="value">grid</span><span class="punct">;</span>
+    <span class="property">grid-template-columns</span><span class="punct">:</span> <span class="value">320px 320px 320px</span><span class="punct">;</span>  <span class="comment">/* 列（横） */</span>
+    <span class="property">grid-template-rows</span><span class="punct">:</span> <span class="value">240px 240px</span><span class="punct">;</span>          <span class="comment">/* 行（縦） */</span>
+    <span class="property">gap</span><span class="punct">:</span> <span class="value">10px</span><span class="punct">;</span>     <span class="comment">/* マス目同士のすき間（marginは使わない） */</span>
+<span class="punct">}</span></pre>
+    <ul class="bullet-pro">
+      <li><code>grid-template-columns</code> ＝<strong>書いた数だけ横に列が増える</strong></li>
+      <li><code>grid-template-rows</code> ＝<strong>書いた数だけ下に行が増える</strong></li>
+      <li>display:grid を付けただけでは何も起きない＝<mark>列・行を自分で書く</mark>必要がある</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">🎮 おすすめ：ゲームで学べる「Grid Garden」</span>
+      <p style="margin:0;">先生が紹介。ゲーム感覚でグリッドに慣れられるサイト。flexbox版（Flexbox Froggy）もあります。<strong>深く考えず慣れる</strong>のがコツ。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="grid-fr">
+    <h2 class="section-title"><span class="icon">📐</span>fr単位でレスポンシブ</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ピクセルで列幅を固定すると計算が面倒だし画面幅で崩れる。グリッド専用の単位 <strong>fr（fraction＝割合）</strong>を使うと<mark>「1対1対1」のような比率</mark>で幅を決められます。料理の「醤油：みりん：酒」の割合のイメージ。
+      </p>
+    </div>
+<pre><span class="selector">.container</span> <span class="punct">{</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">max-width</span><span class="punct">:</span> <span class="value">1000px</span><span class="punct">;</span>
+    <span class="property">grid-template-columns</span><span class="punct">:</span> <span class="value">1fr 1fr 1fr</span><span class="punct">;</span>  <span class="comment">/* 3等分 */</span>
+<span class="punct">}</span>
+<span class="comment">/* スマホ：999px以下は2列に */</span>
+<span class="property">@media</span> <span class="value">screen and (max-width: 999px)</span> <span class="punct">{</span>
+    <span class="selector">.container</span> <span class="punct">{</span> <span class="property">grid-template-columns</span><span class="punct">:</span> <span class="value">1fr 1fr</span><span class="punct">;</span> <span class="punct">}</span>
+<span class="punct">}</span></pre>
+    <p>最大1000px・gap込みなら 1fr＝約320px に自動計算してくれる。<strong>列幅をピクセルで書かなくて済む</strong>のが楽。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="form-mechanism">
+    <h2 class="section-title"><span class="icon">📨</span>フォームの仕組み（フロントとサーバー）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        お問い合わせ・会員登録などの入力フォーム。<strong>見た目（フロント）はHTML/CSSで作れる</strong>けど、<mark>入力された内容をサーバーに保存したりメール通知する部分はプログラミング（PHPなど）が必要</mark>。今回は<strong>見た目だけ</strong>を作ります。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/form_mechanism.png" alt="先生の板書：フォームの仕組み（フロント→サーバー→ユーザー/担当者へメール通知）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：フロント側（HTML/CSS）で入力 → サーバーに保管（ここがプログラミング）→ ユーザーへ確認メール／会社の担当者へ通知。私たちが作るのは左半分だけ</figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">🔒 セキュリティとSSL（https）</span>
+      <p style="margin:0;">フォームは住所・電話・<strong>決済情報</strong>など大事な情報を扱うので、サーバー側はガチガチのセキュリティが必要（だからこれを0から作れる人は給料が高い）。サイトは <code>http</code> ではなく <strong><code>https</code>（SSL対応）</strong>にする。やり方はレンタルサーバーの管理画面でSSLをオンにするだけ。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">用語：私たちがやるHTML/CSS側＝<strong>クライアントサイド（フロント）</strong>、処理する側＝<strong>サーバーサイド</strong>。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="form-tags">
+    <h2 class="section-title"><span class="icon">🧩</span>フォームのタグ（input / label / select / textarea）</h2>
+    <p>フォームは <code>&lt;form&gt;</code> タグの中に部品を並べて作ります。これらは教科書70pの<strong>インタラクティブコンテンツ</strong>の仲間。</p>
+
+    <h3>① form タグ（土台）</h3>
+<pre><span class="punct">&lt;</span><span class="selector">form action</span><span class="punct">=</span><span class="value">"program.php"</span> <span class="selector">method</span><span class="punct">=</span><span class="value">"post"</span><span class="punct">&gt;</span> … <span class="punct">&lt;/</span><span class="selector">form</span><span class="punct">&gt;</span></pre>
+    <ul class="bullet-pro">
+      <li><code>action</code>＝送り先（PHPなどのファイル）。今は気にしなくてOK</li>
+      <li><code>method</code>＝送り方。<strong>post</strong>（中身を隠す）が基本。<mark>getは入力内容がURLに出て丸見え</mark>なのでフォームには使わない</li>
+    </ul>
+
+    <h3>② input ＋ type属性（万能の入力部品）</h3>
+    <p><strong>大体の入力欄は <code>input</code> 1つで作れる</strong>。<code>type</code> 属性の値でブラウザが見た目を変えてくれる。<code>input</code> は<mark>閉じタグなし</mark>。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:150px">type の値</th><th>できる部品</th></tr></thead>
+        <tbody>
+          <tr><td><code>text</code></td><td>1行テキスト入力</td></tr>
+          <tr><td><code>email</code></td><td>メール形式（@がないと弾く）</td></tr>
+          <tr><td><code>password</code></td><td>入力が隠れる（●●●）</td></tr>
+          <tr><td><code>tel</code></td><td>スマホで数字入力モードになる</td></tr>
+          <tr><td><code>checkbox</code></td><td>複数選択できる</td></tr>
+          <tr><td><code>radio</code></td><td>1つだけ選択できる</td></tr>
+          <tr><td><code>submit</code></td><td>送信ボタン</td></tr>
+          <tr><td><code>button</code></td><td>汎用ボタン</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>③ label の for と input の id を一致させる（必須テク）</h3>
+    <div class="callout success">
+      <span class="label">🔑 毎回使うテクニック</span>
+      <p style="margin:0;"><code>&lt;label for="username"&gt;</code> と <code>&lt;input id="username"&gt;</code> の<strong>文字列を一致</strong>させると、<mark>ラベルの文字をクリックしても入力欄が反応</mark>する（紐付け）。または <code>&lt;label&gt;</code> で <code>&lt;input&gt;</code> を囲んでもOK。</p>
+    </div>
+<pre><span class="punct">&lt;</span><span class="selector">label for</span><span class="punct">=</span><span class="value">"username"</span><span class="punct">&gt;</span>お名前<span class="punct">&lt;/</span><span class="selector">label</span><span class="punct">&gt;</span>
+<span class="punct">&lt;</span><span class="selector">input id</span><span class="punct">=</span><span class="value">"username"</span> <span class="selector">type</span><span class="punct">=</span><span class="value">"text"</span> <span class="selector">name</span><span class="punct">=</span><span class="value">"userName"</span><span class="punct">&gt;</span></pre>
+
+    <h3>④ ラジオボタンの name は同じにする（重要なミス防止）</h3>
+    <p>同じ質問のラジオボタンは <strong><code>name</code> 属性を全部同じ</strong>にする。1つでも違うと別グループ扱いになり、<mark>複数選べてしまう</mark>（ラジオは1つだけ選ぶものなのに）。</p>
+    <ul class="bullet-pro">
+      <li><code>name</code>＝プログラミング用のグループ名。同じグループ＝同じname</li>
+      <li><code>value</code>＝送信される値（画面の文字ではなくこの値がサーバーに届く）</li>
+      <li><code>checked</code>＝最初から選択状態にする（ラジオ）</li>
+    </ul>
+
+    <h3>⑤ select ＋ option（プルダウン）</h3>
+<pre><span class="punct">&lt;</span><span class="selector">select</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">option</span><span class="punct">&gt;</span>商品について<span class="punct">&lt;/</span><span class="selector">option</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">option selected</span><span class="punct">&gt;</span>採用について<span class="punct">&lt;/</span><span class="selector">option</span><span class="punct">&gt;</span>  <span class="comment">/* selected=最初に表示 */</span>
+<span class="punct">&lt;/</span><span class="selector">select</span><span class="punct">&gt;</span></pre>
+
+    <h3>⑥ textarea（複数行入力）</h3>
+    <p>お問い合わせ内容など長文用。<code>input</code> は1行だけなので、複数行は <code>&lt;textarea&gt;</code>。<strong>閉じタグあり</strong>。</p>
+
+    <h3>⑦ 送信ボタン（submit / button）</h3>
+    <ul class="bullet-pro">
+      <li><code>&lt;input type="submit"&gt;</code>＝送信ボタン（<code>value</code> の値がボタンの文字に）</li>
+      <li><code>&lt;button&gt;</code> タグ＝<strong>CSSが書きやすい</strong>ので実務ではこちらも多い</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">📌 placeholder（うっすら灰色の文字）</span>
+      <p style="margin:0;"><code>placeholder="田中 太郎"</code> で入力欄に薄い見本文字。ただし<mark>最近は非推奨ぎみ</mark>（入力済みと勘違いして送信しちゃう人がいるため）。<code>label</code> ではなく <code>input</code> に書く。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="form-design">
+    <h2 class="section-title"><span class="icon">🎨</span>フォームのデザイン（CSS）</h2>
+
+    <figure style="margin:22px 0;">
+      <img src="img/form_mockup.png" alt="先生の板書：お問い合わせフォームの完成例（名前/メール/職業/種別/内容/送信）" style="width:100%; max-width:560px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：今日作る完成形。テキスト・メール・ラジオ・プルダウン・複数行・送信ボタン——入力部品が一通り入っている</figcaption>
+    </figure>
+
+    <div class="callout primary">
+      <span class="label">🔥 フォームの幅は800px以下（最重要）</span>
+      <p style="margin:0;">
+        フォームを画面幅いっぱい（90%など）で作ると、入力欄がビヨーンと伸びて<strong>首や目が左右に動いてストレス</strong>になる。だから <code>max-width: 800px</code> くらいに収める。<mark>世の中のフォームも大体1000px以下</mark>。
+      </p>
+    </div>
+
+    <h3>レイアウトの作り方</h3>
+    <ul class="bullet-pro">
+      <li>1問ずつを <code>.form-item</code> でまとめ、<strong>flexで横並び</strong>（ラベル｜入力欄）</li>
+      <li>フォーム全体は <code>margin: 0 auto</code> で中央寄せ、白背景＋padding で枠に</li>
+      <li>入力欄は <code>width: 100%</code> ＋ <code>font-size: 16px</code>（入力文字を大きめに＝使いやすさ）</li>
+      <li>スマホ（768px以下）は <code>display: block</code> で<strong>縦並び</strong>に組み替え</li>
+    </ul>
+
+    <h3>属性セレクター</h3>
+<pre><span class="comment">/* type="text" の input だけを狙う */</span>
+<span class="selector">input[type="text"]</span><span class="punct">,</span> <span class="selector">input[type="email"]</span> <span class="punct">{</span>
+    <span class="property">display</span><span class="punct">:</span> <span class="value">block</span><span class="punct">;</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">font-size</span><span class="punct">:</span> <span class="value">16px</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+    <p>属性と値を <code>[ ]</code> でセレクターにできる。<strong>クラスを振っても同じこと</strong>ができる（先生は実務ではクラス派）。</p>
+
+    <div class="callout">
+      <span class="label">♿ display:none で消すのはNG</span>
+      <p style="margin:0;">凝ったフォームは標準デザインを <code>display:none</code> で全消しして作り直すことがあるが、<mark>キーボード操作のフォーカスができなくなる</mark>。キーボードでフォームを使う人（元エンジニア等）もいるので、<strong>元のスタイルを活かして装飾</strong>する方が良い。いじりすぎない。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">必須マークは <code>dt::before { content: "◆"; }</code> で表示。ボタンは <code>:hover</code> で色を変えるアニメも。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>table / tr / th / td</strong></td><td>表全体 / 行 / 見出しセル / 通常セル</td></tr>
+          <tr><td><strong>caption</strong></td><td>表のタイトル</td></tr>
+          <tr><td><strong>border-collapse: collapse</strong></td><td>隣り合う線を1本にまとめる</td></tr>
+          <tr><td><strong>border-spacing: 0</strong></td><td>セル間の余白をなくす</td></tr>
+          <tr><td><strong>colspan / rowspan</strong></td><td>セルを横 / 縦に結合（伸ばす）</td></tr>
+          <tr><td><strong>display: grid</strong></td><td>グリッドレイアウト（縦横2次元）</td></tr>
+          <tr><td><strong>grid-template-columns / rows</strong></td><td>列 / 行の数と大きさ</td></tr>
+          <tr><td><strong>gap</strong></td><td>マス目同士のすき間（flexでも使える）</td></tr>
+          <tr><td><strong>fr</strong></td><td>fraction＝割合の単位（1fr 1fr＝1対1）</td></tr>
+          <tr><td><strong>form</strong></td><td>フォームの土台タグ</td></tr>
+          <tr><td><strong>action / method</strong></td><td>送り先 / 送り方（post＝隠す, get＝丸見え）</td></tr>
+          <tr><td><strong>input + type</strong></td><td>入力部品。typeで種類が変わる。閉じタグなし</td></tr>
+          <tr><td><strong>label + for ⇔ input + id</strong></td><td>一致させるとラベルクリックで入力欄が反応</td></tr>
+          <tr><td><strong>name</strong></td><td>プログラム用のグループ名（ラジオは同じに）</td></tr>
+          <tr><td><strong>value</strong></td><td>サーバーに送られる値</td></tr>
+          <tr><td><strong>checked / selected</strong></td><td>ラジオ / プルダウンの初期選択</td></tr>
+          <tr><td><strong>select + option</strong></td><td>プルダウンメニュー</td></tr>
+          <tr><td><strong>textarea</strong></td><td>複数行の入力欄（閉じタグあり）</td></tr>
+          <tr><td><strong>submit / button</strong></td><td>送信ボタン / 汎用ボタン</td></tr>
+          <tr><td><strong>placeholder</strong></td><td>うっすら灰色の見本文字（最近は非推奨ぎみ）</td></tr>
+          <tr><td><strong>属性セレクター</strong></td><td><code>input[type="text"]</code> のように属性で狙う</td></tr>
+          <tr><td><strong>SSL / https</strong></td><td>通信を暗号化した安全な接続</td></tr>
+          <tr><td><strong>クライアント / サーバーサイド</strong></td><td>フロント（HTML/CSS） / 処理側（プログラミング）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>テーブルは <code>table &gt; tr &gt; th/td</code>、<strong>各trのセル数をそろえる</strong></li>
+      <li><code>border-collapse: collapse</code> ＋ <code>border-spacing: 0</code> で隙間消し</li>
+      <li><code>colspan</code>（横）/ <code>rowspan</code>（縦）でセル結合</li>
+      <li>テーブルは今はレイアウトに<strong>あまり使わない</strong>（flex/grid優先）</li>
+      <li><code>display: grid</code> ＋ <code>grid-template-columns/rows</code> で格子配置</li>
+      <li>すき間は <code>gap</code>、割合指定は <code>fr</code> 単位</li>
+      <li><strong>まず flex を完璧に</strong>（gridは後回しでOK）</li>
+      <li>フォームの見た目＝HTML/CSS、処理＝プログラミング＋サーバー</li>
+      <li><code>method="post"</code>（getは中身が丸見え）</li>
+      <li><code>input</code> の <code>type</code> で部品を切り替え（閉じタグなし）</li>
+      <li><code>label for</code> ⇔ <code>input id</code> を一致＝クリックで反応</li>
+      <li><strong>ラジオボタンの name は同じに</strong>（違うと複数選べる）</li>
+      <li>複数行は <code>textarea</code>、プルダウンは <code>select + option</code></li>
+      <li>フォーム幅は <strong>max-width 800px</strong> 程度に（首・目の負担減）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>グリッドは最悪覚えられなくてもいいです。その代わりディスプレイフレックスを必ず使いこなせるように。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ flexができればgridでやることの大半はカバーできる。優先順位の話。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>この仕組みを0から作れる人は、めっちゃ給料高くなります。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ フォームのサーバー処理は決済・個人情報を扱う＝責任重大だから。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>お問い合わせの文章、最初に一言あいさつ入れてあげるといいですよ。カスタマーサポートの人も人間ですからね。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ textareaの説明から脱線した、地味に役立つ社会人マナー。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-21｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

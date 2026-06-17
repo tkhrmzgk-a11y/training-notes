@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma 6日目：予約ページ完成・全体プロトタイプ接続｜2026年6月11日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月11日｜講師：A先生</div>
+  <h1>Figma 6日目：予約ページ完成・全体プロトタイプ接続</h1>
+  <p class="subtitle">訓練校｜全3時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業</span>
+    <span>📖 Figma応用（自由制作）</span>
+    <span>🎯 予約ページ・フォーム・コンタクトバナー・全リンク接続</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    Figma授業の<strong>総仕上げ</strong>。最後のページ＝<strong>予約（コンタクト）ページ</strong>を作り、最後に<strong>全ページをプロトタイプで接続</strong>して、ATARAYOオートキャンプ場のポートフォリオサイトが完成。
+    一貫テーマは<strong>「実装の本番はHTML/CSS。Figmaは伝達ツール」</strong>。フォームのUIにはこだわりすぎず、コーディング側で自然に再現できる形を意識して作る。
+  </div>
+
+  <h3 style="border:none; padding:0; margin-bottom:6px;">🎯 今日作っているもの（予約ページ完成形）</h3>
+  <figure style="margin:14px 0 30px;">
+    <img src="img/booking_page_complete.png"
+         alt="ATARAYOオートキャンプ場の予約ページ完成形：ヘッダー、ご予約ページタイトル、プラン選択（ラジオボタン）、人数入力、予約カレンダー枠、お問い合わせテキストエリア、予約するボタン、コンタクトバナー（電話・メール）、フッター"
+         style="width:100%; max-width:520px; display:block; margin:0 auto;
+                border:1px solid var(--border); border-radius:10px;
+                box-shadow:0 2px 12px rgba(0,0,0,.08);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+      ▲ 予約ページ完成形。プラン選択／人数／カレンダー／お問い合わせ／コンタクトバナーの構成
+    </figcaption>
+  </figure>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#reuse">プランページからコピペで時短</a></li>
+      <li><a href="#radio">ラジオボタンの作り方（こだわらない）</a></li>
+      <li><a href="#prefix-icon">アイコン+テキストの順番入れ替え</a></li>
+      <li><a href="#calendar-frame">カレンダー部分は仮枠でOK</a></li>
+      <li><a href="#contact-banner">コンタクトバナーの作り方</a></li>
+      <li><a href="#prototype-finish">全ページのプロトタイプ接続</a></li>
+      <li><a href="#figma-end">Figma授業の総括</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>今回も内容ベースの区切り（タイムスタンプなし）。<span class="star">★★★</span>＝特に重要。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:120px;">区切り</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1時間目 序盤</td><td><a href="#reuse">予約ページ作成スタート（プランページからコピペ）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#calendar-frame">カレンダー部分はフレーム1本で仮置き</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#reuse">前日コンポーネント（アコーディオン）を流用＋ブール値で見出し非表示</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#radio">ラジオボタンの作り方（楕円で簡易・サイズは16px推奨）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#radio">プラン4種：手ぶら／フリー／グランピング／オートキャンプ</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#prefix-icon">人数入力：アイコン+テキストの順番入れ替え</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#prefix-icon">大人/子供の入力欄＋単位（人）の余白</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#calendar-frame">日程＝予約カレンダー枠（外部サービス前提で仮置き）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#calendar-frame">お問い合わせ＝テキストエリア（高さ600px程度）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#radio">「予約する」ボタン＝既存ボタンインスタンスを上書き</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#contact-banner">コンタクトバナー（電話・メール）背景画像＋黒オーバーレイ</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#contact-banner">サブカラー（登録済みスタイル）の活用</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#contact-banner">背景画像のサイズ：内容の幅 × 0.8で固定</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#prototype-finish">フッターのインスタンス配置 → 全ページ完成</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#prototype-finish">プロトタイプで全ページ接続（リンクの繋ぎ込み）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目 終盤</td><td><a href="#figma-end">Figma授業の総括・終了挨拶</a></td><td class="center"><span class="star">★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>コピペで時短</h4><p>プランページの<strong>背景・ヘッダー・コンポーネント</strong>はそのままコピペ。一から作り直さない。</p></div>
+      <div class="card"><span class="num">2</span><h4>ブール値で再利用</h4><p>アコーディオンの見出し部分を<strong>ブール値Falseで非表示</strong>にして、別用途に流用。</p></div>
+      <div class="card"><span class="num">3</span><h4>フォームUIにこだわらない</h4><p>ラジオボタン・テキストエリアは<strong>HTMLのinputそのまま使う</strong>ことが多いので、Figma側は簡易でOK。</p></div>
+      <div class="card"><span class="num">4</span><h4>ラジオは16px</h4><p>ラジオボタンのサイズは<strong>1文字分（16px）</strong>がおすすめ。実装時の自然な見た目に近い。</p></div>
+      <div class="card"><span class="num">5</span><h4>順番入れ替えはオートレイアウト</h4><p>「アイコン→テキスト」を「テキスト→アイコン」に入れ替えるのは<strong>オートレイアウト内で順番を変える</strong>だけ。</p></div>
+      <div class="card"><span class="num">6</span><h4>カレンダーは仮枠</h4><p>予約システムは<strong>外部サービス（Googleカレンダー埋め込み等）</strong>を使うことが多い。フレーム1本「カレンダーが入ります」で十分。</p></div>
+      <div class="card"><span class="num">7</span><h4>サブカラーの活用</h4><p>登録済みスタイルの<strong>サブカラー</strong>を予約ボタンに使うと、サイト全体の統一感が出る。</p></div>
+      <div class="card"><span class="num">8</span><h4>背景画像は内容×0.8</h4><p>コンタクトバナーの背景画像は <strong>内容部分の幅×0.8</strong> で固定するとバランスが良い。</p></div>
+      <div class="card"><span class="num">9</span><h4>プロトタイプで全接続</h4><p>最後に<strong>全ページのリンクを接続</strong>。クリックで遷移できる動くカンプに仕上げる。</p></div>
+      <div class="card"><span class="num">10</span><h4>Figmaは向こう10年</h4><p>先生の所感：<strong>5〜10年はFigmaがデザインのベースツール</strong>であり続ける。慣れる価値あり。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== コピペで時短 ===== -->
+  <section id="reuse">
+    <h2 class="section-title"><span class="icon">🔁</span>プランページからコピペで時短</h2>
+    <p>予約ページの構造はプランページとほぼ同じ。<strong>背景の黒オーバーレイ・ヘッダー・タイトル枠</strong>は全部プランページからコピーして使い回す。</p>
+
+    <div class="callout">
+      <span class="label">流用ポイント</span>
+      <ul style="margin:8px 0 0;">
+        <li>上下にかかっている黒の重ね（半透明オーバーレイ）</li>
+        <li>大枠のフレーム背景＝ブラックスタイル</li>
+        <li><strong>昨日作ったアコーディオンコンポーネント</strong>を「タイトル＋見出し＋本文」の枠として流用</li>
+      </ul>
+    </div>
+
+    <h3>アコーディオンの流用テクニック</h3>
+    <p>予約ページの「プラン」「人数」「日程」「お問い合わせ」の見出し枠は、<strong>アコーディオンコンポーネントを流用</strong>。ただし、アコーディオン特有のプラス/マイナスアイコンは不要なので、<strong>ブール値をFalseにして非表示</strong>にする。</p>
+    <div class="callout primary">
+      <span class="label">これがブール値の真価</span>
+      ブール値で「あってもなくてもいい部分」を作っておくと、<strong>同じコンポーネントを別用途に流用</strong>できる。再利用性が一気に上がる。
+    </div>
+  </section>
+
+  <!-- ===== ラジオボタン ===== -->
+  <section id="radio">
+    <h2 class="section-title"><span class="icon">🔘</span>ラジオボタンの作り方（こだわらない）</h2>
+    <p>プラン選択のラジオボタンを作る。先生のスタンスは<strong>「こだわらない」</strong>。</p>
+
+    <div class="callout">
+      <span class="label">なぜこだわらないのか</span>
+      実装時は <code>&lt;input type="radio"&gt;</code> の<strong>HTML標準UIをそのまま使うことが多い</strong>。Figmaで凝ったデザインを作っても、ブラウザでは反映されないことが多いので、<strong>シンプルに作れば十分</strong>。
+    </div>
+
+    <h3>作り方</h3>
+    <ul class="bullet-pro">
+      <li>ラインツールor楕円ツールで<strong>16px の丸</strong>を作る（1文字分）</li>
+      <li>少し暗めの<strong>グレーの枠線</strong>を付ける</li>
+      <li>テキスト（プラン名）と並べてオートレイアウト</li>
+      <li>これを<strong>4つ複製</strong>してプラン4種（手ぶら／フリー／グランピング／オートキャンプ）に</li>
+    </ul>
+  </section>
+
+  <!-- ===== アイコン+テキストの入れ替え ===== -->
+  <section id="prefix-icon">
+    <h2 class="section-title"><span class="icon">↔️</span>アイコン+テキストの順番入れ替え</h2>
+    <p>人数入力欄では「テキスト → 入力枠」の順。ラジオは「楕円 → テキスト」だったので、流用するには<strong>順番を入れ替える</strong>必要がある。</p>
+    <div class="callout">
+      <span class="label">手順</span>
+      オートレイアウト内でレイヤーの順番をドラッグで入れ替えるだけ。<strong>左右の配置が瞬時に反転</strong>する。
+    </div>
+
+    <h3>人数入力欄の構成</h3>
+    <ul class="bullet-pro">
+      <li><strong>テキスト</strong>「大人」「子供」</li>
+      <li>50px × 数字入力枠（HTMLの<code>&lt;input type="number"&gt;</code>相当）</li>
+      <li><strong>テキスト</strong>「人」（単位）</li>
+      <li>3つをオートレイアウトで横並び、テキストと入力枠の間は余白あり</li>
+    </ul>
+  </section>
+
+  <!-- ===== カレンダー仮枠 ===== -->
+  <section id="calendar-frame">
+    <h2 class="section-title"><span class="icon">📅</span>カレンダー部分は仮枠でOK</h2>
+    <p>予約ページの目玉「日程選択」のカレンダー。<strong>実装は外部サービスを使うことが多い</strong>ので、Figmaで凝って作る必要はない。</p>
+
+    <div class="callout primary">
+      <span class="label">予約システムの現実</span>
+      予約システムを<strong>ゼロから自作するのは大変</strong>。実際は <strong>Googleカレンダー埋め込み・予約サービス（STORES予約・Coubic等）</strong>を使う。<br>
+      Figma段階では <code>「ここには予約カレンダーが入ります」</code> と書いたフレーム1本で十分。
+    </div>
+
+    <h3>お問い合わせ欄</h3>
+    <p>テキストエリアは<strong>適当なサイズ感（横600px・高さ200px程度）</strong>のフレームを1本。これも実装時はHTMLの <code>&lt;textarea&gt;</code> をそのまま使うので、こだわり不要。</p>
+
+    <h3>「予約する」ボタン</h3>
+    <ul class="bullet-pro">
+      <li>既存の<strong>メインボタンインスタンス</strong>を配置</li>
+      <li>テキストを「予約する」に上書き</li>
+      <li>サイズ・余白を全体に合わせる（左右パディング48px、上下も統一）</li>
+    </ul>
+  </section>
+
+  <!-- ===== コンタクトバナー ===== -->
+  <section id="contact-banner">
+    <h2 class="section-title"><span class="icon">📞</span>コンタクトバナーの作り方</h2>
+    <p>予約フォームの下に置く<strong>「電話・メールでも問い合わせできます」のバナー</strong>。背景に写真を敷いて、その上に半透明レイヤー、上にテキストとボタンを重ねる構成。</p>
+
+    <h3>構成要素</h3>
+    <ul class="bullet-pro">
+      <li><strong>背景画像</strong>：コンタクトイメージ（焚き火等の雰囲気写真）</li>
+      <li>背景画像の幅は<strong>内容部分の幅 × 0.8</strong>で固定（大きすぎないバランス）</li>
+      <li>露出は少し下げて<strong>テキストが読みやすい</strong>明度に</li>
+      <li>タイトル「CONTACT」</li>
+      <li>説明文（営業時間・問い合わせ案内）</li>
+      <li>電話番号 <code>080-0000-8888</code></li>
+      <li><strong>サブカラー</strong>を使った「メールを送る」ボタン</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">サブカラーの活用</span>
+      最初に登録した<strong>サブカラー（控えめなアクセント色）</strong>を、ここで初めて使う。コンタクトバナーは「目立たせたいが浮かせない」場面なので、サブカラーがちょうど良い。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== プロトタイプ最終 ===== -->
+  <section id="prototype-finish">
+    <h2 class="section-title"><span class="icon">🔗</span>全ページのプロトタイプ接続</h2>
+    <p>全ページが揃ったので、最後に<strong>プロトタイプで全リンクを接続</strong>する。6/10で学んだリンク接続の手順を、各ページ＋フッターメニューに対して実行。</p>
+
+    <h3>接続作業</h3>
+    <ul class="bullet-pro">
+      <li>ヘッダーのナビ → トップ／施設案内／プラン／予約・お問い合わせ</li>
+      <li>フッターのメニュー → 同じく4ページ</li>
+      <li>各ページのトップに <strong>「フローの開始地点」</strong> を必要に応じて設定</li>
+      <li>遷移時の動きは <strong>スムーズスクロール&リセット</strong> で先頭から表示</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">注意：ヘッダーが被る問題</span>
+      ページ遷移時に<strong>ヘッダーがトップに被ってしまう</strong>ことがある（透明ヘッダーだと特に）。これはCSS実装時に <code>scroll-margin-top</code> や <code>scroll-padding-top</code> で対処する案件。Figma段階では完全には解決しない。
+    </div>
+  </section>
+
+  <!-- ===== Figma授業の総括 ===== -->
+  <section id="figma-end">
+    <h2 class="section-title"><span class="icon">🎓</span>Figma授業の総括</h2>
+    <p>5/29から始まったFigma授業はここで一旦区切り。先生からの締めくくりメッセージ。</p>
+
+    <blockquote>これでFigmaの紹介は以上になります。授業の最初にも言ったように、これは初級編というか入り口になります。<span class="citation">── A先生</span></blockquote>
+
+    <h3>これから個別に学ぶべきこと</h3>
+    <ul class="bullet-pro">
+      <li><strong>プラグイン</strong>がいっぱいある（画像一括差し替え等の便利機能）</li>
+      <li><strong>コミュニティ</strong>に色々なクリエイターの作品が落ちている（無料素材）</li>
+      <li>今回は<strong>Web制作</strong>に特化したが、Figmaは<strong>会社のデザインシステム構築</strong>にも使える</li>
+      <li>様々な使い方ができる汎用ツール</li>
+    </ul>
+
+    <div class="callout primary">
+      <span class="label">先生の所感</span>
+      <strong>「向こう10年ぐらいはFigmaが波動を得るんじゃないか。5年短く見積もっても、5年ぐらいはずっとデザインのベースのツール」</strong>。今学んでおいて損はない。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>ブール値で流用</td><td>表示/非表示の切替で、同じコンポーネントを別用途に使い回す</td></tr>
+          <tr><td>ラジオボタン</td><td>選択肢から1つだけ選ぶUI。HTML標準UIをそのまま使うことが多い</td></tr>
+          <tr><td>テキストエリア</td><td>複数行のテキスト入力。HTMLの<code>&lt;textarea&gt;</code></td></tr>
+          <tr><td>カレンダー埋め込み</td><td>外部サービス（Googleカレンダー等）でカレンダー機能を実装</td></tr>
+          <tr><td>仮枠</td><td>実装時に置き換える前提のダミー要素</td></tr>
+          <tr><td>サブカラー</td><td>メインカラーに次ぐ補助色。ボタン等のアクセントに使う</td></tr>
+          <tr><td>コンタクトバナー</td><td>連絡先案内のバナー領域（背景画像＋テキスト＋CTA）</td></tr>
+          <tr><td>フローの開始地点</td><td>プロトタイプ再生時の最初に表示するフレーム</td></tr>
+          <tr><td>スムーズスクロール&リセット</td><td>ページ遷移時の動き設定。先頭から表示し直す</td></tr>
+          <tr><td>プラグイン（Figma）</td><td>Figmaの拡張機能。画像一括処理・アイコン挿入等</td></tr>
+          <tr><td>コミュニティ（Figma）</td><td>クリエイターが作品・テンプレートを共有する場</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li><strong>予約ページ</strong>を仕上げる（プラン選択／人数／日程／お問い合わせ／予約するボタン）</li>
+      <li><strong>コンタクトバナー</strong>を作る（背景画像＋電話番号＋メールボタン）</li>
+      <li><strong>全ページのプロトタイプを接続</strong>（ヘッダー・フッターの全リンク）</li>
+      <li>「フローの開始地点」を設定して<strong>プレビューで動作確認</strong></li>
+      <li>ATARAYOオートキャンプ場の<strong>ポートフォリオサイト完成</strong> 🎉</li>
+      <li>未完成の人は引き続き作業を進める（時間内に終わらなくてOK）</li>
+      <li>余裕がある人はFigmaコミュニティ・プラグインを覗いてみる</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>ラジオボタンとかにこだわったデザインを入れる必要はないかなと。実際にはinputタイプradioのそのまんまのUIを使うことがほとんどです。<span class="citation">── フォームUIの現実</span></blockquote>
+    <blockquote>予約システムを自作するのは結構難しい。だいたいGoogleカレンダー埋め込みみたいな感じで表示されることが多いので、この辺はとりあえずカレンダーっぽいものを入れて仮置きで。<span class="citation">── 外部サービス活用の前提</span></blockquote>
+    <blockquote>これでFigmaの紹介は以上になります。これは初級編というか入り口です。プラグインもいっぱいあるし、コミュニティにはいろんなクリエイターの作品が落ちてたりとか、引き続き色々と触ってみてください。<span class="citation">── 締めくくり</span></blockquote>
+    <blockquote>向こう10年ぐらいはFigmaが波動を得るんじゃないかなと思います。5年短く見積もっても、5年ぐらいはずっとデザインのベースのツールになる。<span class="citation">── Figmaという選択への確信</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-11｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

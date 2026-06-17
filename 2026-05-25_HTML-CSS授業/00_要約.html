@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハンバーガーメニューの実装（疑似要素で3本線→×→スライドイン）｜2026年5月25日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月25日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>ハンバーガーメニューの実装（疑似要素で3本線→×→スライドイン）</h1>
+  <p class="subtitle">訓練校 IT スクール｜全2時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 1時間30分</span>
+    <span>📖 ハンバーガーメニュー実装（レスポンシブ補講）</span>
+    <span>🎯 ハンバーガーメニュー, メディアクエリ, ブレイクポイント1000px, 疑似要素 ::before/::after, 3本線, transform translate, rotate 45deg, opacity vs rgba, position fixed, スライドイン, close/open クラス, JavaScript予告, flex-direction column</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>今日の流れ</h2>
+    <div class="callout primary">
+      <span class="label">💡 今日のテーマ</span>
+      <p style="margin:0;">
+        スマホでよく見る<strong>「3本線（≡）のハンバーガーメニュー」</strong>を作る回。<mark>疑似要素で3本線 → ×に変形 → スライドインで開閉</mark>まで。テクニカルで難しいけど、サイトを作るなら必須の技術。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>導入</td><td><a href="#what">ハンバーガーメニューとは・作る手順</a></td></tr>
+          <tr><td>4時間目</td><td><a href="#nav-sp">ナビをスマホ用レイアウトに上書き</a></td></tr>
+          <tr><td>5時間目</td><td><a href="#icon">3本線アイコンを作る（疑似要素）</a></td></tr>
+          <tr><td>5時間目</td><td><a href="#center">アイコンを枠の中央に置く（transform）</a></td></tr>
+          <tr><td>終盤</td><td><a href="#cross">クリックで×に変形（rotate）</a></td></tr>
+          <tr><td>終盤</td><td><a href="#slidein">スライドインで開閉（fixed＋負のright）</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li>普通のナビ→画面を狭めてハンバーガー化＝<strong>メディアクエリの中に書く</strong>（最初からハンバーガーなら不要）</li>
+      <li>3本線は<strong>空の <code>span</code>＋<code>::before</code>＋<code>::after</code></strong>（疑似要素）で作る</li>
+      <li>疑似要素は<strong><code>content:""</code> 必須</strong>（空でもOK、無いと出ない）</li>
+      <li>線＝<code>width:32px; height:2px; background:#000; display:block</code></li>
+      <li>クリック領域は <code>div.hamburger</code> に<strong>幅・高さ（42px）</strong>を持たせる</li>
+      <li>絶対配置のズレは <strong><code>transform: translate(-50%,-50%)</code></strong> で中央に</li>
+      <li>×への変形＝上下の線を <strong><code>rotate(45deg)</code> と <code>rotate(-45deg)</code></strong></li>
+      <li>真ん中の線を消すのは <strong><code>opacity</code> ではなく <code>rgba(…,0)</code></strong>（opacityだと子ごと消える）</li>
+      <li>開閉のきっかけは<strong>クラスの付け外し</strong>（<code>close</code>/<code>open</code>）＝実際はJavaScript</li>
+      <li>スライドイン＝<strong><code>position:fixed</code>＋<code>right:-40%</code></strong> で画面外に隠し、openで <code>right:0</code></li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="what">
+    <h2 class="section-title"><span class="icon">🍔</span>ハンバーガーメニューとは・手順</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <strong>3本線（≡）をクリックするとナビが開閉する</strong>あれ。形がハンバーガーに似てるから「ハンバーガーメニュー」。PCでは普通のリスト型ナビ、<mark>画面幅を狭めるとハンバーガーに切り替わる</mark>のが定番（最初からハンバーガーのサイトも増加中）。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/hamburger_concept.png" alt="先生の板書：ハンバーガーメニューの仕組み（PCナビを黄色で囲み、これがハンバーガーになると示す）" style="width:100%; max-width:880px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：PCのこの横並びナビ（黄色で囲った部分）を、画面を狭めたときに「≡」のハンバーガーへ切り替える</figcaption>
+    </figure>
+
+    <h3>作る手順（3ステップ）</h3>
+    <ol class="bullet-pro">
+      <li><strong>ナビをスマホ用に上書き</strong>（横並び→縦並びの表示領域に）</li>
+      <li><strong>3本線アイコンを追加</strong>（HTMLとCSSで）</li>
+      <li><strong>クリックで×に変形＆スライドイン</strong>（クラス付け外し＝JS）</li>
+    </ol>
+    <p style="font-size:14px;color:var(--text-soft);">今回は「普通のナビ → 狭めてハンバーガー」型なので、すべて<strong>メディアクエリ＋ブレイクポイント（今回は1000px）の中</strong>に書いていく。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="nav-sp">
+    <h2 class="section-title"><span class="icon">📱</span>① ナビをスマホ用に上書き</h2>
+    <p>ブレイクポイント（レイアウトが崩れる<strong>1000px</strong>あたり）で、横並びナビを画面右の縦並びパネルに変える。</p>
+<pre><span class="property">@media</span> <span class="value">screen and (max-width: 1000px)</span> <span class="punct">{</span>
+  <span class="comment">/* ナビを右側に固定（親 .h-container に position:relative が必要） */</span>
+  <span class="selector">nav</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">absolute</span><span class="punct">;</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span> <span class="property">right</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">40%</span><span class="punct">;</span>
+    <span class="property">height</span><span class="punct">:</span> <span class="value">100vh</span><span class="punct">;</span>          <span class="comment">/* 画面の高さいっぱい */</span>
+    <span class="property">background</span><span class="punct">:</span> <span class="value">#fff</span><span class="punct">;</span>      <span class="comment">/* 表示領域 */</span>
+  <span class="punct">}</span>
+  <span class="comment">/* 横並び→縦並び＆中央寄せ */</span>
+  <span class="selector">nav ul</span> <span class="punct">{</span>
+    <span class="property">flex-direction</span><span class="punct">:</span> <span class="value">column</span><span class="punct">;</span>
+    <span class="property">align-items</span><span class="punct">:</span> <span class="value">center</span><span class="punct">;</span>
+  <span class="punct">}</span>
+  <span class="comment">/* リストの左右マージンを消し、上下に余白 */</span>
+  <span class="selector">nav li</span> <span class="punct">{</span> <span class="property">margin</span><span class="punct">:</span> <span class="value">48px 0</span><span class="punct">;</span> <span class="punct">}</span>
+<span class="punct">}</span></pre>
+    <div class="callout">
+      <span class="label">📌 復習ポイント</span>
+      <p style="margin:0;"><code>position:absolute</code> を使うので<strong>親に <code>position:relative</code></strong>が必要（前回の親rel＋子absの復習）。横並びは <code>flex-direction: column</code> で縦に切り替え。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="icon">
+    <h2 class="section-title"><span class="icon">🍔</span>② 3本線アイコンを作る（疑似要素）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <strong>空の <code>span</code>（真ん中の線）＋ <code>::before</code>（上の線）＋ <code>::after</code>（下の線）</strong>で3本線を作る。文字は書かず、CSSで形だけ作るのがコツ。
+      </p>
+    </div>
+
+    <h3>HTML（navと兄弟に置く）</h3>
+<pre><span class="punct">&lt;</span><span class="selector">div class</span><span class="punct">=</span><span class="value">"hamburger"</span><span class="punct">&gt;</span>      <span class="comment">/* クリック領域 */</span>
+  <span class="punct">&lt;</span><span class="selector">span</span><span class="punct">&gt;&lt;/</span><span class="selector">span</span><span class="punct">&gt;</span>             <span class="comment">/* 真ん中の線 */</span>
+<span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span></pre>
+
+    <h3>自作HTML図解：≡ → × の変化</h3>
+    <div style="display:flex; gap:40px; justify-content:center; align-items:center; flex-wrap:wrap; background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:32px; margin:20px 0;">
+      <div style="text-align:center;">
+        <div style="width:64px; height:64px; position:relative; margin:0 auto 12px;">
+          <span style="position:absolute; top:18px; left:8px; width:48px; height:5px; background:#1a3a5c; border-radius:2px;"></span>
+          <span style="position:absolute; top:30px; left:8px; width:48px; height:5px; background:#1a3a5c; border-radius:2px;"></span>
+          <span style="position:absolute; top:42px; left:8px; width:48px; height:5px; background:#1a3a5c; border-radius:2px;"></span>
+        </div>
+        <strong style="color:var(--primary);">通常（3本線）</strong><br>
+        <span style="font-size:13px;color:var(--text-soft);">span＋::before＋::after</span>
+      </div>
+      <div style="font-size:32px; color:var(--accent); font-weight:700;">→</div>
+      <div style="text-align:center;">
+        <div style="width:64px; height:64px; position:relative; margin:0 auto 12px;">
+          <span style="position:absolute; top:30px; left:8px; width:48px; height:5px; background:#e07b00; border-radius:2px; transform:rotate(45deg);"></span>
+          <span style="position:absolute; top:30px; left:8px; width:48px; height:5px; background:#e07b00; border-radius:2px; transform:rotate(-45deg);"></span>
+        </div>
+        <strong style="color:var(--accent);">クリック後（×）</strong><br>
+        <span style="font-size:13px;color:var(--text-soft);">真ん中を透明＋上下を45°回転</span>
+      </div>
+    </div>
+
+    <h3>CSS（線の作り方）</h3>
+<pre><span class="comment">/* 真ん中の線 */</span>
+<span class="selector">.hamburger span</span> <span class="punct">{</span>
+    <span class="property">display</span><span class="punct">:</span> <span class="value">block</span><span class="punct">;</span>      <span class="comment">/* これが無いと線にならない */</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">32px</span><span class="punct">;</span>
+    <span class="property">height</span><span class="punct">:</span> <span class="value">2px</span><span class="punct">;</span>
+    <span class="property">background</span><span class="punct">:</span> <span class="value">#000</span><span class="punct">;</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">absolute</span><span class="punct">;</span>
+<span class="punct">}</span>
+<span class="comment">/* 上下の線（疑似要素） */</span>
+<span class="selector">.hamburger span::before</span><span class="punct">,</span>
+<span class="selector">.hamburger span::after</span> <span class="punct">{</span>
+    <span class="property">content</span><span class="punct">:</span> <span class="value">""</span><span class="punct">;</span>          <span class="comment">/* 必須！ */</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">absolute</span><span class="punct">;</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">32px</span><span class="punct">;</span> <span class="property">height</span><span class="punct">:</span> <span class="value">2px</span><span class="punct">;</span> <span class="property">background</span><span class="punct">:</span> <span class="value">#000</span><span class="punct">;</span>
+<span class="punct">}</span>
+<span class="selector">.hamburger span::before</span> <span class="punct">{</span> <span class="property">bottom</span><span class="punct">:</span> <span class="value">8px</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* 上にずらす */</span>
+<span class="selector">.hamburger span::after</span>  <span class="punct">{</span> <span class="property">top</span><span class="punct">:</span> <span class="value">8px</span><span class="punct">;</span> <span class="punct">}</span>     <span class="comment">/* 下にずらす */</span></pre>
+  </section>
+
+  <hr class="divider">
+
+  <section id="center">
+    <h2 class="section-title"><span class="icon">🎯</span>③ アイコンを枠の中央に置く</h2>
+    <p>クリック領域の <code>div.hamburger</code> に<strong>幅・高さ（42px）</strong>を持たせる（spanの32pxより大きく）。spanは<code>absolute</code>だと左上基準でズレるので、<code>transform: translate(-50%,-50%)</code> で中央へ。</p>
+<pre><span class="selector">.hamburger</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">absolute</span><span class="punct">;</span>
+    <span class="property">right</span><span class="punct">:</span> <span class="value">48px</span><span class="punct">;</span> <span class="property">top</span><span class="punct">:</span> <span class="value">50%</span><span class="punct">;</span>
+    <span class="property">transform</span><span class="punct">:</span> <span class="value">translateY(-50%)</span><span class="punct">;</span>  <span class="comment">/* 縦中央に */</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">42px</span><span class="punct">;</span> <span class="property">height</span><span class="punct">:</span> <span class="value">42px</span><span class="punct">;</span>     <span class="comment">/* クリック領域 */</span>
+<span class="punct">}</span>
+<span class="selector">.hamburger span</span> <span class="punct">{</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">50%</span><span class="punct">;</span> <span class="property">left</span><span class="punct">:</span> <span class="value">50%</span><span class="punct">;</span>
+    <span class="property">transform</span><span class="punct">:</span> <span class="value">translate(-50%, -50%)</span><span class="punct">;</span>  <span class="comment">/* 枠の真ん中へ */</span>
+<span class="punct">}</span></pre>
+    <p style="font-size:14px;color:var(--text-soft);">前回の「position absoluteは左上が基準→translateで自分の半分戻す」の応用。クリック領域(青い42px四角)の中に3本線がぴったり収まる。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="cross">
+    <h2 class="section-title"><span class="icon">✖️</span>④ クリックで×に変形（rotate）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ×は<strong>線2本</strong>。真ん中の線を消し、上下の線を中央に集めて<mark>45°と-45°に回転</mark>させる。回転は <code>transform: rotate()</code>。
+      </p>
+    </div>
+    <div class="callout warn">
+      <span class="label">⚠️ 真ん中を消すのは opacity ではなく rgba</span>
+      <p style="margin:0;"><code>opacity: 0</code> にすると<strong>子要素（::before/::after）まで全部消えてしまう</strong>。なので<mark>背景色を <code>rgba(0,0,0,0)</code>（アルファ0）で透明</mark>にする。これなら真ん中の線だけ消える。</p>
+    </div>
+<pre><span class="comment">/* close クラスが付いたら×に */</span>
+<span class="selector">.hamburger.close span</span> <span class="punct">{</span>
+    <span class="property">background</span><span class="punct">:</span> <span class="value">rgba(0,0,0,0)</span><span class="punct">;</span>  <span class="comment">/* 真ん中を透明（opacityはNG） */</span>
+<span class="punct">}</span>
+<span class="selector">.hamburger.close span::before</span> <span class="punct">{</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span>
+    <span class="property">transform</span><span class="punct">:</span> <span class="value">rotate(45deg)</span><span class="punct">;</span>
+<span class="punct">}</span>
+<span class="selector">.hamburger.close span::after</span> <span class="punct">{</span>
+    <span class="property">top</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span>
+    <span class="property">transform</span><span class="punct">:</span> <span class="value">rotate(-45deg)</span><span class="punct">;</span>  <span class="comment">/* 逆向きでバツに */</span>
+<span class="punct">}</span></pre>
+    <p>同じ45°だと1本に重なるので、<strong>片方は -45°</strong> にして×にする。<code>close</code> というクラスを付けたり外したりで切り替え。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="slidein">
+    <h2 class="section-title"><span class="icon">➡️</span>⑤ スライドインで開閉</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ナビを普段は<strong>画面の外</strong>に置いておき、クリックしたら<mark>右からスーッと出てくる</mark>（スライドイン）。画面外に出すので <code>position: fixed</code>（absoluteではなく）＋ <code>right</code> をマイナスに。
+      </p>
+    </div>
+<pre><span class="selector">nav</span> <span class="punct">{</span>
+    <span class="property">position</span><span class="punct">:</span> <span class="value">fixed</span><span class="punct">;</span>       <span class="comment">/* 画面基準で固定（absoluteから変更） */</span>
+    <span class="property">right</span><span class="punct">:</span> <span class="value">-40%</span><span class="punct">;</span>       <span class="comment">/* 画面の外（右）に隠す */</span>
+<span class="punct">}</span>
+<span class="comment">/* open クラスが付いたら表示 */</span>
+<span class="selector">nav.open</span> <span class="punct">{</span> <span class="property">right</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span> <span class="punct">}</span></pre>
+    <div class="callout success">
+      <span class="label">🔑 開閉のきっかけ＝クラスの付け外し（JS）</span>
+      <p style="margin:0;"><code>close</code> や <code>open</code> というクラスを<strong>付けたり外したりする処理は JavaScript</strong>で行う（まだ習っていない）。今日は<mark>クラスが付いた時/外れた時のCSS（見た目）</mark>まで。HTMLだけではクラスの付け外しはできない。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ハンバーガーメニュー</strong></td><td>3本線(≡)をクリックで開閉するナビ。形が由来</td></tr>
+          <tr><td><strong>ブレイクポイント</strong></td><td>レイアウトを切り替える画面幅（今回1000px）</td></tr>
+          <tr><td><strong>::before / ::after</strong></td><td>疑似要素。content必須。上下の線に使う</td></tr>
+          <tr><td><strong>display: block</strong></td><td>spanを線として表示するのに必要</td></tr>
+          <tr><td><strong>transform: translate(-50%,-50%)</strong></td><td>絶対配置の要素を自分の半分戻して中央に</td></tr>
+          <tr><td><strong>transform: rotate(45deg)</strong></td><td>要素を回転（×を作る）</td></tr>
+          <tr><td><strong>opacity vs rgba(…,0)</strong></td><td>opacityは子ごと消える / rgbaは背景だけ透明</td></tr>
+          <tr><td><strong>position: fixed</strong></td><td>画面基準で固定（スライドインの土台）</td></tr>
+          <tr><td><strong>right: -40%</strong></td><td>画面外に隠す（openで0に戻して表示）</td></tr>
+          <tr><td><strong>close / open クラス</strong></td><td>状態切り替えの目印。付け外しはJavaScript</td></tr>
+          <tr><td><strong>flex-direction: column</strong></td><td>横並びを縦並びに切り替え</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>普通のナビ→ハンバーガーは<strong>メディアクエリの中</strong>に書く</li>
+      <li>3本線＝<code>span</code>＋<code>::before</code>＋<code>::after</code>（content必須・display:block）</li>
+      <li>クリック領域 <code>div.hamburger</code> に幅・高さ（42px）</li>
+      <li>中央配置は <code>top/left:50%</code>＋<code>translate(-50%,-50%)</code></li>
+      <li>×への変形は <code>rotate(45deg)</code> と <code>rotate(-45deg)</code></li>
+      <li>真ん中を消すのは <strong><code>rgba(…,0)</code></strong>（opacityはNG）</li>
+      <li>スライドイン＝<code>position:fixed</code>＋<code>right:-40%</code>→openで<code>right:0</code></li>
+      <li>クラス付け外し（close/open）は<strong>JavaScriptの役割</strong>（次のステップ）</li>
+      <li><strong>0ベースで何回か作ってみる</strong>と難しさ＝身につき方が分かる</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>結構テクニカルで難しいんですけど、サイト作るなら絶対これ覚えなきゃいけないんで。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ ハンバーガーメニューは必須スキル。難しくても避けて通れない。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>opacityを使うと全部消えちゃうんで、RGBAのアルファを使って透明にしていきます。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 先生も一瞬ハマったポイント。opacityは子要素ごと消える落とし穴。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>一旦0ベースで、どっかで作ってみてください。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 見ながらだと分かった気になる。ゼロから組むと本当の理解になる。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-26｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Figma 2日目：フレーム・コンポーネント・オートレイアウト｜2026年6月1日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月1日｜講師：A先生</div>
+  <h1>Figma 2日目：フレーム・コンポーネント・オートレイアウト</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間43分</span>
+    <span>📖 教科書 47〜53p</span>
+    <span>🎯 フレーム・スタイル登録・コンポーネント・オートレイアウト</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    Figma 2日目は「<strong>枠を作る → 中身を整える → 部品にする → 自動で並べる</strong>」という制作の土台を一気に学んだ回。
+    <strong>フレーム（=HTMLのdiv）</strong>で枠を作り、<strong>スタイル登録</strong>で色とフォントを事前に決め、
+    <strong>コンポーネント</strong>でパーツを使い回し、<strong>オートレイアウト</strong>で余白と並びを自動化する。
+    最後は実際に「ヘッダーをゼロから作る」課題まで到達した。
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#frame">フレーム＝親要素で囲う</a></li>
+      <li><a href="#mobile-first">モバイルファースト・375px</a></li>
+      <li><a href="#frame-vs-group">フレーム vs グループ</a></li>
+      <li><a href="#style-register">スタイル登録（色・フォント・グリッド）</a></li>
+      <li><a href="#component">コンポーネントとインスタンス</a></li>
+      <li><a href="#variant">バリアント</a></li>
+      <li><a href="#text-property">テキストプロパティ</a></li>
+      <li><a href="#boolean-prop">ブール値（表示/非表示）</a></li>
+      <li><a href="#auto-layout">オートレイアウト</a></li>
+      <li><a href="#final-exercise">最終演習：ヘッダーを作る</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>時刻をクリックすると、その内容の詳しい解説に飛べます。<span class="star">★★★</span>＝特に重要。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#frame">00:02</a></td><td><a href="#frame">フレーム機能＝親要素で囲う（HTMLのdivのイメージ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#mobile-first">00:04</a></td><td><a href="#mobile-first">フレーム一覧・デスクトップ/スマホ・モバイルファースト</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#mobile-first">00:06</a></td><td><a href="#mobile-first">375px問題・横スクロールは生まない</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#frame">00:16</a></td><td><a href="#frame">ページ名の付け方（トップPC / サービスSP など）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#frame">00:26</a></td><td><a href="#frame">子要素から作って親要素で囲う手順（記事カードの例）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#frame">00:36</a></td><td><a href="#frame">選択範囲のフレーム化（必ず名前をつける）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#frame-vs-group">00:51</a></td><td><a href="#frame-vs-group">フレーム vs グループの違い</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#frame-vs-group">01:01</a></td><td><a href="#frame-vs-group">背景色はフレームに直接「塗り」を追加する</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#frame-vs-group">01:04</a></td><td><a href="#frame-vs-group">フレーム名は英語？日本語？（ケースバイケース）</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#style-register">01:08</a></td><td><a href="#style-register">スタイル登録（色・フォントを事前に決めて登録）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#style-register">01:10</a></td><td><a href="#style-register">フォントスタイルの登録手順・一括管理</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#style-register">01:27</a></td><td><a href="#style-register">※最初はサイズが決まらなくて当然 → トップページから</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#style-register">01:48</a></td><td><a href="#style-register">カラーの登録（バリアブルではなくスタイルで）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#style-register">01:50</a></td><td><a href="#style-register">ベース／メイン／アクセント・最低3色以上</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">02:28</td><td>パソコン再起動 → お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#style-register">03:20</a></td><td><a href="#style-register">エフェクト登録・白はドロップシャドウで見やすく</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#style-register">03:21</a></td><td><a href="#style-register">グリッド（ガイド線）・12カラム/型120/ガター24=1200px</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#component">03:33</a></td><td><a href="#component">コンポーネント＝部品化（教科書47p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component">03:34</a></td><td><a href="#component">コンポーネントとインスタンス（親子関係）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component">03:39</a></td><td><a href="#component">ボタンを作る（Shift+A＝オートレイアウト）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component">03:47</a></td><td><a href="#component">コンポーネント化（紫の枠・独特なアイコン）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#component">03:53</a></td><td><a href="#component">インスタンス側でテキスト・色を上書き</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">04:03</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#homework">04:15</a></td><td><a href="#homework">【連絡】月末の欠席・遅刻の書類は早めに（給付金に影響）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#variant">04:17</a></td><td><a href="#variant">バリアント（A/Bパターン・教科書48〜49p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#variant">04:31</a></td><td><a href="#variant">バリアントの名前を分かりやすく変える</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#text-property">04:39</a></td><td><a href="#text-property">テキストプロパティ（教科書49p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#boolean-prop">04:50</a></td><td><a href="#boolean-prop">ブール値＝表示/非表示の切り替え（セールタグ等）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">05:00</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#auto-layout">05:11</a></td><td><a href="#auto-layout">オートレイアウト（教科書50p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#auto-layout">05:14</a></td><td><a href="#auto-layout">水平/垂直・「自動」＝space-between</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#auto-layout">05:18</a></td><td><a href="#auto-layout">hug（コンテンツを内包）・パディング（教科書52p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#auto-layout">05:30</a></td><td><a href="#auto-layout">fill（コンテナに合わせて拡大・教科書53p）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#final-exercise">05:36</a></td><td><a href="#final-exercise">最終演習：1440pxにヘッダーを作る</a></td><td class="center"><span class="star">★★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>フレーム＝HTMLのdiv</h4><p>枠を作るのも、要素を「親要素で囲う」のも全部フレーム。ショートカットは <code>F</code>。</p></div>
+      <div class="card"><span class="num">2</span><h4>モバイルファースト</h4><p>スマホサイズを優先して先に作る。<strong>考えるのは「小さい幅」</strong>の方。</p></div>
+      <div class="card"><span class="num">3</span><h4>横スクロールは生まない</h4><p>意図的なデザインでない限り、横スクロールは起こしてはいけない。</p></div>
+      <div class="card"><span class="num">4</span><h4>Webはほぼフレーム</h4><p>グループは中身ごと拡大縮小されて困る。だから整列に強いフレームを使う。</p></div>
+      <div class="card"><span class="num">5</span><h4>スタイル登録</h4><p>色・フォントを<strong>事前登録</strong>。後から一括で変えられる（=CSS変数のイメージ）。</p></div>
+      <div class="card"><span class="num">6</span><h4>最初は決まらなくて当然</h4><p>サイズ感は数十本作らないと掴めない。まずトップページを作ってから登録する。</p></div>
+      <div class="card"><span class="num">7</span><h4>コンポーネント＝部品</h4><p>親＝コンポーネント／子＝インスタンス。<strong>親を変えると子に反映</strong>（逆はしない）。</p></div>
+      <div class="card"><span class="num">8</span><h4>インスタンスで上書き</h4><p>文言や色は子（インスタンス）側で個別に上書きできる。</p></div>
+      <div class="card"><span class="num">9</span><h4>コンポーネントプロパティ</h4><p>バリアント／テキスト／ブール値で、部品をぐっと使いやすくする。</p></div>
+      <div class="card"><span class="num">10</span><h4>オートレイアウト</h4><p>余白と並びを自動化。<strong>hug（中身に合わせる）／fill（親に合わせる）</strong>がカギ。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== フレーム ===== -->
+  <section id="frame">
+    <h2 class="section-title"><span class="icon">🖼️</span>フレーム＝親要素で囲う</h2>
+    <p>この日の主役の一つが <strong>フレーム（Frame）</strong>。Figmaで枠を作るときも、要素をまとめて囲うときも、ほぼ全部このフレームを使う。先生のたとえがそのまま核心だった。</p>
+    <blockquote>HTMLで <code>div</code> タグとかで囲っておくみたいなの、よくあったと思うんですね。子要素を div で親要素として囲う。あれをフィグマで視覚的に表現すると、フレームを使うイメージです。<span class="citation">── A先生</span></blockquote>
+
+    <h3>2つの使いどころ</h3>
+    <ul class="bullet-pro">
+      <li><strong>①土台（ページの枠）</strong>：フレームツール（<code>F</code>）を選ぶと、右パネルにデスクトップ・スマホ・タブレットなどの<strong>画面幅の一覧</strong>が出る。ここから選んで、まずページの大枠を作る。</li>
+      <li><strong>②親要素で囲う</strong>：複数の要素をまとめて1つの枠にする。レイヤーが整理され、後で整列・余白付けがしやすくなる。</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">作る順番（メモ必須）</span>
+      <strong>子要素から作って、親要素で囲う。</strong> いきなり枠から作らず、画像やテキスト（子）を先に用意してから、まとめてフレーム化していく。これがFigmaでカンプを組む基本手順。
+    </div>
+
+    <h4>HTMLで考えるとこういう入れ子</h4>
+    <pre><span class="comment">&lt;!-- 記事カードの例：フレームは div の入れ子と同じ構造 --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">div</span> class=<span class="value">"card"</span><span class="punct">&gt;</span>          <span class="comment">← 外枠フレーム（親）</span>
+  <span class="punct">&lt;</span><span class="selector">img</span><span class="punct">&gt;</span>                   <span class="comment">← 子（サムネイル）</span>
+  <span class="punct">&lt;</span><span class="selector">div</span> class=<span class="value">"desc"</span><span class="punct">&gt;</span>    <span class="comment">← 子をまとめたフレーム</span>
+    <span class="punct">&lt;</span><span class="selector">p</span><span class="punct">&gt;</span>タイトル<span class="punct">&lt;/</span><span class="selector">p</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">p</span><span class="punct">&gt;</span>本文<span class="punct">&lt;/</span><span class="selector">p</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+<span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span></pre>
+
+    <h3>覚えておく操作</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>操作</th><th>やり方</th></tr></thead>
+        <tbody>
+          <tr><td>フレームを作る</td><td>ショートカット <code>F</code> → 右パネルから画面幅を選ぶ</td></tr>
+          <tr><td>複製する</td><td><code>Option(Alt)</code> を押しながらドラッグ</td></tr>
+          <tr><td>選択範囲をフレーム化</td><td>右クリック →「選択範囲のフレーム化」（<code>⌘+Option+G</code>）</td></tr>
+          <tr><td>名前をつける</td><td>フレーム化したら<strong>すぐ名前を変える</strong>（クラス名を考える感覚）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">ページ名の付け方</span>
+      同じファイル内でPC用とスマホ用を分けるときは <code>トップPC</code> / <code>トップSP</code> のように区別する（レイヤー名の重複を防ぐ）。ページ自体を分ける場合は <code>SP</code> を付けなくてもOK。
+    </div>
+    <p class="callout success" style="font-size:14px;"><span class="label">補足</span> 先生は途中で「ショートカットはS」と言いかけたが、すぐ「フレームは <code>F</code>」と訂正。<strong>正しくはF</strong>。レイヤーのアイコンが <strong>シャープ(#)型</strong>になっていればフレーム、長方形ツールだとフレームにならないので注意。</p>
+  </section>
+
+  <!-- ===== モバイルファースト ===== -->
+  <section id="mobile-first">
+    <h2 class="section-title"><span class="icon">📱</span>モバイルファースト・375px</h2>
+    <figure style="margin:22px 0;">
+      <img src="img/mobile.png"
+           alt="先生の板書：モバイルファースト／375px／考えるのは小さい幅／横スクロールはさせない／最初は1440pxで作成／子要素から作って親要素へ"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書（Figma）：この日のキーワードが全部詰まったメモ。赤字＝特に意識すべきポイント
+      </figcaption>
+    </figure>
+
+    <h3>モバイルファーストとは</h3>
+    <p><strong>スマホサイズのデザインから先に作っていくこと</strong>。今のWeb制作はPC幅とスマホ幅の2種類を作るのがスタンダードで、その出発点をスマホにする考え方。</p>
+
+    <div class="callout">
+      <span class="label">なぜ「小さい幅」を先に考えるのか</span>
+      画面が広い方は、左右に余白がつくだけで済む（広がっても困らない）。逆に<strong>狭い画面は、広めに作ると要素が収まりきらず横スクロールが生まれてしまう</strong>。だから難しい方＝小さい幅を先に考える。
+    </div>
+
+    <h3>375px という数字</h3>
+    <ul class="bullet-pro">
+      <li><strong>375px</strong>＝今普及しているスマホで一番小さいクラスの幅（iPhone SE 等）。Figmaのスマホ一覧にはあえて無いが、最重要キーワードとしてメモ。</li>
+      <li>これより狭いのはかなり古い端末（iPhone 4/4s 世代）なので、ほぼ考えなくてよい。</li>
+      <li><strong>PCは 1440px</strong> で組んでおけばまず安心（それ以下のPCで見る人は少ない）。「最初は1440pxで作成でいい。最初は。」</li>
+    </ul>
+
+    <div class="callout primary">
+      <span class="label">マインドの切り替え</span>
+      今の自分は<strong>ユーザーではなくクリエイター（作る側）</strong>。使う人の端末がどんなものかを考慮してデザインする。「クリエイター側は横スクロールはさせない。させてはいけない！」
+    </div>
+  </section>
+
+  <!-- ===== フレーム vs グループ ===== -->
+  <section id="frame-vs-group">
+    <h2 class="section-title"><span class="icon">🆚</span>フレーム vs グループ</h2>
+    <p>2時間目の冒頭、生徒の質問から「フレームとグループの違い」を解説。<strong>結論：Webデザインのカンプを作るならほぼ100%フレーム。</strong></p>
+
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>グループ（あまり使わない）</h4>
+        <ul>
+          <li>中身を1つのオブジェクトに「まとめる」</li>
+          <li>枠を拡大すると<strong>中身も一緒に拡大縮小</strong>されてしまう</li>
+          <li>ロゴデザインなどには使うこともある</li>
+        </ul>
+      </div>
+      <div class="compare-col right">
+        <h4>フレーム（こっちを使う）</h4>
+        <ul>
+          <li>中身を「整列」させるための親要素</li>
+          <li>枠を広げても<strong>親の幅が伸び縮みするだけ</strong>（div の width/height を決める感覚）</li>
+          <li>セクション・カード・ヘッダー…ほぼ全部フレーム</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>背景色は「長方形」で作らない</h3>
+    <div class="callout">
+      <span class="label">よくある間違い</span>
+      背景色のために長方形（レクタングル）を敷くのはNG。<strong>囲っているフレーム自体に「塗り」を追加</strong>すると、それが背景色（background-color）になる。これが一般的な作り方。
+    </div>
+
+    <h3>フレーム名は英語？日本語？</h3>
+    <p>これもケースバイケース。<strong>訓練校の制作では英語で統一</strong>している。理由は、最近は現場でAIにコーディングを任せる場面が多く、<mark>フレーム名をそのままクラス名にして指示できる</mark>と英語の方が適切に伝わるから。分かりやすさ重視であえて日本語にする現場もある。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== スタイル登録 ===== -->
+  <section id="style-register">
+    <h2 class="section-title"><span class="icon">🎨</span>スタイル登録（色・フォント・グリッド）</h2>
+    <p><strong>スタイル登録</strong>＝サイトで使う色・フォント・エフェクト・グリッドを<strong>事前にまとめて登録</strong>しておく機能。毎回フォントを探す手間が消え、後からの一括変更もできる。</p>
+
+    <div class="callout primary">
+      <span class="label">サイトを作る前段階</span>
+      Figmaを開く前に、本来は<strong>「使う色・使うフォント・使う素材」を決める</strong>のが現場のやり方。その「決めたもの」をスタイルとして登録しておく。
+    </div>
+
+    <h3>フォントスタイルの登録手順</h3>
+    <ul class="bullet-pro">
+      <li>テキストを選択 → タイプグラフィのパネルから「スタイルを適用」アイコン → <code>＋</code>（スタイルの作成）</li>
+      <li>名前をつけて保存（例：<code>Heading1</code>）。<strong>クラス名・CSS変数のイメージ</strong>で命名する</li>
+      <li>登録したスタイルは<strong>再編集が可能</strong>＝適用箇所がすべて一括で変わる（解除も可能）</li>
+    </ul>
+    <p class="callout" style="font-size:14px;"><span class="label">場所メモ</span> このメニューは最初すごく見つけづらい。「どこにあるか」を必ずメモしておくこと。</p>
+
+    <figure style="margin:22px 0;">
+      <img src="img/style_exercise.png"
+           alt="先生の板書：フォントとカラー決めの演習。欧文と和文でフォントを探す、heading系で最低3つ・textで最低2つのサイズ、ベースカラー・メインカラー・アクセントカラーを最低3つ以上登録"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書（Figma）：「フォントとカラー決めの演習」課題。欧文＋和文で計12個ほどのスタイルを登録する
+      </figcaption>
+    </figure>
+
+    <div class="callout success">
+      <span class="label">この日いちばん大事な心構え</span>
+      最初からフォントサイズや余白感を決めるのは<strong>難しくて当然</strong>。イメージが湧かないから。数十本サイトを作らないと感覚はつかめない。だから今は <strong>① まずトップページをしっかり作る → ② そこで使ったフォントをスタイル登録する</strong> という順番でOK。これを何度も繰り返すうちに、事前に決められるようになる。
+    </div>
+
+    <h3>カラーの登録（注意点あり）</h3>
+    <ul class="bullet-pro">
+      <li>手順はフォントとほぼ同じ。「塗り」のアイコン → 作成。</li>
+      <li><strong>「スタイル」と「バリアブル」が並んでいるが、今回は必ず「スタイル」で登録</strong>（バリアブルでやってしまいがちなので注意）。</li>
+      <li>色の種類：<strong>ベースカラー／メインカラー／アクセントカラー</strong>。ただし<strong>3色だけに限る必要はなく、最低3つ以上</strong>。Webデザインの見本帳などを見てトーンを意識して決める。</li>
+    </ul>
+
+    <h3>エフェクト＆グリッドの登録</h3>
+    <ul class="bullet-pro">
+      <li><strong>エフェクト</strong>も同じ手順で登録できる。<mark>白を登録するときは、軽くドロップシャドウをかけておく</mark>と背景に埋もれず見やすい（先生おすすめのテクニック）。</li>
+      <li><strong>グリッド（ガイド線）</strong>：レイアウトの基準になるガイド。Webでは「列（カラム）」一択。</li>
+      <li>おすすめ初期設定：<strong>本数12・型(左右余白)120・ガター(列間)24</strong> → 中身がちょうど <strong>1200px</strong>（世の中で最も小さいPC幅の目安）に収まる。ただしガチガチに守る必要はない。</li>
+      <li>Tailwind のような<strong>フレームワーク</strong>を使うとき、このカラム数がコーディングのルールの基準になる。使わなくてもサイトは作れる。</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== コンポーネント ===== -->
+  <section id="component">
+    <h2 class="section-title"><span class="icon">🧩</span>コンポーネントとインスタンス</h2>
+    <p><strong>コンポーネント（直訳＝部品）</strong>＝サイト内で繰り返し使うパーツを部品化する機能（教科書47p）。ヘッダー・フッター・ボタン・カードなど、複数ページで共通のデザインに使う。</p>
+
+    <div class="callout primary">
+      <span class="label">親子の関係（教科書48p）</span>
+      <strong>親コンポーネント</strong>と、その複製である<strong>インスタンス（子）</strong>の2種類がある。
+      <ul style="margin:10px 0 0;">
+        <li>親（コンポーネント）の色やサイズを変えると <strong>→ インスタンスにも反映される</strong></li>
+        <li>逆に、インスタンスを編集しても <strong>→ 親には反映されない</strong></li>
+      </ul>
+    </div>
+
+    <h3>置き場所のルール</h3>
+    <p>実際にカンプに配置するのは<strong>インスタンス</strong>。親コンポーネントは大元なので、<strong>「コンポーネント置き場」フレームを用意</strong>してそこにまとめておく。現場では「トップページを作る → 繰り返すパーツをコンポーネント化 → 置き場に移動 → 複製したインスタンスを配置」という流れが多い。</p>
+
+    <h3>ボタンを作る実習</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ステップ</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>1. テキスト</td><td>「ボタン」と打つ（登録スタイル16px / Bold）</td></tr>
+          <tr><td>2. オートレイアウト化</td><td><code>Shift+A</code> でフレーム化（=ボタンの土台）</td></tr>
+          <tr><td>3. 装飾</td><td>フレームに塗り・パディング（左右16/上下8）・角丸8px</td></tr>
+          <tr><td>4. コンポーネント化</td><td><code>⌘+Option+K</code>。枠が<strong>紫</strong>＆アイコンが<strong>4分割の◇型</strong>になる</td></tr>
+          <tr><td>5. インスタンス</td><td>複製するか、左パネル「アセット」からドラッグ＆ドロップ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="callout" style="font-size:14px;"><span class="label">見分け方</span> レイヤーパネルで、インスタンスは<strong>中が抜けた◇型</strong>のアイコン。「レイヤーパネルから目を離さない」が先生の口ぐせ。</p>
+
+    <h3>インスタンス側で「上書き」する</h3>
+    <p>親の色を変えると全インスタンスに反映される。でも例えばボタンに「ボタン」というカタカナをそのまま並べることはない。そこで<strong>インスタンス側でテキストだけを上書き</strong>（例：「申し込む」）。</p>
+    <ul class="bullet-pro">
+      <li>テキストを上書きしたインスタンスは、以後<strong>その文言だけ親に追従しなくなる</strong>（他の色・サイズは追従する）。</li>
+      <li>色も同様に個別上書きできる（1つだけアクセントカラーにする等）。</li>
+      <li>ぐちゃぐちゃになったら右クリック →「<strong>インスタンスのリセット</strong>」で初期状態に戻る。</li>
+      <li>「<strong>インスタンスの切り離し</strong>」で親子関係を解除し、ただのフレームに戻すこともできる。</li>
+    </ul>
+  </section>
+
+  <!-- ===== バリアント ===== -->
+  <section id="variant">
+    <h2 class="section-title"><span class="icon">🔀</span>バリアント</h2>
+    <p>コンポーネントには色・サイズの反映だけでなく、<strong>コンポーネントプロパティ</strong>という機能を足せる（教科書48〜49p。旧「バリアント」は今は49pのコンポーネントプロパティに統合）。主に使うのは <strong>バリアント／テキスト／ブール値</strong> の3つ。</p>
+
+    <h3>バリアント＝A/Bパターンを作る</h3>
+    <p>1つのコンポーネントの中に、<strong>状態違い（ホバー前・ホバー中・押せない＝ディセーブル など）</strong>のパターンを持たせる機能。インスタンス側で右パネルのトグルから切り替えられる。</p>
+
+    <figure style="margin:22px 0;">
+      <img src="img/header_nav.png"
+           alt="完成したナビゲーション：LOGO・top・私たちについて（下線アクセント＝現在ページ）・店舗案内・商品一覧・お問い合わせ"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書（Figma）：「私たちについて」だけ下線＋色が違う＝<strong>現在ページをバリアントで表現</strong>した例
+      </figcaption>
+    </figure>
+
+    <h3>作り方</h3>
+    <ul class="bullet-pro">
+      <li>コンポーネントを選択 → 右パネル「プロパティ」の <code>＋</code> →「バリアント」</li>
+      <li>バリアントの <code>＋</code> でパターンを追加（例：バリアント2＝ホバー、バリアント3＝ディセーブル）し、それぞれデザインを変える</li>
+      <li><strong>名前を分かりやすく変える</strong>：初期の「プロパティ1／バリアント2」では意味不明なので、「ボタンの状態」「ホバー」「ディセーブル」などに変更すると、他の人が見ても分かる</li>
+    </ul>
+
+    <div class="callout primary">
+      <span class="label">なぜ使う？</span>
+      コンポーネントもバリアントも、極論<strong>使えなくてもカンプは作れる</strong>。でも管理・編集・一括変更といった<strong>効率（仕事の質）</strong>を考えると必ず使うことになる。逆に管理せず進めると、統一性のないデザインになりやすい。
+    </div>
+  </section>
+
+  <!-- ===== テキストプロパティ ===== -->
+  <section id="text-property">
+    <h2 class="section-title"><span class="icon">✍️</span>テキストプロパティ</h2>
+    <p>インスタンスのテキストを<strong>右パネルから簡単に書き換えられるようにする</strong>機能（教科書49p）。地味だけど、先生いわく「個人的にすごく大事」。</p>
+
+    <div class="callout">
+      <span class="label">手順（少し面倒なので要メモ）</span>
+      <ol style="margin:8px 0 0;">
+        <li>コンポーネントを選択 → プロパティの <code>＋</code> →「テキスト」</li>
+        <li><strong>名前と値</strong>を入力（値＝デフォルトで入る文字。例：サンプル）</li>
+        <li><strong>反映させたいテキストレイヤーを自分で選び</strong>、外観の「バリアブルプロパティを適用」から先ほどのテキストプロパティと紐付ける</li>
+      </ol>
+    </div>
+    <p>これをやっておくと、複雑なコンポーネントでも<strong>レイヤーを深く潜らずに右パネルで一発でテキスト変更</strong>できる。中身をダブルクリックで掘っていく手間（＝検証ミスや作業時間の増加）が減る。</p>
+  </section>
+
+  <!-- ===== ブール値 ===== -->
+  <section id="boolean-prop">
+    <h2 class="section-title"><span class="icon">🔘</span>ブール値（表示/非表示）</h2>
+    <p><strong>ブール値（Boolean）</strong>＝True / False を返すもの。Figmaでは<strong>レイヤーの表示・非表示をワンクリックで切り替える</strong>機能になる（教科書49p）。</p>
+    <div class="callout">
+      <span class="label">使う場面の例</span>
+      商品カードの「<strong>SALE</strong>」タグのように、<strong>付けたり外したりするバッジ</strong>の表示/非表示。
+    </div>
+    <ul class="bullet-pro">
+      <li>コンポーネントを選択 → プロパティの <code>＋</code> →「ブール値」→ 名前（例：セール）</li>
+      <li>表示/非表示を切り替えたい<strong>レイヤーを選び</strong>、外観のアイコンからプロパティを適用</li>
+      <li><strong>True＝表示／False＝非表示</strong>。インスタンスではトグル（オン/オフスイッチ）で操作できる</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== オートレイアウト ===== -->
+  <section id="auto-layout">
+    <h2 class="section-title"><span class="icon">📐</span>オートレイアウト</h2>
+    <p>本日のラスト＆最重要（教科書50p）。<strong>余白（マージン/パディング）を自動で保持し、要素の並びも自動でレイアウト</strong>してくれるプロパティ。Figmaで<strong>ボックスモデルを実現する</strong>イメージ。ボタン・カード・グローバルナビ・テーブルなど幅広く使う。</p>
+
+    <div class="callout primary">
+      <span class="label">基本</span>
+      オートレイアウトは<strong>フレームの一種</strong>。ショートカット <code>Shift+A</code> で囲う。普通のフレームより「並べるのが得意」なフレーム、と考えればOK。
+    </div>
+
+    <h3>方向と間隔（=Flexboxそのもの）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Figma</th><th>CSS（Flexbox）での対応</th></tr></thead>
+        <tbody>
+          <tr><td>水平に並べる</td><td><code>flex-direction: row</code>（横並び）</td></tr>
+          <tr><td>垂直に並べる</td><td><code>flex-direction: column</code>（縦並び）</td></tr>
+          <tr><td>間隔を数字で指定</td><td><code>gap</code>（要素間の余白＝margin）</td></tr>
+          <tr><td>間隔を「自動」</td><td><code>justify-content: space-between</code></td></tr>
+          <tr><td>パディング（上下/左右）</td><td><code>padding</code>（内側の余白）</td></tr>
+          <tr><td>中の位置（中央揃え等）</td><td><code>align-items / justify-content</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <pre><span class="comment">/* オートレイアウトで作ったナビを CSS にするとこんなイメージ */</span>
+<span class="selector">.nav</span> <span class="punct">{</span>
+  <span class="property">display</span><span class="punct">:</span> <span class="value">flex</span><span class="punct">;</span>                    <span class="comment">/* 水平 */</span>
+  <span class="property">justify-content</span><span class="punct">:</span> <span class="value">space-between</span><span class="punct">;</span> <span class="comment">/* 間隔=自動 */</span>
+  <span class="property">gap</span><span class="punct">:</span> <span class="value">80px</span><span class="punct">;</span>                    <span class="comment">/* 要素の間隔 */</span>
+  <span class="property">padding</span><span class="punct">:</span> <span class="value">0 32px</span><span class="punct">;</span>               <span class="comment">/* 左右パディング */</span>
+<span class="punct">}</span></pre>
+
+    <h3>サイズの決め方：hug と fill（最重要）</h3>
+    <div class="compare">
+      <div class="compare-col right">
+        <h4>hug＝コンテンツを内包（教科書52p）</h4>
+        <ul>
+          <li>中身（子要素）の大きさに<strong>フレームを合わせる</strong></li>
+          <li>余分な高さ・幅をピタッと詰められる</li>
+          <li>CSSの <code>width: fit-content</code> の感覚</li>
+        </ul>
+      </div>
+      <div class="compare-col left">
+        <h4>fill＝コンテナに合わせて拡大（教科書53p）</h4>
+        <ul>
+          <li>逆に<strong>親フレームの幅に子を合わせる</strong></li>
+          <li>ヘッダーを1440pxの親いっぱいに広げるときに使う</li>
+          <li>CSSの <code>width: 100%</code> の感覚</li>
+        </ul>
+      </div>
+    </div>
+    <p class="callout" style="font-size:14px;"><span class="label">つまずきポイント</span> 「コンテナに合わせて拡大」は、<strong>親がオートレイアウトになっていないと選べない</strong>（先生も授業中ここで一瞬詰まった）。固定幅のままだと親を伸ばしても子が広がらない。</p>
+
+    <blockquote>ピンと来ない人は、オートレイアウト<strong>なし</strong>でこれを作ってみてください。めっちゃ面倒くさいです。「なるほど、面倒だな」と気づいてもらえると思います。<span class="citation">── A先生</span></blockquote>
+  </section>
+
+  <!-- ===== 最終演習 ===== -->
+  <section id="final-exercise">
+    <h2 class="section-title"><span class="icon">🏗️</span>最終演習：ヘッダーを作る</h2>
+    <p>この日学んだ全部（フレーム・コンポーネント・バリアント・テキストプロパティ・オートレイアウト）を使う総合課題。</p>
+
+    <figure style="margin:22px 0;">
+      <img src="img/header_exercise.png"
+           alt="先生の板書：figmaでヘッダーを作ってみよう。1440pxのフレームにヘッダーをデザイン。ナビはtop/私たちについて/店舗案内/商品一覧/お問い合わせの5つ。ヘッダーはコンポーネント化しインスタンスをtopフレームに配置。ナビはテキストプロパティ。現在ページはバリアントでアクセント"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書（Figma）：最終演習「figmaでヘッダーを作ってみよう」の課題要件
+      </figcaption>
+    </figure>
+
+    <div class="callout success">
+      <span class="label">課題の要件</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>1440px</strong> のフレームにヘッダーをデザインする</li>
+        <li>ナビゲーションは <strong>トップ / 私たちについて / 店舗案内 / 商品一覧 / お問い合わせ</strong> の5つ（ロゴはダミーのテキストでOK）</li>
+        <li>ヘッダーは<strong>コンポーネント化</strong>し、インスタンスを <code>トップ</code> というフレームに配置</li>
+        <li>ヘッダーとナビは<strong>オートレイアウト</strong>で組む</li>
+        <li>ナビの文字は<strong>テキストプロパティ</strong>でいつでも変更できるように</li>
+        <li><strong>現在のページ</strong>が分かるよう、リンクに<strong>バリアント</strong>でアクセント（下線など）をつける</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px;">用語</th><th>意味（このクラスでの理解）</th></tr></thead>
+        <tbody>
+          <tr><td>フレーム</td><td>枠を作る／要素を親要素で囲う、Figmaの中心機能。HTMLの <code>div</code>。ショートカット <code>F</code></td></tr>
+          <tr><td>グループ</td><td>中身を1つにまとめる。拡大すると中身も拡大。Webカンプではほぼ使わない</td></tr>
+          <tr><td>モバイルファースト</td><td>スマホサイズから先に作る考え方</td></tr>
+          <tr><td>375px</td><td>普及スマホで最小クラスの幅（iPhone SE等）。横スクロール回避の基準</td></tr>
+          <tr><td>1440px</td><td>PCデザインの基本の横幅。「最初はこれでいい」</td></tr>
+          <tr><td>スタイル登録</td><td>色・フォント・エフェクト・グリッドを事前登録し一括管理する機能</td></tr>
+          <tr><td>バリアブル（CSS変数）</td><td>スタイルと並ぶ登録方法。今回は使わず「スタイル」で登録するのが約束</td></tr>
+          <tr><td>グリッド／カラム</td><td>レイアウトの基準ガイド線。Webは「列」一択。12カラムが目安</td></tr>
+          <tr><td>フレームワーク</td><td>Tailwind等のコーディングルール集。カラム数が基準になる</td></tr>
+          <tr><td>コンポーネント／インスタンス</td><td>親＝部品の大元／子＝配置する複製。親→子に反映、子→親は反映なし</td></tr>
+          <tr><td>コンポーネントプロパティ</td><td>部品に機能を足す仕組み。バリアント/テキスト/ブール値の3つを主に使う</td></tr>
+          <tr><td>バリアント</td><td>1部品内の状態違い（ホバー/ディセーブル/現在ページ 等）</td></tr>
+          <tr><td>テキストプロパティ</td><td>インスタンスの文字を右パネルから簡単に書き換える設定</td></tr>
+          <tr><td>ブール値（Boolean）</td><td>True/False＝レイヤーの表示/非表示の切り替え</td></tr>
+          <tr><td>オートレイアウト</td><td>余白と並びを自動化するフレーム。<code>Shift+A</code>。CSSのFlexbox</td></tr>
+          <tr><td>hug（コンテンツを内包）</td><td>中身の大きさにフレームを合わせる。<code>fit-content</code></td></tr>
+          <tr><td>fill（コンテナに合わせて拡大）</td><td>親の幅に子を合わせる。<code>width:100%</code>。親がオートレイアウト必須</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h4>ショートカットまとめ</h4>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>キー</th><th>機能</th></tr></thead>
+        <tbody>
+          <tr><td><code>F</code></td><td>フレームツール</td></tr>
+          <tr><td><code>Shift + A</code></td><td>オートレイアウト化</td></tr>
+          <tr><td><code>⌘ + Option + K</code>（Ctrl+Alt+K）</td><td>コンポーネント化</td></tr>
+          <tr><td><code>⌘ + Option + G</code>（Alt+G）</td><td>選択範囲のフレーム化</td></tr>
+          <tr><td><code>Option(Alt) + ドラッグ</code></td><td>複製</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <p>授業中に出た演習＝そのまま復習課題。間に合わなかったものは隙間時間で。</p>
+    <ul class="check-list">
+      <li>フレームで<strong>ダミーページを5つ</strong>作る（<code>トップPC</code>/<code>サービスSP</code> のように命名）</li>
+      <li>用意されたフッターを、自分の考えで<strong>フレーム分け＋名前付け</strong>する</li>
+      <li>欧文・和文で<strong>各最低3サイズ＝計12個ほどのフォントスタイル</strong>を登録</li>
+      <li><strong>ベース／メイン／アクセント＋α</strong>のカラースタイルを登録（喫茶店など作りたいサイトをイメージ）</li>
+      <li>ボタンを<strong>コンポーネント化</strong> → インスタンス2つ → 色・テキストの上書きを試す</li>
+      <li><strong>バリアント</strong>（ホバー／ディセーブル）を追加し、名前を分かりやすく変更</li>
+      <li><strong>テキストプロパティ</strong>・<strong>ブール値</strong>（SALEタグの表示/非表示）を試す</li>
+      <li>【最終課題】<strong>1440pxにヘッダーを作る</strong>（ナビ5項目・コンポーネント化してトップに配置・テキストプロパティ・現在ページはバリアントでアクセント・オートレイアウト活用）</li>
+    </ul>
+    <div class="callout">
+      <span class="label">📣 事務連絡（5時間目）</span>
+      月末は<strong>欠席・遅刻・早退の書類の締切が近い</strong>。書類に不備や遅れがあると<strong>雇用保険・給付金の支給に影響</strong>することがあるので、該当する人は早めに提出を。
+    </div>
+    <p style="font-size:14px; color:var(--muted);">※ 明日・明後日が（チャンネルの）投稿日、という先生の連絡もありました。</p>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>大事なのは、我々がデザイナー目線になること。考えるのは小さい幅の方です。<span class="citation">── モバイルファーストの核心</span></blockquote>
+    <blockquote>最初に大体どんぐらいのフォントサイズにするか…って言われてもピンとこないじゃないですか。それは絶対しょうがない。みんな最初はそうなる。まずはトップページをしっかり作ってから、使ったフォントを登録すればいい。<span class="citation">── スタイル登録の現実的な進め方</span></blockquote>
+    <blockquote>極論、コンポーネントが使えなくてもカンプは作れます。でも管理・編集・一括変更…効率を考えると、絶対に使っていくことになります。<span class="citation">── 便利機能との付き合い方</span></blockquote>
+    <blockquote>ピンと来ない人は、オートレイアウトなしで作ってみてください。めっちゃ面倒くさいと気づけます。<span class="citation">── オートレイアウトのありがたみ</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-02｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

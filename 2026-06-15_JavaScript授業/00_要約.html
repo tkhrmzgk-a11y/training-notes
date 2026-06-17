@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 2日目：カラーピッカー実践（DOM操作）｜2026年6月15日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月15日｜講師：A先生</div>
+  <h1>JavaScript 2日目：カラーピッカー実践（DOM操作）</h1>
+  <p class="subtitle">訓練校｜全5時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 4時間37分</span>
+    <span>📖 JavaScript（要素取得〜イベント〜CSS書換）</span>
+    <span>🎯 querySelector・value・addEventListener・関数・命名規則・style書換</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    JavaScript 2日目。前回の基礎（オブジェクト/メソッド/変数）を踏まえ、今日は<strong>実際に「カラーピッカー」を作りながら</strong>JSを学ぶ実践回。
+    色を選ぶと<strong>背景色が変わり・16進数のカラーコードが表示される</strong>という「動き」を、ゼロから実装した。
+    キーワードは <strong>要素の取得（querySelector）→ イベント（addEventListener）→ 処理（関数）→ 書き換え（textContent / style）</strong>。
+  </div>
+
+  <h3 style="border:none; padding:0; margin-bottom:6px;">🎯 今日の骨格：JSで「動き」を作る4ステップ（先生の板書）</h3>
+  <figure style="margin:14px 0 30px;">
+    <img src="img/implementation_steps.png"
+         alt="先生の板書：実装の手順。1.js側からカラーピッカーの要素を取得してくる 2.取得した要素を変数に代入する 3.代入した変数に対してイベントを設定する 4.そのイベントに対して実行する処理内容を作成する"
+         style="width:100%; max-width:860px; display:block; margin:0 auto;
+                border:1px solid var(--border); border-radius:10px;
+                box-shadow:0 2px 8px rgba(0,0,0,.06);">
+    <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+      ▲ 先生の板書：JSで動きを実装するときの4ステップ。<strong>この流れは今後ずっと使う基本形</strong>
+    </figcaption>
+  </figure>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#recipe">実装の手順（4ステップ）</a></li>
+      <li><a href="#get-element">要素の取得（querySelector）</a></li>
+      <li><a href="#value-property">値の取得（.value＝プロパティ）</a></li>
+      <li><a href="#textcontent">テキストの書き換え（.textContent）</a></li>
+      <li><a href="#concat">文字列の連結（+）</a></li>
+      <li><a href="#naming">命名規則（キャメル/スネーク/ケバブ）</a></li>
+      <li><a href="#event">イベントとaddEventListener</a></li>
+      <li><a href="#function">関数の作り方</a></li>
+      <li><a href="#dom">DOM（JSがHTMLを操る仕組み）</a></li>
+      <li><a href="#style-change">CSSを書き換える（.style）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>時刻をクリックすると詳しい解説に飛べます。<span class="star">★★★</span>＝特に重要。全5時間（約4時間40分）。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#recipe">00:00</a></td><td><a href="#recipe">前回の復習・カラーピッカー制作スタート</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#recipe">00:05</a></td><td><a href="#recipe">読み込み位置（CSSの次にJS）・HTML/CSS下準備</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#recipe">00:21</a></td><td><a href="#recipe">★実装の手順4ステップ（取得→代入→イベント→処理）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#get-element">00:30</a></td><td><a href="#get-element">document.querySelector で要素を取得（IDで指定）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#get-element">00:38</a></td><td><a href="#get-element">★defer忘れエラーの実演（null=要素が無い）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#value-property">00:57</a></td><td><a href="#value-property">値の取得 .value（メソッドでなくプロパティ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#value-property">01:10</a></td><td><a href="#value-property">オブジェクトの構造（キーとvalue）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#textcontent">01:18</a></td><td><a href="#textcontent">テキストの書き換え .textContent</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#concat">01:30</a></td><td><a href="#concat">文字列の連結 +（文字列＋変数）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time">01:38</td><td>休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#naming">01:49</a></td><td><a href="#naming">命名規則（キャメル/スネーク/ケバブ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#naming">01:53</a></td><td><a href="#naming">変数・関数名は2単語以上（予約語回避）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#event">02:02</a></td><td><a href="#event">イベント＝ユーザーのアクションで処理を実行</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#event">02:04</a></td><td><a href="#event">addEventListener メソッド（イベント種類＋関数）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#event">02:10</a></td><td><a href="#event">イベントの種類（click/mouseover/load/input等）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#function">02:21</a></td><td><a href="#function">関数の作り方（別で用意 / 無名関数の2種類）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">02:31</td><td>お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#function">03:21</a></td><td><a href="#function">function（昔の書き方）も紹介</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#function">03:34</a></td><td><a href="#function">実際の処理を実装（カラーコードを動的に表示）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#dom">03:49</a></td><td><a href="#dom">DOM（JSが理解するHTMLの形式・ノード）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#style-change">03:58</a></td><td><a href="#style-change">JSからCSSを書き換える準備</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#style-change">04:00</a></td><td><a href="#style-change">要素.style.プロパティ=値（font-size→fontSize）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#style-change">04:21</a></td><td><a href="#style-change">style属性は優先度が最強・背景色を動的変更</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#homework">04:34</a></td><td><a href="#homework">演習1：入力したテキストをボタンで表示</a></td><td class="center"><span class="star">★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>動きを作る4ステップ</h4><p><strong>取得→代入→イベント設定→処理作成</strong>。JSで動きを作るときの基本形（板書）。</p></div>
+      <div class="card"><span class="num">2</span><h4>要素の取得</h4><p><code>document.querySelector('#id')</code>。中身は<strong>CSSセレクター</strong>。Sは大文字。</p></div>
+      <div class="card"><span class="num">3</span><h4>IDで取得が確実</h4><p>同じタグが複数あると迷う。<strong>IDは重複しない</strong>ので取得に最適。JS用にIDを振ることも。</p></div>
+      <div class="card"><span class="num">4</span><h4>値は .value</h4><p>inputの値は <code>.value</code> で取る。これは<strong>メソッドでなくプロパティ</strong>（情報）。</p></div>
+      <div class="card"><span class="num">5</span><h4>テキスト書き換え</h4><p><code>要素.textContent = '...'</code> でテキストを上書き（=代入）。</p></div>
+      <div class="card"><span class="num">6</span><h4>文字列の連結は +</h4><p>文字列と変数をつなぐのは <code>+</code>（足し算ではない）。性質が違うものを連結。</p></div>
+      <div class="card"><span class="num">7</span><h4>命名規則3種</h4><p>JS=<strong>キャメル</strong>(colorPicker)／CSS=ケバブ(color-picker)／ファイル=スネーク(color_picker)。</p></div>
+      <div class="card"><span class="num">8</span><h4>addEventListener</h4><p><code>要素.addEventListener('click', 関数)</code>。<strong>これが使えればJSの大半はできる</strong>と先生。</p></div>
+      <div class="card"><span class="num">9</span><h4>名前は2単語以上</h4><p>1単語は<strong>予約語</strong>と被るリスク。<code>colorCode</code>のように2単語以上で。</p></div>
+      <div class="card"><span class="num">10</span><h4>CSSを書き換え</h4><p><code>要素.style.fontSize = '20px'</code>。ハイフン付きは<strong>キャメルケース</strong>に。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 実装の手順 ===== -->
+  <section id="recipe">
+    <h2 class="section-title"><span class="icon">🪜</span>実装の手順（4ステップ）</h2>
+    <p>今日いちばん大事なのが「<strong>どういう手順で動きを実装するか</strong>」。これを掴むのに時間がかかるが、JSで何か作るときは毎回この流れ（板書参照）。</p>
+    <div class="callout primary">
+      <span class="label">JSで「動き」を作る4ステップ</span>
+      <ol style="margin:8px 0 0;">
+        <li><strong>JS側から対象の要素を取得</strong>してくる（例：カラーピッカー）</li>
+        <li>取得した要素を<strong>変数に代入</strong>する</li>
+        <li>代入した変数に<strong>イベントを設定</strong>する</li>
+        <li>そのイベントに対して<strong>実行する処理内容を作成</strong>する</li>
+      </ol>
+    </div>
+    <p>今回作るのは「カラーピッカーを選ぶと、①背景色が同じ色に変わる ②16進数のカラーコードが表示される」という動き。ユーザーのアクション（色を選ぶ）に反応する＝<strong>JSの領域</strong>。</p>
+    <p class="callout" style="font-size:14px;"><span class="label">下準備のメモ</span> JSの読み込みは<strong>CSSの読み込みの「次」</strong>に書くことが多い（リセットCSS→共通CSS→…→JS の順）。これはルールでなく「あるある」。</p>
+  </section>
+
+  <!-- ===== 要素の取得 ===== -->
+  <section id="get-element">
+    <h2 class="section-title"><span class="icon">🎯</span>要素の取得（querySelector）</h2>
+    <p>JSからHTMLをいじるには、まず対象の要素を取ってくる。使うのは <strong>document オブジェクト</strong>（HTMLの情報が入った箱）の <strong>querySelector メソッド</strong>。</p>
+    <pre><span class="comment">// #colorpicker のついた要素を取得して変数に入れる</span>
+<span class="selector">let</span> <span class="property">colorPicker</span> = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#colorpicker'</span>)<span class="punct">;</span></pre>
+    <ul class="bullet-pro">
+      <li><code>querySelector</code> の <strong>S は大文字</strong>（注意）</li>
+      <li>パラメーターは<strong>CSSセレクター形式</strong>（文字列なのでクォートで囲う）</li>
+      <li><strong>IDで指定するのが確実</strong>。同じタグ（input等）が複数あるとどれか分からなくなるが、IDは重複しないので一発で取れる。<mark>JSでいじるためにわざわざIDを振る</mark>こともある</li>
+    </ul>
+    <div class="callout">
+      <span class="label">⚠️ よくあるエラー：defer忘れ（実演あり）</span>
+      <code>&lt;script&gt;</code> に <code>defer</code> をつけ忘れると、要素がまだ読み込まれる前にJSが走り、取得結果が <code>null</code>（=何もない）になる。先生も授業中にやらかした「あるあるミス」。<strong>JSファイルの読み込みには必ず defer</strong>。
+    </div>
+  </section>
+
+  <!-- ===== 値の取得 ===== -->
+  <section id="value-property">
+    <h2 class="section-title"><span class="icon">🔢</span>値の取得（.value＝プロパティ）</h2>
+    <p>要素そのものでなく、<strong>その中の「値」</strong>（カラーピッカーが持つ16進数カラーコード）が欲しいときは <code>.value</code> をつける。</p>
+    <pre><span class="property">colorPicker</span>.<span class="property">value</span>  <span class="comment">// → '#34c759' のようなカラーコード</span></pre>
+    <div class="callout primary">
+      <span class="label">メソッドとプロパティの違い</span>
+      ドット <code>.</code> でつなげるのはメソッドだけではない。<strong>メソッド＝命令・指示</strong>（log、alert等）／<strong>プロパティ＝情報そのもの</strong>（value等）。<code>.value</code> はプロパティ。
+    </div>
+    <h3>オブジェクトの構造（キーと値）</h3>
+    <p>オブジェクトデータは <strong>「キー（項目）」と「値」</strong>のペアでできている。<code>.value</code> は「value という<strong>キー</strong>」を指定して、そこに入っている<strong>値</strong>を呼び出している、というイメージ。フォームで習った <code>value属性</code> と同じもの。</p>
+  </section>
+
+  <!-- ===== textContent ===== -->
+  <section id="textcontent">
+    <h2 class="section-title"><span class="icon">✏️</span>テキストの書き換え（.textContent）</h2>
+    <p>画面の文字を書き換えるには、要素のテキスト部分を <code>.textContent</code> で指定して、新しい値を<strong>代入（=）</strong>する。</p>
+    <pre><span class="comment">// PタグのテキストをJSから上書きする</span>
+<span class="property">colorParagraph</span>.<span class="property">textContent</span> = <span class="value">'カラーコード'</span><span class="punct">;</span></pre>
+    <div class="callout">
+      <span class="label">細かく指定できる</span>
+      JSはとても細分化されていて、要素の「IDという属性」「タグ」「テキスト」などをピンポイントで指定できる。テキストだけを扱いたいときは <code>.textContent</code>。
+    </div>
+  </section>
+
+  <!-- ===== 連結 ===== -->
+  <section id="concat">
+    <h2 class="section-title"><span class="icon">➕</span>文字列の連結（+）</h2>
+    <p>「カラーコード：#34c759」のように、<strong>文字列と変数をつなげて</strong>表示したいときは <code>+</code> を使う。</p>
+    <pre><span class="value">'カラーコード：'</span> + <span class="property">colorCode</span>
+<span class="comment">// → 'カラーコード：#34c759'</span></pre>
+    <div class="callout">
+      <span class="label">これは足し算ではない</span>
+      性質の違うデータ（文字列＋変数）をそのまま並べるとエラー。<code>+</code> でつなぐと連結できる。連結した結果は<strong>文字列に統一されがち</strong>（前回の <code>'10'+'10'='1010'</code> と同じ理屈）。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 命名規則 ===== -->
+  <section id="naming">
+    <h2 class="section-title"><span class="icon">🏷️</span>命名規則（キャメル/スネーク/ケバブ）</h2>
+    <p>変数名・クラス名・ファイル名などの名前の付け方には種類（命名規則）がある。代表的な3つ。</p>
+
+    <figure style="margin:18px 0;">
+      <img src="img/naming_conventions.png"
+           alt="先生の板書：命名規則。キャメルケースcamelCase（単語の先頭を大文字・PHPやjsの関数）、スネークケースsnake_case（アンダーバー・DB）、ケバブケースkebab-case（ハイフン・HTMLのclass名やファイル名）"
+           style="width:100%; max-width:800px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：命名規則3種（キャメル / スネーク / ケバブ）の実例と使い分け
+      </figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>名前</th><th>書き方</th><th>主な用途</th></tr></thead>
+        <tbody>
+          <tr><td><strong>キャメルケース</strong></td><td><code>colorPicker</code>（2語目の頭を大文字）</td><td><strong>JS・PHPの変数</strong></td></tr>
+          <tr><td><strong>ケバブケース</strong></td><td><code>color-picker</code>（ハイフン区切り）</td><td>HTMLクラス名・CSS変数</td></tr>
+          <tr><td><strong>スネークケース</strong></td><td><code>color_picker</code>（アンダースコア区切り）</td><td>ファイル名など</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>使い分けの目安：<strong>JSはキャメル／HTML・CSSはケバブ／それ以外はスネーク</strong>。命名がバラバラだと可読性が下がり、チームのルールがブレてバグの原因にもなる。</p>
+    <div class="callout primary">
+      <span class="label">変数・関数名は「2単語以上」で</span>
+      JSには<strong>予約語</strong>（あらかじめ使い道が決まっている単語）があり、変数名に使えない。予約語は<strong>すべて1単語</strong>なので、<strong>名前を2単語以上にすれば予約語と被らない</strong>（例 <code>colorCode</code>、<code>colorPicker</code>）。暗記するより、2語以上にする習慣で回避するのがラク。
+    </div>
+  </section>
+
+  <!-- ===== イベント ===== -->
+  <section id="event">
+    <h2 class="section-title"><span class="icon">⚡</span>イベントとaddEventListener</h2>
+    <p><strong>イベント＝ユーザーのアクションに対して処理を実行すること</strong>。これを設定するのが <code>addEventListener</code> メソッド。</p>
+    <pre><span class="property">colorPicker</span>.<span class="property">addEventListener</span>(<span class="value">'click'</span>, <span class="property">関数名</span>)<span class="punct">;</span>
+<span class="comment">//                     ① イベントの種類   ② 実行する関数</span></pre>
+
+    <figure style="margin:18px 0;">
+      <img src="img/addeventlistener.png"
+           alt="先生の板書：addEventListenerの構文。variable.addEventListener('イベントの種類', 実行する内容（関数）)。第1引数はクォートで囲ったイベントの種類、カンマで区切り、第2引数に関数。下にイベントの種類一覧（click/keydown/keyup/mouseover/load等）"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：<code>addEventListener('イベントの種類', 関数)</code> の構文と、イベントの種類一覧
+      </figcaption>
+    </figure>
+
+    <div class="callout primary">
+      <span class="label">先生いわく「ここが最重要」</span>
+      この <code>addEventListener</code> がある程度使えるようになれば、<strong>JSのカリキュラムは十分</strong>。「この半年でやりたいことのほとんどはできるようになる」。難しいと感じてもここだけは押さえたい。
+    </div>
+    <h3>パラメーターは2つ</h3>
+    <ul class="bullet-pro">
+      <li><strong>① イベントの種類</strong>（決まった値・シングルクォートで囲う）：<code>click</code>（クリック）／<code>mouseover</code>（ホバー）／<code>load</code>（読み込み完了）／<code>resize</code>（リサイズ）／<code>input</code>（入力）など</li>
+      <li><strong>② 実行する関数</strong>（次のセクション）</li>
+    </ul>
+    <p style="font-size:14px; color:var(--text-soft);">※今回のカラーピッカーは <code>input</code> イベントを使用（入力・選択の変化に反応）。</p>
+  </section>
+
+  <!-- ===== 関数 ===== -->
+  <section id="function">
+    <h2 class="section-title"><span class="icon">🛠️</span>関数の作り方</h2>
+    <p><strong>関数＝処理内容に名前をつけたもの</strong>。呼び出すと中の処理が実行される。ハリーポッターの呪文と同じ（「ファイア」で火が出る、その「火が出る」中身を自分で書く）。</p>
+
+    <h3>書き方は2種類</h3>
+    <div class="compare">
+      <div class="compare-col right">
+        <h4>A. 別で関数を用意（おすすめ）</h4>
+        <ul>
+          <li>関数を作り、addEventListenerに<strong>関数名</strong>を渡す</li>
+          <li>すっきり・分かりやすい</li>
+        </ul>
+      </div>
+      <div class="compare-col left">
+        <h4>B. 無名関数（直接書く）</h4>
+        <ul>
+          <li>第2引数に処理を<strong>直接書く</strong></li>
+          <li>短い処理向け（サボり的）</li>
+        </ul>
+      </div>
+    </div>
+
+    <pre><span class="comment">// A. 別で関数を用意（今の書き方＝アロー関数）</span>
+<span class="selector">let</span> <span class="property">changeColor</span> = () => <span class="punct">{</span>
+  <span class="comment">// 実行する処理をここに書く</span>
+<span class="punct">}</span><span class="punct">;</span>
+<span class="property">colorPicker</span>.<span class="property">addEventListener</span>(<span class="value">'input'</span>, <span class="property">changeColor</span>)<span class="punct">;</span></pre>
+
+    <figure style="margin:18px 0;">
+      <img src="img/function_syntax.png"
+           alt="先生の板書：関数の作り方_1。let clickEvent = () => { 処理内容 }; letで宣言し、let以降の名前は変数名でなく関数名と呼ぶ。なみかっこの中に実際の処理内容を書く"
+           style="width:100%; max-width:820px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：関数の作り方（<code>let 関数名 = () => { 処理 };</code>）。<code>{}</code>の中に処理を書く
+      </figcaption>
+    </figure>
+
+    <p style="font-size:14px; color:var(--text-soft);">※ <code>function 関数名(){}</code> という<strong>昔からの書き方</strong>もある。参考サイトで見かけたら「古い書き方」と思えばOK。授業では新しい <code>() => {}</code>（アロー関数）で進める。</p>
+  </section>
+
+  <!-- ===== DOM ===== -->
+  <section id="dom">
+    <h2 class="section-title"><span class="icon">🌳</span>DOM（JSがHTMLを操る仕組み）</h2>
+    <p><strong>DOM（Document Object Model）＝JSが理解するHTMLの形式</strong>。JSから見たHTMLの地図のようなもの。</p>
+    <div class="callout">
+      <span class="label">ざっくり理解でOK</span>
+      JSだけではHTML要素を直接操作できない。<strong>DOMという仕組みを通すことで、クリックやスクロールに応じてサイトの中身を更新</strong>できるようになる。DOMはブラウザに最初から実装済みなので、自分で用意するものではない。
+    </div>
+    <ul class="bullet-pro">
+      <li><strong>DOMツリー</strong>：HTMLを枝分かれの構造（ツリー）として捉えたもの</li>
+      <li><strong>ノード</strong>：その中の最小単位。<strong>エレメントノード</strong>（要素）／<strong>テキストノード</strong>（テキスト）など</li>
+      <li>頂点に <code>document</code>（ドキュメントオブジェクト）がある</li>
+    </ul>
+    <p style="font-size:14px; color:var(--text-soft);">※今は触り程度でOK。「JSがHTMLを操作するための仕組みがある」と分かれば十分。本格的に学ぶときに掘り下げる。</p>
+  </section>
+
+  <!-- ===== CSS書き換え ===== -->
+  <section id="style-change">
+    <h2 class="section-title"><span class="icon">🎨</span>CSSを書き換える（.style）</h2>
+    <p>JSから要素のCSS（見た目）を書き換えるには <code>要素.style.プロパティ = 値</code>。</p>
+    <pre><span class="comment">// 文字サイズを変える</span>
+<span class="property">colorParagraph</span>.<span class="property">style</span>.<span class="property">fontSize</span> = <span class="value">'20px'</span><span class="punct">;</span>
+<span class="comment">// 背景色を、選んだカラーコードに変える</span>
+<span class="property">container</span>.<span class="property">style</span>.<span class="property">backgroundColor</span> = <span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">;</span></pre>
+    <div class="callout primary">
+      <span class="label">ハイフン付きはキャメルケースに</span>
+      JSではケバブケース（ハイフン）が使えない。CSSプロパティにハイフンがある場合は<strong>キャメルケースに変換</strong>する。<br>
+      <code>font-size</code> → <code>fontSize</code>／<code>background-color</code> → <code>backgroundColor</code>
+    </div>
+    <ul class="bullet-pro">
+      <li>値が<strong>文字</strong>のときはクォートで囲う（<code>'20px'</code>）。数値だけなら不要</li>
+      <li>この <code>style</code> 属性での上書きは<strong>優先度が最強</strong>（<code>!important</code>以外のCSSには勝つ）</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">これでカラーピッカー完成！</span>
+      色を選ぶ → <code>input</code>イベント発火 → 関数が走り → <strong>背景色が変わり・カラーコードが表示される</strong>。CSSだけでは作れない「動き」をJSで実現できた。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:230px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>document.querySelector()</td><td>HTMLから要素を取得するメソッド。中身はCSSセレクター</td></tr>
+          <tr><td>.value</td><td>input等の入力値を取得するプロパティ</td></tr>
+          <tr><td>.textContent</td><td>要素のテキストを取得・書き換えるプロパティ</td></tr>
+          <tr><td>プロパティ</td><td>オブジェクトの中の「情報」（メソッド＝命令とは別物）</td></tr>
+          <tr><td>キー / 値</td><td>オブジェクトの構造。キーで値を呼び出す</td></tr>
+          <tr><td>文字列の連結 +</td><td>文字列と変数などをつなぐ記号（足し算ではない）</td></tr>
+          <tr><td>命名規則</td><td>キャメル(JS)／ケバブ(CSS)／スネーク(ファイル)</td></tr>
+          <tr><td>予約語</td><td>JSで使い道が決まっている単語。変数名に使えない（全て1単語）</td></tr>
+          <tr><td>イベント</td><td>ユーザーのアクションに反応して処理を実行すること</td></tr>
+          <tr><td>addEventListener</td><td>イベントを設定するメソッド。(種類, 関数)の2つを渡す</td></tr>
+          <tr><td>イベントの種類</td><td>click / mouseover / load / resize / input など</td></tr>
+          <tr><td>関数</td><td>処理に名前をつけたもの。別で用意 / 無名関数の2種</td></tr>
+          <tr><td>アロー関数</td><td><code>() => {}</code> という今の関数の書き方</td></tr>
+          <tr><td>DOM / ノード</td><td>JSが理解するHTMLの形式 / その最小単位（要素・テキスト）</td></tr>
+          <tr><td>要素.style.プロパティ</td><td>JSからCSSを書き換える。ハイフンはキャメルケースに</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li><strong>カラーピッカー</strong>を完成させる（色を選ぶ→背景色が変わる＋カラーコード表示）</li>
+      <li>4ステップ（取得→代入→イベント→処理）の流れを自分の言葉で言えるようにする</li>
+      <li><code>querySelector</code>・<code>.value</code>・<code>.textContent</code>・<code>addEventListener</code>・<code>.style</code> を一通り書いてみる</li>
+      <li>命名は<strong>キャメルケース＋2単語以上</strong>を意識する</li>
+      <li><strong>defer</strong>を忘れない（要素がnullになるエラー）</li>
+      <li><strong>演習1</strong>：inputに名前を入力 → ボタンをクリックすると「○○さん」とP要素に表示されるよう実装（例：田中太郎 → 田中太郎さん）</li>
+      <li>できた人はノートまとめ・振り返りの時間に</li>
+    </ul>
+    <div class="callout">
+      <span class="label">先生からのヒント</span>
+      <strong>JSの授業ではAIを使いすぎない方がいい</strong>。AIは気の利きすぎた（初級では不要な）コードを出してきて、かえって分からなくなる。まずは自分で手を動かして、流れを体に入れるのがおすすめ。
+    </div>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>最大のセキュリティは、コップを（パソコンから）遠ざけること。世界的に有名なエンジニアの名言です。<span class="citation">── 朝の余談（飲み物こぼし対策）</span></blockquote>
+    <blockquote>このaddEventListenerが使いこなせるようになれば、JavaScriptのカリキュラムは十分。この半年でやりたいことのほとんどはできるようになります。<span class="citation">── 今日いちばんの核</span></blockquote>
+    <blockquote>JSの授業では、AIをめっちゃ活用している人は逆に難しくなっちゃうと思うので、あんまり使わない方がおすすめかもしれないですね。<span class="citation">── 学び方のアドバイス</span></blockquote>
+    <blockquote>難しいですね。今週も言いましたが、難しいですからね。（先生自身もdefer忘れでミスりながら）こういうちょっとしたミスでも気づかない時があるので、よう注意ですね。<span class="citation">── JSの難しさと向き合う</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-16｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

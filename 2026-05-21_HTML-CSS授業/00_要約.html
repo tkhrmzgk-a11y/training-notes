@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>演習デー：レッスン5「Mdn Tours」を自力コーディング＋総復習｜2026年5月21日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月21日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>演習デー：レッスン5「Mdn Tours」を自力コーディング＋総復習</h1>
+  <p class="subtitle">訓練校 IT スクール｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 実習中心（説明約6分）</span>
+    <span>📖 教科書レッスン5（総合演習）</span>
+    <span>🎯 総合演習, Mdn Tours, 画像エクスポート, SVG/JPEG, Figma Dev Mode, デザイン仕様, 幅/パディング/色の読み取り, 総復習, ディレクトリ構成自由, CSS分割自由</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>今日の流れ（演習デー）</h2>
+    <div class="callout primary">
+      <span class="label">💡 今日はこういう日</span>
+      <p style="margin:0;">
+        教科書がほぼ終わり（あとはアニメーション紹介くらい）。なので<strong>今までの総復習</strong>として、<mark>レッスン5の「Mdn Tours」サイトを自力で1ページまるごとコーディング</mark>する演習デー。教科書は開かず、配られたデザインだけを見て作る。明日(5/22)に先生が講師例を書く。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>冒頭（〜6分）</td><td><a href="#assignment">課題の説明（Mdn Tours を作る）</a></td></tr>
+          <tr><td>〃</td><td><a href="#export">Figmaから画像をエクスポート（ロゴ/メイン/イメージ）</a></td></tr>
+          <tr><td>残り全部</td><td><a href="#spec">デザイン仕様を読みながら自力コーディング</a></td></tr>
+          <tr><td>ゴール</td><td><a href="#result">今日1日で1ページ完成（私の成果）</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="assignment">
+    <h2 class="section-title"><span class="icon">📝</span>課題：Mdn Tours サイトを作る</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        教科書レッスン5の<strong>旅行サイト「Mdn Tours」を1ページ</strong>、これまで習ったタグ・CSSだけで再現する課題。<mark>デザインはFigmaで支給</mark>（クラスルームとチャットに共有）。「教科書を開かなくていい＝記憶と実力で作る」のがポイント。
+      </p>
+    </div>
+    <h3>ルール（自由度高め）</h3>
+    <ul class="bullet-pro">
+      <li><strong>ディレクトリ構成は自由</strong>（自分の好きに決めてOK）</li>
+      <li><strong>CSSの分け方も自由</strong>（reset/styleで分ける or 1枚で全部、どちらでも）</li>
+      <li>今まで習ったタグ・CSSプロパティを<mark>思い出しながら</mark>使う</li>
+      <li>デザイン編集の依頼を出しても<strong>先生は却下</strong>します（笑）＝自分で作る</li>
+      <li>目標：<strong>今日1日で完成させる気概</strong>で（できる人は5人くらい？想定）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="export">
+    <h2 class="section-title"><span class="icon">📤</span>Figmaから画像をエクスポート</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        サイトに使う画像はFigmaのデザインファイルから<strong>自分で書き出す（エクスポート）</strong>。対象のレイヤーを選択 → エクスポートを押す → 形式とサイズを選んで書き出し。
+      </p>
+    </div>
+    <h3>今回書き出す3つの画像</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:170px">画像</th><th>形式</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ロゴ</strong></td><td><code>SVG</code></td><td>小さくてもくっきり綺麗に映る（ベクター）</td></tr>
+          <tr><td><strong>メインビジュアル</strong></td><td><code>JPEG</code></td><td>写真。透過の必要がないので</td></tr>
+          <tr><td><strong>イメージエリア</strong></td><td><code>JPEG</code></td><td>写真。同上</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="bullet-pro">
+      <li>書き出し倍率は<strong>等倍（1倍）でOK</strong>（普段は2倍だが今回は練習なので）</li>
+      <li>ロゴのレイヤー名が「Vector」のままは良くない → <mark>分かりやすい名前（logo等）に変える</mark></li>
+      <li>透過が必要なもの＝PNG、写真＝JPEG、図形・ロゴ＝SVG、と使い分け（過去回の復習）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="spec">
+    <h2 class="section-title"><span class="icon">📐</span>デザイン仕様を読む（Figma Dev Mode）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        配られたFigmaには、各パーツの<strong>幅・高さ・余白（パディング）・色</strong>がすべて数値で指定されています。これを読み取って<mark>そのままCSSに写す</mark>と、デザイン通りに作れる。下は「campaign-section」の仕様の例。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/design_spec.png" alt="Figma Dev Mode：campaign-sectionの仕様（幅1440px・パディング40/216/60/216・背景色#A68672）" style="width:100%; max-width:380px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 支給デザインの仕様パネル（Figma）：幅 固定1,440px、高さ 内包426px、パディング 上40/右216/下60/左216px、間隔8px、背景色 <code>#A68672</code>。この数値をCSSにそのまま書く</figcaption>
+    </figure>
+
+    <h3>仕様の読み取り → CSS への対応</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:180px">Figmaの表記</th><th>CSSでは</th></tr></thead>
+        <tbody>
+          <tr><td>幅 固定 (1,440px)</td><td><code>width: 1440px;</code>（固定幅）</td></tr>
+          <tr><td>幅 塗り (1,008px)</td><td><code>width: 100%; max-width: 1008px;</code>（親いっぱい）</td></tr>
+          <tr><td>高さ 内包 (426px)</td><td>高さは中身に合わせる＝基本書かない（height auto）</td></tr>
+          <tr><td>パディング 上40 右216 下60 左216</td><td><code>padding: 40px 216px 60px 216px;</code></td></tr>
+          <tr><td>間隔 8px</td><td>flex/grid の <code>gap: 8px;</code></td></tr>
+          <tr><td>色 #A68672</td><td><code>background: #A68672;</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">「塗り」＝親要素いっぱいに広がる（fill）、「内包」＝中身ぶんだけ（hug）、「固定」＝数値で固定（fixed）。Figmaのオートレイアウト用語。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="review">
+    <h2 class="section-title"><span class="icon">🔁</span>総復習：このサイトで使う技術（5/11〜5/20）</h2>
+    <p>Mdn Tours を作るのに必要な、これまで習った技術の早見表。<strong>各リンクからその日の要約へ飛べます</strong>（目次の検索窓も活用）。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:160px">パーツ</th><th>使う技術</th></tr></thead>
+        <tbody>
+          <tr><td><strong>全体リセット</strong></td><td><code>* { box-sizing: border-box; margin:0; }</code>、リセットCSS</td></tr>
+          <tr><td><strong>ヘッダー</strong></td><td><code>header &gt; div</code>＋flex（space-between / align-items center）、ナビ <code>nav&gt;ul&gt;li&gt;a</code></td></tr>
+          <tr><td><strong>メインビジュアル</strong></td><td>背景画像 <code>background: url() center/cover</code>、<code>height:100vh</code>、中央配置（position+translate or flex）</td></tr>
+          <tr><td><strong>セクション</strong></td><td>幅 <code>max-width</code>＋<code>margin:0 auto</code>、見出し、<code>padding</code></td></tr>
+          <tr><td><strong>カード/画像ギャラリー</strong></td><td>flex または grid（<code>gap</code>）、<code>object-fit: cover</code></td></tr>
+          <tr><td><strong>テーブル（料金表など）</strong></td><td><code>table/tr/th/td</code>、<code>border-collapse</code></td></tr>
+          <tr><td><strong>お問い合わせフォーム</strong></td><td><code>form</code>、<code>input/label/select/textarea</code>、<code>max-width:800px</code></td></tr>
+          <tr><td><strong>フッター</strong></td><td><code>footer</code>、住所 <code>address</code>、コピーライト <code>small</code>＋<code>&amp;copy;</code></td></tr>
+          <tr><td><strong>レスポンシブ</strong></td><td>メディアクエリ <code>@media (max-width:768px)</code>、相対指定に切替</td></tr>
+          <tr><td><strong>飾り</strong></td><td>疑似要素 <code>::before/::after</code>、<code>:hover</code>、<code>box-shadow</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout success">
+      <span class="label">🔑 作る順番のコツ</span>
+      <p style="margin:0;"><mark>外側→内側</mark>、<mark>上→下</mark>の順で。①リセット → ②ヘッダー → ③メインビジュアル → ④各セクション → ⑤フォーム → ⑥フッター → ⑦レスポンシブ。1ブロック作るごとにブラウザで確認。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="result">
+    <h2 class="section-title"><span class="icon">🏆</span>今日の成果（私が作ったMdn Tours）</h2>
+    <p>支給デザインを見ながら、ヘッダー・メインビジュアル・本文・テーブル・画像ギャラリー・お問い合わせフォーム・フッターまで<strong>1ページまるごと再現</strong>。今まで5/11〜5/20で習った技術が全部入っています。</p>
+
+    <figure style="margin:22px 0;">
+      <img src="img/gakky_result.png" alt="私がコーディングしたMdn Toursサイトの完成形（ヘッダー/メインビジュアル/本文/テーブル/画像ギャラリー/フォーム/フッター）" style="width:100%; max-width:620px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,.1);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 私の完成作「Mdn Tours」：メインビジュアルの全面背景＋中央テキスト、料金テーブル、写真ギャラリー、お問い合わせフォーム、フッターまで一通り実装</figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">📌 振り返りポイント</span>
+      <p style="margin:0;">明日(5/22)に先生が講師例を書くので、<strong>自分のコードと見比べる</strong>と学びが深い。特に「ここどうやるんだっけ」と詰まった所＝復習すべき所。詰まった箇所は<mark>目次の検索窓でキーワード検索</mark>すれば該当回にすぐ飛べます。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>教科書、開かなくていいです。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ これまでの積み重ねだけで1ページ作れる、という自信を促す一言。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>これ編集依頼しても私、却下しますからね。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ デザインに頼らず自力で作らせるための先生のユーモア。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>今日1日で完成させるという気概を持ってやってください。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ 演習デーの心構え。完璧でなくても最後まで通して作る経験が大事。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-22｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

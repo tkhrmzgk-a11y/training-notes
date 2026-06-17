@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript 3日目：テンプレートリテラル・条件分岐(if/else if)｜2026年6月16日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月16日｜講師：A先生</div>
+  <h1>JavaScript 3日目：テンプレートリテラル・条件分岐(if/else if)</h1>
+  <p class="subtitle">訓練校｜全5時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業（録画分割2本構成）</span>
+    <span>📖 JavaScript（テンプレートリテラル・条件分岐）</span>
+    <span>🎯 テンプレートリテラル・if文・else if・演算子・条件設計</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    JavaScript 3日目。前日の演習1の答え合わせから始まり、新トピックは2つ：<strong>テンプレートリテラル</strong>（<code>+</code>連結の進化形）と、本日の主役 <strong>条件分岐（if文・else if文）</strong>。
+    カラーピッカーで「<strong>白だったら(white)、黒だったら(black)、それ以外はカラーコード</strong>」と表示を切り替える動きを実装。<strong>演算子</strong>（算術・比較・論理）も整理した。
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#review">前回演習1の答え合わせ</a></li>
+      <li><a href="#planning">実装前に「やることを書き出す」</a></li>
+      <li><a href="#parameter">パラメーター＝「引数」</a></li>
+      <li><a href="#literal">テンプレートリテラル（+の進化形）</a></li>
+      <li><a href="#if">条件分岐とは・if文</a></li>
+      <li><a href="#operators">演算子（算術・比較・論理）</a></li>
+      <li><a href="#elseif">else if文（複数条件）</a></li>
+      <li><a href="#colorpicker-done">カラーピッカー完成コード</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>区切りベース（タイムスタンプなしの文字起こしのため）。<span class="star">★★★</span>＝特に重要。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:120px;">区切り</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1時間目 序盤</td><td><a href="#review">前回演習1の解説（入力名前→ボタンで「○○さん」表示）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#planning">いきなりコードでなく「やることを書き出す」</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#review">querySelector → .value で値を取得</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#review">addEventListener('click', 関数) で「ボタンクリック→実行」</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#parameter">パラメーターは日本語で「引数」と呼ぶ</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#literal">★テンプレートリテラル（バッククォート＋ ${変数} ）の紹介</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目 末</td><td>休憩・自由実装時間</td><td class="center">—</td></tr>
+          <tr><td>2時間目 開始</td><td><a href="#if">カラーピッカーに条件分岐を導入</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#if">★条件分岐とは（焼肉の例）・if文の書き方</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#operators">演算子＝記号のこと（算術・比較・論理）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#operators">==（同じ）の動き：true/false を返す</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td>受講者Bさんの質問：条件には変数も入る（実用例）</td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#if">if文は「関数の中」に書く（カラーピッカーの場合）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#if">白だったら「(white)」表示・条件の上に背景色変更</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目 開始</td><td><a href="#elseif">★else if 文（白/黒/その他の3分岐）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#elseif">else if は何個でも増やせる（PHP・WordPressで活躍）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#colorpicker-done">カラーピッカー完成・ノートまとめタイム</a></td><td class="center"><span class="star">★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>実装前に書き出す</h4><p>いきなりVS Codeを開かない。<strong>紙か.txtに「やること」をリストアップ</strong>してから手を動かす。</p></div>
+      <div class="card"><span class="num">2</span><h4>パラメーター＝引数</h4><p>JSでは <strong>「ひきすう」</strong> と呼ぶ方が一般的。第1引数・第2引数。</p></div>
+      <div class="card"><span class="num">3</span><h4>テンプレートリテラル</h4><p><code>`カラーコード(${変数})`</code> でもOK。<code>+</code>が多すぎると計算式と混同するので<strong>こちらが現代的</strong>。</p></div>
+      <div class="card"><span class="num">4</span><h4>条件分岐＝if文</h4><p>「AならXする、BならYする」を書ける機能。プログラミングの大の得意分野。</p></div>
+      <div class="card"><span class="num">5</span><h4>条件は { } の中</h4><p><code>if (条件) { 処理 } else { 別の処理 }</code>。条件は<strong>自分で決める</strong>。</p></div>
+      <div class="card"><span class="num">6</span><h4>演算子＝記号</h4><p>3種類：<strong>算術（+−×÷）</strong>／<strong>比較（==, &gt;=, &lt;=）</strong>／<strong>論理（&amp;&amp;, ||）</strong>。</p></div>
+      <div class="card"><span class="num">7</span><h4>== は同じか判定</h4><p><code>5 == 5</code>→<strong>true</strong>、<code>2 == 5</code>→<strong>false</strong>。trueなら ifブロックが実行される。</p></div>
+      <div class="card"><span class="num">8</span><h4>if文の場所</h4><p>カラーピッカー実装では <strong>関数の中</strong> に書く。実行されるのが関数だから。</p></div>
+      <div class="card"><span class="num">9</span><h4>else if</h4><p>3つ以上の分岐は <code>else if</code> を増やす。<strong>何個でも追加できる</strong>。</p></div>
+      <div class="card"><span class="num">10</span><h4>背景色は if の前</h4><p>if文でエラーが出ると以降が実行されない。<strong>必ず実行したい処理は if の上に書く</strong>。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 前回演習1の答え合わせ ===== -->
+  <section id="review">
+    <h2 class="section-title"><span class="icon">🔁</span>前回演習1の答え合わせ</h2>
+    <p>前回の演習：<strong>入力欄に名前を入れて「表示する」ボタンを押すと、P要素に「○○さん」と表示される</strong>。半分くらいできた人がいた。</p>
+
+    <h3>実装の手順（再掲）</h3>
+    <ol class="bullet-pro" style="list-style:decimal; margin-left:22px;">
+      <li><strong>要素を取得</strong>：input・button・p の3つを <code>document.querySelector('#id')</code> で</li>
+      <li><strong>変数に代入</strong>：<code>const userInput = ...</code> のように</li>
+      <li><strong>イベントを設定</strong>：ボタンに <code>addEventListener('click', 関数名)</code></li>
+      <li><strong>処理を作成</strong>：関数の中で <code>resultText.textContent = ...</code> で書き換え</li>
+    </ol>
+
+    <pre><span class="comment">// 完成例（+連結バージョン）</span>
+<span class="selector">const</span> <span class="property">userInput</span> = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#userInput'</span>)<span class="punct">;</span>
+<span class="selector">const</span> <span class="property">displayBtn</span> = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#displayBtn'</span>)<span class="punct">;</span>
+<span class="selector">const</span> <span class="property">resultText</span> = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#resultText'</span>)<span class="punct">;</span>
+
+<span class="selector">const</span> <span class="property">displayText</span> = () => <span class="punct">{</span>
+  <span class="property">resultText</span>.<span class="property">textContent</span> = <span class="property">userInput</span>.<span class="property">value</span> + <span class="value">'さん'</span><span class="punct">;</span>
+<span class="punct">}</span><span class="punct">;</span>
+
+<span class="property">displayBtn</span>.<span class="property">addEventListener</span>(<span class="value">'click'</span>, <span class="property">displayText</span>)<span class="punct">;</span></pre>
+
+    <div class="callout">
+      <span class="label">IDの命名のあるある</span>
+      演習では <code>#userInput</code>（キャメル）にしているが、<strong>現場では <code>#user-input</code>（ケバブケース）が多い</strong>。会社によってルールはバラつくが、HTMLのIDはハイフン区切りが定番。
+    </div>
+
+    <div class="callout primary">
+      <span class="label">小ネタ：シングルクォートの意味</span>
+      <code>querySelector('#xxx')</code> の<strong>クォートは文字列として書いている</strong>。それを JS が要素に変換してくれる、というイメージ。だから<strong>必ずクォートで囲う</strong>。
+    </div>
+  </section>
+
+  <!-- ===== 実装前の書き出し ===== -->
+  <section id="planning">
+    <h2 class="section-title"><span class="icon">📝</span>実装前に「やることを書き出す」</h2>
+    <p>初心者はいきなり VS Code を開くと迷子になる。先生のおすすめ：</p>
+    <div class="callout">
+      <span class="label">紙とペン、または .txt・.md ファイルで</span>
+      <ol style="margin:8px 0 0;">
+        <li>インプットに入力された値を取得する</li>
+        <li>ボタンをクリックしたらイベントを発生させる</li>
+        <li>P要素に値を出力する</li>
+      </ol>
+      これくらいの粒度で OK。<strong>ざっくりしすぎは危険</strong>、<strong>細分化が安全</strong>。
+    </div>
+  </section>
+
+  <!-- ===== パラメーター ===== -->
+  <section id="parameter">
+    <h2 class="section-title"><span class="icon">📦</span>パラメーター＝「引数」</h2>
+    <p>これまで「パラメーター」と呼んでいたものは、日本語では <strong>「引数（ひきすう）」</strong> と呼ぶ方が一般的。意味は同じ。</p>
+    <ul class="bullet-pro">
+      <li><strong>第1引数</strong>＝1つ目のパラメーター（例：addEventListenerのイベント種類）</li>
+      <li><strong>第2引数</strong>＝2つ目のパラメーター（例：実行する関数）</li>
+    </ul>
+    <p>「ひきすう」と呼ぶ方が現場感がある、と先生。</p>
+  </section>
+
+  <!-- ===== テンプレートリテラル ===== -->
+  <section id="literal">
+    <h2 class="section-title"><span class="icon">📝</span>テンプレートリテラル（+の進化形）</h2>
+    <p>文字列と変数をつなぐとき、これまでは <code>+</code> を使っていた。新しい書き方が <strong>テンプレートリテラル</strong>。</p>
+
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>旧：+ で連結</h4>
+        <pre style="margin:0; padding:14px; font-size:12px;"><span class="value">'カラーコード('</span> + <span class="property">color</span> + <span class="value">')'</span></pre>
+      </div>
+      <div class="compare-col right">
+        <h4>新：テンプレートリテラル</h4>
+        <pre style="margin:0; padding:14px; font-size:12px;">`カラーコード(<span class="punct">${</span><span class="property">color</span><span class="punct">}</span>)`</pre>
+      </div>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">書き方のポイント</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>全体をバッククォート <code>`</code></strong> で囲む（シングル/ダブルではない）</li>
+        <li>変数の部分を <strong><code>${変数名}</code></strong> と書く</li>
+        <li>バッククォートは <strong>Shift + @</strong>（日本語配列）/ <strong>1の隣のチルダ</strong>（US配列）</li>
+      </ul>
+    </div>
+
+    <p><strong>どちらでもOK</strong>だが、世の中的にはテンプレートリテラル推奨。理由：<code>+</code>が多いと計算式と勘違いされやすい。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== if文 ===== -->
+  <section id="if">
+    <h2 class="section-title"><span class="icon">🔀</span>条件分岐とは・if文</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/if_syntax.png"
+           alt="先生の板書：条件分岐〜if文について〜。日常の中の選択（焼肉の予算で店を変える）の例から、if (自分で決める条件) { 条件に合った場合はこの中の処理を実行する } else { 条件に合わない場合の処理 }。if (2 == 5) の例で「両方が同じ…つまり条件はFalse」"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：条件分岐〜if文〜。条件が true なら<code>{}</code>、false なら <code>else</code> の中が実行される
+      </figcaption>
+    </figure>
+
+    <div class="callout primary">
+      <span class="label">先生の例え：焼肉の話</span>
+      財布の中に <strong>3万円あったので今日は高級焼肉</strong>／<strong>5000円なのでチェーン店</strong>——日常で自然にやっている「条件で行動を変える」。これがプログラミングの<strong>大の得意</strong>。<br>
+      条件に分けて結果を変えることを <strong>「条件分岐」</strong>、その構文を <strong>「if文」</strong> と呼ぶ。
+    </div>
+
+    <h3>if文の構造</h3>
+    <pre><span class="selector">if</span> (<span class="comment">自分で決める条件</span>) <span class="punct">{</span>
+  <span class="comment">// 条件に合った場合の処理</span>
+<span class="punct">}</span> <span class="selector">else</span> <span class="punct">{</span>
+  <span class="comment">// 条件に合わない場合の処理</span>
+<span class="punct">}</span></pre>
+
+    <h3>カラーピッカーへの導入</h3>
+    <p>選んだ色が真っ白なら <code>(white)</code>、それ以外ならカラーコード、という分岐を作る。</p>
+    <pre><span class="selector">const</span> <span class="property">changeColor</span> = () => <span class="punct">{</span>
+  <span class="comment">// ① 背景色を変更（if より前に！）</span>
+  <span class="property">backgroundColor</span>.<span class="property">style</span>.<span class="property">background</span> = <span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">;</span>
+
+  <span class="comment">// ② 表示テキストを条件分岐</span>
+  <span class="selector">if</span> (<span class="property">colorPicker</span>.<span class="property">value</span> == <span class="value">'#ffffff'</span>) <span class="punct">{</span>
+    <span class="property">colorParagraph</span>.<span class="property">textContent</span> = `カラーコード(<span class="punct">${</span><span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">}</span>) (white)`<span class="punct">;</span>
+  <span class="punct">}</span> <span class="selector">else</span> <span class="punct">{</span>
+    <span class="property">colorParagraph</span>.<span class="property">textContent</span> = `カラーコード(<span class="punct">${</span><span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">}</span>)`<span class="punct">;</span>
+  <span class="punct">}</span>
+<span class="punct">}</span><span class="punct">;</span></pre>
+
+    <div class="callout">
+      <span class="label">📍 if文を書く場所のクイズ（先生）</span>
+      候補は3つ：① 変数定義の後 / ② 関数の中 / ③ addEventListenerの下。<br>
+      <strong>答え：② 関数の中</strong>。理由＝実行されるのが関数だから、その中身を分岐させたい。
+    </div>
+
+    <div class="callout primary">
+      <span class="label">⚠️ 順番に注意</span>
+      <strong>背景色の上書きは if文の前に書く</strong>。if内でエラーが出たり処理が終わると、下のコードが実行されない可能性がある。必ず動かしたい処理は if の<strong>上</strong>に。
+    </div>
+  </section>
+
+  <!-- ===== 演算子 ===== -->
+  <section id="operators">
+    <h2 class="section-title"><span class="icon">➗</span>演算子（算術・比較・論理）</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/operators.png"
+           alt="先生の板書：演算子とは？詰まるところ記号のこと。比較演算子(==, !=, &gt;, &lt;, &gt;=, &lt;=)、算術演算子(+, -, *, /, %)、論理演算子(&amp;&amp;, ||, !)の3表"
+           style="width:100%; max-width:1000px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：演算子3種類（比較・算術・論理）の一覧
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">演算子とは？</span>
+      <strong>詰まるところ「記号のこと」</strong>。<code>+</code><code>-</code><code>*</code><code>/</code>などはすべて「演算子」と呼ぶ。<br>
+      （正直この呼び名を覚えなくてもコードは書けるが、勉強として知っておく）
+    </div>
+
+    <h3>3種類の演算子</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>種類</th><th>使うシーン</th><th>例</th></tr></thead>
+        <tbody>
+          <tr><td><strong>算術演算子</strong></td><td>計算</td><td><code>+</code> <code>-</code> <code>*</code> <code>/</code> <code>%</code>（余り）</td></tr>
+          <tr><td><strong>比較演算子</strong></td><td>条件を作る（if文で使う）</td><td><code>==</code>（同じ）<code>!=</code>（違う）<code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code></td></tr>
+          <tr><td><strong>論理演算子</strong></td><td>条件を組み合わせる</td><td><code>&amp;&amp;</code>（かつ）<code>||</code>（または）<code>!</code>（〜ではない）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">== の動き</span>
+      <code>5 == 5</code> → <strong>true</strong>（両辺が同じ）<br>
+      <code>2 == 5</code> → <strong>false</strong>（同じではない）<br>
+      ifは true なら中身を実行、false なら else へ進む。
+    </div>
+
+    <h3>条件には変数も入る（受講者Bさんの質問）</h3>
+    <p>「if (2 == 5)」のような固定値だけでなく、<strong>実際は変数で条件を作る</strong>。例えば：</p>
+    <pre><span class="comment">// 入力された数値が20以上だったら（年齢確認の例）</span>
+<span class="selector">if</span> (<span class="property">ageInput</span>.<span class="property">value</span> &gt;= <span class="value">20</span>) <span class="punct">{</span>
+  <span class="comment">// ページを表示</span>
+<span class="punct">}</span> <span class="selector">else</span> <span class="punct">{</span>
+  <span class="comment">// 別のページに飛ばす</span>
+<span class="punct">}</span></pre>
+    <p>条件の設計はアイデア勝負。優秀なプログラマーは経験則でうまく組み立てる。</p>
+  </section>
+
+  <!-- ===== else if ===== -->
+  <section id="elseif">
+    <h2 class="section-title"><span class="icon">🌳</span>else if文（複数条件）</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/elseif_syntax.png"
+           alt="先生の板書：条件分岐〜elseif文について〜。if (条件1) { 条件1がtrueの処理 } else if (条件2) { 条件2 true処理 } else if (条件3) {} else if (条件4) {} else {} ——条件1がfalseの場合（Falseなら）どの条件にも当てはまらない場合は else 文が実行される"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：<code>else if</code> 文。条件は<strong>何個でも</strong>追加できる
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">if文だけでは2分岐まで</span>
+      普通の if/else だと <strong>「A」と「それ以外」</strong> の2パターンしか作れない。3つ以上の条件分岐をしたいときに <strong>else if</strong> を使う。
+    </div>
+
+    <h3>カラーピッカー：白/黒/その他の3分岐</h3>
+    <pre><span class="selector">if</span> (<span class="property">colorPicker</span>.<span class="property">value</span> == <span class="value">'#ffffff'</span>) <span class="punct">{</span>
+  <span class="property">colorParagraph</span>.<span class="property">textContent</span> = `カラーコード(<span class="punct">${</span><span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">}</span>) (white)`<span class="punct">;</span>
+<span class="punct">}</span> <span class="selector">else if</span> (<span class="property">colorPicker</span>.<span class="property">value</span> == <span class="value">'#000000'</span>) <span class="punct">{</span>
+  <span class="property">colorParagraph</span>.<span class="property">textContent</span> = `カラーコード(<span class="punct">${</span><span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">}</span>) (black)`<span class="punct">;</span>
+<span class="punct">}</span> <span class="selector">else</span> <span class="punct">{</span>
+  <span class="property">colorParagraph</span>.<span class="property">textContent</span> = `カラーコード(<span class="punct">${</span><span class="property">colorPicker</span>.<span class="property">value</span><span class="punct">}</span>)`<span class="punct">;</span>
+<span class="punct">}</span></pre>
+
+    <p class="callout" style="font-size:14px;"><span class="label">注意：書き方の細かいルール</span> <code>}else if(...)</code> ではなく <code>} else if (...)</code> と<strong>半角スペース</strong>を入れる。詰めるとエラーになる。</p>
+
+    <div class="callout primary">
+      <span class="label">将来活躍する場面（PHP / WordPress）</span>
+      授業の後半で出てくる<strong>WordPress（PHP）</strong>でも else if は大活躍。<br>
+      例：「トップページなら top.css を読み込む／About ページなら about.css を読み込む」のように<strong>ページ別の処理分岐</strong>を作れる。不要なCSSを読み込まずに済む＝スマートで高速。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== カラーピッカー完成 ===== -->
+  <section id="colorpicker-done">
+    <h2 class="section-title"><span class="icon">🎨</span>カラーピッカー完成コード</h2>
+    <p>2日かけて作ったカラーピッカーの最終形。先生のVS Code画面。</p>
+
+    <figure style="margin:18px 0;">
+      <img src="img/colorpicker_code.png"
+           alt="先生のVS Code：カラーピッカーの完成コード。要素取得→背景色変更→if/else if文で白/黒/その他のカラーコード表示。最後に addEventListener('input', convertColorValue) と、別 input の addEventListener(...) も"
+           style="width:100%; max-width:1000px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生のVS Code画面：カラーピッカーの完成形。これまで学んだ要素を全部使っている
+      </figcaption>
+    </figure>
+
+    <div class="callout success">
+      <span class="label">使った技術の総まとめ</span>
+      ① <strong>document.querySelector</strong> で要素取得（6/15）<br>
+      ② <strong>変数（let / const）</strong>で代入<br>
+      ③ <strong>関数（アロー関数 () =&gt; {}）</strong>で処理<br>
+      ④ <strong>addEventListener('input', 関数)</strong> でイベント設定<br>
+      ⑤ <strong>要素.style.プロパティ = 値</strong> でCSS書き換え（6/15）<br>
+      ⑥ <strong>テンプレートリテラル <code>`${変数}`</code></strong> で文字列組み立て<br>
+      ⑦ <strong>if / else if / else</strong> で3分岐
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>引数（ひきすう）</td><td>パラメーターの日本語呼び。第1引数・第2引数のように番号で呼ぶ</td></tr>
+          <tr><td>テンプレートリテラル</td><td><code>`文字列${変数}文字列`</code> の新しい書き方。+ 連結より読みやすい</td></tr>
+          <tr><td>バッククォート</td><td><code>`</code> の記号。日本語配列は Shift+@</td></tr>
+          <tr><td>条件分岐</td><td>「○○ならXする、××ならYする」と処理を分けること</td></tr>
+          <tr><td>if文</td><td>条件分岐の構文。<code>if (条件) {...} else {...}</code></td></tr>
+          <tr><td>else if文</td><td>3つ以上の条件分岐に使う。何個でも追加可</td></tr>
+          <tr><td>演算子</td><td>記号のこと。算術／比較／論理の3種類</td></tr>
+          <tr><td>算術演算子</td><td><code>+ - * / %</code>（計算用）</td></tr>
+          <tr><td>比較演算子</td><td><code>== != &gt; &lt; &gt;= &lt;=</code>（条件用）</td></tr>
+          <tr><td>論理演算子</td><td><code>&amp;&amp;</code>（かつ）<code>||</code>（または）<code>!</code>（否定）</td></tr>
+          <tr><td>true / false</td><td>真／偽。ifは true なら実行、false なら else へ</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li><strong>演習1</strong>（前回・名前→「○○さん」表示）を完成させる</li>
+      <li>テンプレートリテラル <code>`${変数}`</code> に書き換えてみる</li>
+      <li>カラーピッカーに <strong>if/else if/else で白/黒/その他の3分岐</strong> を実装</li>
+      <li>if文を書く場所＝<strong>関数の中</strong>を意識する</li>
+      <li>背景色の上書きは <strong>if の前</strong>に書く（実行が止まらないように）</li>
+      <li><strong>演算子3種類</strong>（算術・比較・論理）を一通り頭に入れる</li>
+      <li>余裕がある人は <strong>else if を増やして</strong>色のバリエーションを追加してみる</li>
+      <li>うまくいかない人はノートまとめ・コード見直しの時間に</li>
+    </ul>
+    <div class="callout">
+      <span class="label">📣 先生からのアドバイス</span>
+      条件の設計は<strong>アイデア勝負</strong>。優秀なプログラマーは経験則で組み立てる。最初は難しいが、慣れまで辛抱。<br>
+      演算子は他にもたくさんあるので、<strong>自分で調べる時間も設ける</strong>のがおすすめ。
+    </div>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>初めてそういうことをやる人は、もうシンプルに紙とペンとかでもいいので、何をするのかをリストにした方がいいと思います。<span class="citation">── 実装前の準備</span></blockquote>
+    <blockquote>条件に分けて結果を変えることをプログラミングでは「条件分岐」と呼びます。プログラミングの大の得意な部分です。<span class="citation">── 条件分岐の本質</span></blockquote>
+    <blockquote>条件の作り方とかのアイデア出しは、経験則からいろいろ作れるようになるんですけど、最初は多分その辺がちょっと難しいんじゃないかなと思います。<span class="citation">── 慣れるまでの覚悟</span></blockquote>
+    <blockquote>年に1人くらい、プログラミング面白いって言って趣味でゲーム作っちゃいましたみたいな人がいますね。時間と余裕のある方はぜひチャレンジしてみるのがいいんじゃないかなと思います。<span class="citation">── インベーダーゲームも作れる</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-17｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSSアニメーション（transition と @keyframes animation）｜2026年5月26日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月26日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>CSSアニメーション（transition と @keyframes animation）</h1>
+  <p class="subtitle">訓練校 IT スクール｜全4時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 3時間27分</span>
+    <span>📖 HTML本153-156p（CSSアニメーション）＋次の課題</span>
+    <span>🎯 transition, transition-property/duration/timing-function/delay, イージング, ease-out, :hoverでなく元要素, transform scale/translate/rotate, @keyframes, animation, iteration-count infinite, direction alternate, transitionとanimationの違い, JS制御, ポートフォリオ課題 Nekota Koharu</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <style>
+    /* ===== 5/26 ライブCSSアニメーションデモ用（このノート内だけで使う） ===== */
+    .anim-stage{ display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start;
+      background:var(--card-bg); border:1px solid var(--border); border-radius:10px; padding:28px; margin:20px 0; }
+    .anim-box{ width:110px; height:110px; background:#b23b3b; color:#fff; border-radius:6px;
+      display:flex; align-items:center; justify-content:center; text-align:center; font-size:13px;
+      font-weight:700; padding:8px; cursor:pointer; }
+    /* ① 右に伸びる */
+    .demo-grow{ transition: width 0.5s ease-out; }
+    .demo-grow:hover{ width:240px; }
+    /* ② 四角→丸 */
+    .demo-round{ transition: border-radius 1s ease-in-out; }
+    .demo-round:hover{ border-radius:50%; }
+    /* ③ 1秒後にズームアップ */
+    .demo-zoom{ transition: transform 0.4s ease 1s; }
+    .demo-zoom:hover{ transform: scale(1.4); }
+    .anim-note{ font-size:12.5px; color:var(--muted); margin-top:8px; text-align:center; }
+    /* @keyframes ライブデモ：ジグザグ＋色変化（自動・無限ループ） */
+    @keyframes ggcZigzag{
+      0%{ transform:translate(0,0); background:#b23b3b; }
+      50%{ transform:translate(60px,40px); background:#2c5a8a; }
+      100%{ transform:translate(0,80px); background:#2d7a4a; }
+    }
+    .demo-keyframe{ width:90px; height:90px; border-radius:8px; color:#fff; display:flex;
+      align-items:center; justify-content:center; font-size:12px; font-weight:700;
+      animation: ggcZigzag 2.5s ease-in-out infinite alternate; }
+    .kf-stage{ height:230px; }
+  </style>
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>今日の流れ</h2>
+    <div class="callout primary">
+      <span class="label">💡 今日のテーマ</span>
+      <p style="margin:0;">
+        <strong>CSSだけで作るアニメーション</strong>。ふわふわ動かす・回転・ホバーで拡大などが、JavaScriptなしで実装できる。<mark>きっかけで動く「transition」</mark>と、<mark>自動で動く「@keyframes animation」</mark>の2本立て。
+      </p>
+    </div>
+    <div class="callout success">
+      <span class="label">🖐 このノートは触れます</span>
+      <p style="margin:0;">下のデモは<strong>実際に動くCSS</strong>です。赤い四角に<mark>マウスを乗せる（ホバー）</mark>と動きます。@keyframesのデモは自動で動き続けます。Chromeで開いて試してください。</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>1時間目</td><td><a href="#transition">transition（きっかけで動く）</a></td></tr>
+          <tr><td>1時間目</td><td><a href="#transition-props">transitionの4プロパティ・イージング</a></td></tr>
+          <tr><td>2時間目</td><td><a href="#button">ボタンのホバーアニメーション演習</a></td></tr>
+          <tr><td>3時間目</td><td><a href="#animation">@keyframes animation（自動で動く）</a></td></tr>
+          <tr><td>3時間目</td><td><a href="#anim-props">animationの6プロパティ</a></td></tr>
+          <tr><td>まとめ</td><td><a href="#diff">transition と animation の違い</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li><strong>transition</strong>＝ホバー等の<mark>きっかけ（トリガー）</mark>で状態を変化させる</li>
+      <li><strong>animation（@keyframes）</strong>＝<mark>読み込みで自動</mark>に動く（トリガー不要）</li>
+      <li>transitionは一括指定：<code>property / duration / timing-function / delay</code></li>
+      <li>時間だけ書くと <code>duration</code> として適用される</li>
+      <li><code>transition-property</code> の初期値は <strong>all（全部）</strong></li>
+      <li>イージング＝動きの緩急（<code>ease-out</code> など）。電車・コンビニの扉と同じ</li>
+      <li>🔑 transitionは <strong>:hoverではなく元の要素</strong>に書く（離した時も滑らかに戻る）</li>
+      <li><code>delay</code> は実務でほぼ0（ユーザーを待たせると違和感）</li>
+      <li>animationの一括指定：<code>name / duration / timing / delay / iteration-count / direction</code></li>
+      <li><strong>animationプロパティ＋@keyframes</strong> を<mark>同じ名前で紐付け</mark>て初めて発動</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="transition">
+    <h2 class="section-title"><span class="icon">🎬</span>transition（きっかけで動く）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <code>:hover</code> で <code>width:400px</code> にするだけだと<strong>パッと</strong>切り替わる。そこに <code>transition</code> を足すと<mark>「何秒かけて変化するか」</mark>を指定でき、ぬるっと動く。transition自体は「変化に時間をかける」プロパティ。
+      </p>
+    </div>
+
+    <h3>▼ 実際に動くデモ（マウスを乗せてみて）</h3>
+    <div class="anim-stage">
+      <div>
+        <div class="anim-box demo-grow">右に伸びる</div>
+        <div class="anim-note">width 0.5s ease-out</div>
+      </div>
+      <div>
+        <div class="anim-box demo-round">四角→丸へ</div>
+        <div class="anim-note">border-radius 1s ease-in-out</div>
+      </div>
+      <div>
+        <div class="anim-box demo-zoom">ホバーして<br>1秒後にズーム</div>
+        <div class="anim-note">transform scale / delay 1s</div>
+      </div>
+    </div>
+
+    <h3>コード</h3>
+<pre><span class="comment">/* ① 右に伸びる */</span>
+<span class="selector">.box</span> <span class="punct">{</span> <span class="property">transition</span><span class="punct">:</span> <span class="value">0.5s ease-out</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* 元の要素に書く！ */</span>
+<span class="selector">.box:hover</span> <span class="punct">{</span> <span class="property">width</span><span class="punct">:</span> <span class="value">400px</span><span class="punct">;</span> <span class="punct">}</span>
+
+<span class="comment">/* ③ ホバーして1秒後にズームアップ */</span>
+<span class="selector">.box</span> <span class="punct">{</span> <span class="property">transition</span><span class="punct">:</span> <span class="value">transform 0.4s ease 1s</span><span class="punct">;</span> <span class="punct">}</span>
+<span class="selector">.box:hover</span> <span class="punct">{</span> <span class="property">transform</span><span class="punct">:</span> <span class="value">scale(1.5)</span><span class="punct">;</span> <span class="punct">}</span></pre>
+
+    <div class="callout warn">
+      <span class="label">🔑 transitionは :hover ではなく元の要素に書く（重要）</span>
+      <p style="margin:0;"><code>:hover</code> 側に transition を書くと、<strong>カーソルを離した時にパッと戻ってしまう</strong>。:hoverは「乗った時だけ」のセレクターで、離した時を考慮しないから。<mark>元の要素（.box）に書けば行きも帰りも滑らか</mark>。忘れやすいので注意。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="transition-props">
+    <h2 class="section-title"><span class="icon">🎚</span>transitionの4プロパティ・イージング</h2>
+    <p><code>transition</code> は4つのプロパティの<strong>一括指定</strong>。省略した値は初期値が入る。</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:260px">プロパティ</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>transition-property</code></td><td>何を変化させるか（初期値 <strong>all</strong>＝全部）</td></tr>
+          <tr><td><code>transition-duration</code></td><td>変化にかける時間（<code>0.5s</code> / <code>500ms</code>）</td></tr>
+          <tr><td><code>transition-timing-function</code></td><td>イージング（動きの緩急）</td></tr>
+          <tr><td><code>transition-delay</code></td><td>開始までの遅延（実務はほぼ0）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>時間だけ</strong>書くと <code>duration</code> 扱い。<code>property</code> を省くと初期値allで<mark>変化できるもの全部</mark>にかかる（色も幅も同時に動く）。「これだけ動かしたい」時はpropertyで指定。</p>
+
+    <div class="callout">
+      <span class="label">📌 イージング（よく使う4つ）</span>
+      <p style="margin:0;">動きの緩急＝<strong>電車やコンビニの扉</strong>と同じ。開き始め・閉まり際が少し遅いと自然に見える。
+      <code>ease</code> / <code>ease-in</code>（最初ゆっくり）/ <code>ease-out</code>（最後ゆっくり）/ <code>ease-in-out</code>（両端ゆっくり）。<mark>等速より自然</mark>でユーザーに違和感を与えない。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="button">
+    <h2 class="section-title"><span class="icon">🔘</span>ボタンのホバーアニメーション演習</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        transitionの<strong>主な使い所はボタン</strong>。マウスを乗せたら色が変わる・少し浮く・角丸になる等。参考サイトを見ながら「使えそうなもの」を作る演習。<mark>規則性（元要素にtransition→:hoverで変化）さえ分かれば、あとは何を変えるかだけ</mark>。
+      </p>
+    </div>
+    <ul class="bullet-pro">
+      <li>色が変わる：<code>transition: background 0.3s;</code> ＋ <code>:hover{ background:... }</code></li>
+      <li>少し浮く：<code>:hover{ transform: translateY(-4px); box-shadow:...; }</code></li>
+      <li>拡大：<code>:hover{ transform: scale(1.05); }</code></li>
+    </ul>
+    <p style="font-size:14px;color:var(--text-soft);">先生のコードをそのまま真似るのではなく、自分で「何秒かけるか」「どのイージングか」を考えて作るのが大事。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="animation">
+    <h2 class="section-title"><span class="icon">🔁</span>@keyframes animation（自動で動く）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        transitionより複雑な動きは <strong>@keyframes</strong> を使う。<mark>開始0%〜終了100%の間に、好きなタイミングで「この時はこうなる」を打ち込む</mark>（動画編集のキーフレームと同じ発想）。<code>animation</code>プロパティと<code>@keyframes</code>を<strong>同じ名前で紐付け</strong>て発動。
+      </p>
+    </div>
+
+    <h3>▼ 実際に動くデモ（自動・無限ループ）</h3>
+    <div class="anim-stage kf-stage">
+      <div>
+        <div class="demo-keyframe">ジグザグ</div>
+        <div class="anim-note">@keyframes（位置＋色を変化）<br>2.5s infinite alternate</div>
+      </div>
+    </div>
+
+    <h3>コード</h3>
+<pre><span class="comment">/* ① animationプロパティで設定（一括指定） */</span>
+<span class="selector">.sample</span> <span class="punct">{</span>
+    <span class="property">animation</span><span class="punct">:</span> <span class="value">zigzag 2s ease 0s 3 normal</span><span class="punct">;</span>
+    <span class="comment">/*         名前  時間 緩急 遅延 回数 再生方法 */</span>
+<span class="punct">}</span>
+<span class="comment">/* ② @keyframesで動きを定義（名前を一致させる！） */</span>
+<span class="property">@keyframes</span> <span class="value">zigzag</span> <span class="punct">{</span>
+    <span class="selector">0%</span>   <span class="punct">{</span> <span class="property">transform</span><span class="punct">:</span> <span class="value">translate(0, 0)</span><span class="punct">;</span> <span class="punct">}</span>
+    <span class="selector">50%</span>  <span class="punct">{</span> <span class="property">transform</span><span class="punct">:</span> <span class="value">translate(50px, 50px)</span><span class="punct">;</span> <span class="punct">}</span>
+    <span class="selector">100%</span> <span class="punct">{</span> <span class="property">transform</span><span class="punct">:</span> <span class="value">translate(0, 80px)</span><span class="punct">;</span> <span class="punct">}</span>
+<span class="punct">}</span></pre>
+    <p>0%〜100%の中は<strong>自由に刻める</strong>（0/50/100でも、1%刻みで100個でもOK）。名前（zigzag）は自分で決める固有名詞。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="anim-props">
+    <h2 class="section-title"><span class="icon">🎛</span>animationの6プロパティ</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:280px">プロパティ</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>animation-name</code></td><td>@keyframesと紐付ける名前（自分で決める）</td></tr>
+          <tr><td><code>animation-duration</code></td><td>1回の長さ（時間）</td></tr>
+          <tr><td><code>animation-timing-function</code></td><td>イージング</td></tr>
+          <tr><td><code>animation-delay</code></td><td>開始までの遅延</td></tr>
+          <tr><td><code>animation-iteration-count</code></td><td>繰り返し回数。<strong><code>infinite</code></strong> で無限ループ</td></tr>
+          <tr><td><code>animation-direction</code></td><td>再生方法。<code>normal</code> / <strong><code>alternate</code></strong>（偶数回は逆再生）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="bullet-pro">
+      <li><strong>infinite</strong>：ふわふわ動き続ける素材などはこれ（ずっと0%→100%を繰り返す）</li>
+      <li><strong>alternate</strong>：1回目0→100%、2回目100→0%（行ったり来たり）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="diff">
+    <h2 class="section-title"><span class="icon">⚖️</span>transition と animation の違い</h2>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary);border-bottom-color:var(--primary);">transition</h4>
+        <ul><li><strong>きっかけが必要</strong>（hover/click等）</li><li>変更前→変更後の2状態だけ</li><li>主にボタンのホバー</li></ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent);border-bottom-color:var(--accent);">animation（@keyframes）</h4>
+        <ul><li><strong>読み込みで自動実行</strong>（トリガー不要）</li><li>0〜100%で複雑な動き</li><li>実行タイミングは<mark>JSで制御可能</mark></li></ul>
+      </div>
+    </div>
+    <div class="callout success">
+      <span class="label">🔑 よくある実務パターン</span>
+      <p style="margin:0;"><strong>CSSでアニメーションを作っておき、実行のタイミングはJavaScriptで制御</strong>する。「スクロールしたらふわっと出る」などはこの組み合わせ。今のCSSの土台があってこそ。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="next-assignment">
+    <h2 class="section-title"><span class="icon">📝</span>午後〜次の課題：ポートフォリオサイト</h2>
+    <div class="callout primary">
+      <span class="label">💡 次の練習</span>
+      <p style="margin:0;">
+        午後からは新しいコーディング練習。<strong>「Nekota Koharu（猫小春）」さんのポートフォリオサイト</strong>（ダミーサイト）を、これまでの知識で作る。<mark>早い人は3時間くらいで完成</mark>。これは元々Figmaの教科書で作る題材なので、<strong>先にコーディング練習</strong>→後日「Figmaで作るならどうするか」を学ぶ流れ。
+      </p>
+    </div>
+
+    <figure style="margin:22px 0;">
+      <img src="img/portfolio_assignment.png" alt="次の課題のデザイン：Nekota Koharu ポートフォリオサイト（Hero/Service/Works/About）" style="width:100%; max-width:480px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 12px rgba(0,0,0,.1);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 支給デザイン（Figma）：Hero（Nekota Koharu）→ Service（Graphic/Web Design）→ Works（作品ギャラリー）→ About（プロフィール）。これを再現する</figcaption>
+    </figure>
+
+    <ul class="bullet-pro">
+      <li>ディレクトリ名は <code>nekota-koharu</code> や <code>portfolio</code> など自由に</li>
+      <li>使う技術は総復習：ヘッダー・<strong>flex/grid</strong>でWorksギャラリー・Service横並び・About・フッター</li>
+      <li>今日習った<strong>ホバーアニメーション</strong>（ボタンやWorks画像）も活かせる</li>
+      <li>明日朝、終わった人数を見て次を決める</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:240px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>transition</strong></td><td>きっかけで状態を変化させるアニメーション（一括指定）</td></tr>
+          <tr><td><strong>transition-property</strong></td><td>何を変化させるか（初期値all）</td></tr>
+          <tr><td><strong>transition-duration</strong></td><td>変化にかける時間（0.5s / 500ms）</td></tr>
+          <tr><td><strong>timing-function（イージング）</strong></td><td>動きの緩急（ease-out等）</td></tr>
+          <tr><td><strong>transition-delay</strong></td><td>開始までの遅延</td></tr>
+          <tr><td><strong>transform: scale()</strong></td><td>拡大（ズームアップ）</td></tr>
+          <tr><td><strong>transform: translate()</strong></td><td>位置の移動</td></tr>
+          <tr><td><strong>@keyframes</strong></td><td>0〜100%で動きの過程を定義</td></tr>
+          <tr><td><strong>animation-name</strong></td><td>@keyframesと紐付ける名前</td></tr>
+          <tr><td><strong>animation-iteration-count</strong></td><td>繰り返し回数（infinite＝無限）</td></tr>
+          <tr><td><strong>animation-direction</strong></td><td>再生方法（normal / alternate）</td></tr>
+          <tr><td><strong>infinite / alternate</strong></td><td>無限ループ / 行ったり来たり</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>transition＝きっかけで動く、animation＝自動で動く</li>
+      <li>transitionは一括指定（property/duration/timing/delay）</li>
+      <li>時間だけ書くとduration、propertyの初期値はall</li>
+      <li><strong>transitionは:hoverでなく元の要素に書く</strong>（戻りも滑らかに）</li>
+      <li>イージングで自然な緩急（ease-out等）</li>
+      <li>delayは実務でほぼ0</li>
+      <li>@keyframesは0〜100%で動きを定義、好きに刻める</li>
+      <li>animationプロパティ＋@keyframesを<strong>同じ名前で紐付け</strong></li>
+      <li><code>infinite</code>で無限、<code>alternate</code>で行ったり来たり</li>
+      <li>実務はCSSアニメ＋JSで実行タイミング制御がよくある</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>これは画面共有で見るより、自分で書いてみた方が早いですね。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ アニメーションは手を動かして体感するのが一番。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>電車の扉、開き始めと開き終わりが少し遅くなるの分かります？</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ イージング（緩急）の身近な例。等速より自然に見える。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>:hoverに書くと、カーソルを離した時にパッと戻っちゃう。意外と忘れるのでメモを。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ transitionは元の要素に。今日いちばんの落とし穴。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-26｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

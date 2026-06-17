@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSSの単位・レスポンシブ対応・リンク/ボタン・疑似クラス/要素｜2026年5月15日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月15日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>CSSの単位・レスポンシブ対応・リンク/ボタン・疑似クラス/要素</h1>
+  <p class="subtitle">訓練校 IT スクール｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 5時間24分</span>
+    <span>📖 HTML本78-92p（単位/メディアクエリ/リンク/リスト）</span>
+    <span>🎯 px/%/vw/vh/em/rem, メディアクエリ, レスポンシブ, リンク/ボタン, :hover/:active, opacity/box-shadow, ::before/::after, Emmet</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="callout primary" style="margin-top: 40px;">
+    <span class="label">📌 今日のひとことまとめ</span>
+    <p style="margin:0; font-size:18px; line-height:1.85;">
+      テーマは <strong>「CSSの単位」「レスポンシブ（メディアクエリ）」「リンク・ボタン」「疑似クラス／疑似要素」</strong>。<br>
+      かんたんに言うと <mark>「まずは px と % の2つを使いこなす」「@media で画面幅ごとにCSSを切り替える」「:hover や :active で動きをつける」「::before / ::after は飾り専用（content必須）」</mark>という、盛りだくさんの日です。
+    </p>
+  </div>
+
+  <nav class="toc" style="margin-top: 40px;">
+    <h2>📑 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（1日の流れ）</a></li>
+      <li><a href="#must">今日おさえる10個</a></li>
+      <li><a href="#units">CSSの単位（px/%/vw/vh/em/rem）</a></li>
+      <li><a href="#fullscreen">画面いっぱいの画像</a></li>
+      <li><a href="#minmax">max-width / min-width</a></li>
+      <li><a href="#media">メディアクエリ＆ブレイクポイント</a></li>
+      <li><a href="#link">リンク（aタグ）</a></li>
+      <li><a href="#button">ボタンリンクの作り方</a></li>
+      <li><a href="#pseudo-class">疑似クラス（:active / :hover）</a></li>
+      <li><a href="#effects">opacity / box-shadow</a></li>
+      <li><a href="#list">リスト（ul / ol / li）</a></li>
+      <li><a href="#pseudo-element">疑似要素（::before / ::after）</a></li>
+      <li><a href="#emmet">Emmet・時短技</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">チェックリスト</a></li>
+      <li><a href="#quotes">先生の名言</a></li>
+    </ol>
+  </nav>
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>タイムマップ（1日の流れ）</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:90px">時刻</th><th>内容</th><th style="width:80px" class="center">大事さ</th></tr></thead>
+        <tbody>
+          <tr><td class="time"><a href="#units">00:04</a></td><td><a href="#units"><strong>CSSの単位（px/%/vw/vh/em/rem）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#fullscreen">00:28</a></td><td><a href="#fullscreen"><strong>画面いっぱい画像（3点セット）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#minmax">00:41</a></td><td><a href="#minmax"><strong>max-width / min-width</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#media">01:02</a></td><td><a href="#media"><strong>メディアクエリ・ブレイクポイント</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#media">01:12</a></td><td><a href="#media">モバイルファースト・半角スペース注意</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#link">01:33</a></td><td><a href="#link"><strong>リンク（aタグ・href・target）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#button">02:08</a></td><td><a href="#button">@charset "UTF-8"; ・中央寄せ</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#button">02:22</a></td><td><a href="#button"><strong>ボタンリンク作成（タップ44px）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">02:31</td><td>お昼休憩</td><td class="center">—</td></tr>
+          <tr><td class="time"><a href="#pseudo-class">03:21</a></td><td><a href="#pseudo-class"><strong>:active で押し込みアニメ</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#pseudo-class">03:30</a></td><td><a href="#pseudo-class"><strong>:hover（スマホでは効かない）</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#effects">03:33</a></td><td><a href="#effects">opacity / box-shadow</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#list">03:56</a></td><td><a href="#list">リスト（ul/ol/li）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#pseudo-element">04:35</a></td><td><a href="#pseudo-element"><strong>::before / ::after 疑似要素</strong></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time">05:24</td><td>授業終了</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <div class="card-grid">
+      <a href="#units" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">1</span><h4>まず px と %</h4><p>この2つを使いこなせば大体作れる。</p></div></a>
+      <a href="#units" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">2</span><h4>%は親要素基準</h4><p>画面幅じゃなく<mark>親要素</mark>。1rem=16px。</p></div></a>
+      <a href="#fullscreen" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">3</span><h4>画面いっぱい画像</h4><p>width:100%+height:100vh+object-fit:cover。</p></div></a>
+      <a href="#minmax" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">4</span><h4>max-width</h4><p><code>width:100% + max-width:1200px</code>が定番。</p></div></a>
+      <a href="#media" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">5</span><h4>メディアクエリ</h4><p>@media screen and (max-width: 768px)</p></div></a>
+      <a href="#media" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">6</span><h4>半角スペース</h4><p><code>screen and (...)</code>の空白忘れが最頻ミス。</p></div></a>
+      <a href="#link" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">7</span><h4>リンク</h4><p>aタグ・href・target="_blank"（外部別タブ）。</p></div></a>
+      <a href="#button" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">8</span><h4>中央寄せ</h4><p><code>margin: 0 auto</code>で要素中央。</p></div></a>
+      <a href="#pseudo-class" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">9</span><h4>疑似クラス</h4><p>:active（押下）/ :hover（カーソル乗）。</p></div></a>
+      <a href="#pseudo-element" style="text-decoration:none;color:inherit;"><div class="card"><span class="num">10</span><h4>疑似要素</h4><p>::before/::after は content 必須。飾り専用。</p></div></a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="units">
+    <h2 class="section-title"><span class="icon">📏</span>CSSの単位（px/%/vw/vh/em/rem）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        先生の板書に赤い手書きで <strong>「まずはこの2つ（px と %）を使いこなそう！」</strong>とありました。<mark>px と % が基本</mark>。vw/vh/em/rem は次のステップ。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:90px">単位</th><th>基準</th><th>特徴</th></tr></thead>
+        <tbody>
+          <tr><td><strong>px</strong></td><td>絶対値</td><td><mark>拡大も縮小もしない</mark>。ボタンなど縮むと困る所に</td></tr>
+          <tr><td><strong>%</strong></td><td><mark>親要素</mark>の幅</td><td>※画面幅ではなく親要素。よく勘違いする所</td></tr>
+          <tr><td><strong>vw / vh</strong></td><td>画面幅 / 高さ</td><td>100vwはスクロールバー分はみ出る注意</td></tr>
+          <tr><td><strong>em / rem</strong></td><td>フォントサイズ</td><td><strong>1rem = 16px</strong>。余白を「○文字分」で指定したい時に便利</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">親が500pxで子が90%なら → 500×0.9＝450px。HTMLのデフォルト文字サイズは16pxなので 1rem=16px。</p>
+    <figure style="margin:22px 0;">
+      <img src="img/units.png" alt="先生の板書：webでよく使う単位の紹介（px と % の解説＋手書きメモ）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：ピンク枠の px と % に赤い手書きで「まずはこの2つの単位を使いこなそう！」。px＝絶対指定、%＝親要素の幅に対する割合</figcaption>
+    </figure>
+  </section>
+
+  <hr class="divider">
+
+  <section id="fullscreen">
+    <h2 class="section-title"><span class="icon">🖼</span>画面いっぱいの画像</h2>
+    <p>メインビジュアルを画面いっぱいに表示する定番3点セット。</p>
+<pre><span class="selector">*</span> <span class="punct">{</span> <span class="property">margin</span><span class="punct">:</span> <span class="value">0</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* bodyのデフォルト余白を消す */</span>
+<span class="selector">img</span> <span class="punct">{</span>
+    <span class="property">display</span><span class="punct">:</span> <span class="value">block</span><span class="punct">;</span>       <span class="comment">/* インライン下の隙間を消すおまじない */</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">height</span><span class="punct">:</span> <span class="value">100vh</span><span class="punct">;</span>     <span class="comment">/* 画面の高さいっぱい */</span>
+    <span class="property">object-fit</span><span class="punct">:</span> <span class="value">cover</span><span class="punct">;</span> <span class="comment">/* ゆがめずトリミング */</span>
+<span class="punct">}</span></pre>
+    <p style="font-size:14px;color:var(--text-soft);">imgはインラインなのに幅高さ指定OKの特例。display:blockは「下の隙間を消すおまじない」の意味合いが強い。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="minmax">
+    <h2 class="section-title"><span class="icon">↔️</span>max-width / min-width</h2>
+    <div class="callout success">
+      <span class="label">✅ 鉄板コンビ</span>
+      <p style="margin:0;"><code>width: 100%</code> ＋ <code>max-width: 1200px</code> → スマホでは画面いっぱい、大画面でも1200pxで止まる。<mark>最初はこのコンビを覚えれば十分</mark>。</p>
+    </div>
+<pre><span class="selector">.container</span> <span class="punct">{</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">100%</span><span class="punct">;</span>
+    <span class="property">max-width</span><span class="punct">:</span> <span class="value">1200px</span><span class="punct">;</span>  <span class="comment">/* これ以上大きくならない */</span>
+<span class="punct">}</span></pre>
+  </section>
+
+  <hr class="divider">
+
+  <section id="media">
+    <h2 class="section-title"><span class="icon">📱</span>メディアクエリ＆ブレイクポイント</h2>
+    <p>教科書83p。<strong>画面幅に応じてCSSを切り替える</strong>＝レスポンシブの王道。</p>
+<pre><span class="punct">@media</span> <span class="value">screen and (max-width: 768px)</span> <span class="punct">{</span>
+    <span class="selector">.container</span> <span class="punct">{</span> <span class="property">flex-direction</span><span class="punct">:</span> <span class="value">column</span><span class="punct">;</span> <span class="punct">}</span>
+<span class="punct">}</span></pre>
+    <div class="callout primary">
+      <span class="label">🔥 最頻ミス：半角スペース忘れ</span>
+      <p style="margin:0;"><code>screen<strong> </strong>and<strong> </strong>(max-width:...)</code> の<strong>スペースがないと動きません</strong>。毎回ハマる人がいます。</p>
+    </div>
+    <ul class="bullet-pro">
+      <li><code>max-width: 768px</code>＝768px<strong>以下</strong>に適用（PCから作りスマホ上書き）</li>
+      <li><code>min-width: 1200px</code>＝1200px<strong>以上</strong>に適用（<mark>モバイルファースト</mark>＝スマホから作る）</li>
+      <li>ブレイクポイントに最適値はない（時代で変動。目安：スマホ≤480、タブレット768〜960）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="link">
+    <h2 class="section-title"><span class="icon">🔗</span>リンク（aタグ）</h2>
+<pre><span class="punct">&lt;</span><span class="selector">a href</span><span class="punct">=</span><span class="value">"https://example.com"</span> <span class="selector">target</span><span class="punct">=</span><span class="value">"_blank"</span><span class="punct">&gt;</span>外部リンク<span class="punct">&lt;/</span><span class="selector">a</span><span class="punct">&gt;</span>
+<span class="punct">&lt;</span><span class="selector">a href</span><span class="punct">=</span><span class="value">"#"</span><span class="punct">&gt;</span>仮リンク（ヌルリンク）<span class="punct">&lt;/</span><span class="selector">a</span><span class="punct">&gt;</span></pre>
+    <ul class="bullet-pro">
+      <li><code>href</code>＝飛び先（imgのsrcとは違う）</li>
+      <li><code>href="#"</code>＝<strong>ヌルリンク</strong>（リンク先なし・仮置き）</li>
+      <li><code>target="_blank"</code>＝<strong>別タブで開く</strong>（主に外部リンク）</li>
+      <li>aタグは<strong>親要素でブロック/インラインが変わる</strong>。「クリックできそう」感が大事</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="button">
+    <h2 class="section-title"><span class="icon">🔘</span>ボタンリンクの作り方</h2>
+<pre><span class="comment">/* CSSの1行目に必ず */</span>
+<span class="property">@charset</span> <span class="value">"UTF-8"</span><span class="punct">;</span>
+
+<span class="selector">.button-link</span> <span class="punct">{</span>
+    <span class="property">display</span><span class="punct">:</span> <span class="value">block</span><span class="punct">;</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">200px</span><span class="punct">;</span>
+    <span class="property">margin</span><span class="punct">:</span> <span class="value">40px auto</span><span class="punct">;</span>      <span class="comment">/* 左右autoで中央寄せ */</span>
+    <span class="property">padding</span><span class="punct">:</span> <span class="value">16px</span><span class="punct">;</span>
+    <span class="property">text-align</span><span class="punct">:</span> <span class="value">center</span><span class="punct">;</span>   <span class="comment">/* 文字を中央 */</span>
+    <span class="property">text-decoration</span><span class="punct">:</span> <span class="value">none</span><span class="punct">;</span> <span class="comment">/* 下線を消す */</span>
+    <span class="property">background</span><span class="punct">:</span> <span class="value">#1a3a5c</span><span class="punct">;</span>
+    <span class="property">color</span><span class="punct">:</span> <span class="value">#fff</span><span class="punct">;</span>
+    <span class="property">border-radius</span><span class="punct">:</span> <span class="value">10px</span><span class="punct">;</span>  <span class="comment">/* 角丸 */</span>
+<span class="punct">}</span></pre>
+    <div class="callout primary">
+      <span class="label">💡 2種類の「中央寄せ」</span>
+      <p style="margin:0;"><strong>要素の中央＝<code>margin: 0 auto</code></strong>、<strong>テキストの中央＝<code>text-align: center</code></strong>。別物。両方必要なことが多い。</p>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">タップしやすいサイズは44px以上（Apple/Google基準）。padding領域までクリック可能になるので、paddingを広めに取ると押しやすい。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="pseudo-class">
+    <h2 class="section-title"><span class="icon">✨</span>疑似クラス（:active / :hover）</h2>
+    <h3>:active（クリック押下中）</h3>
+<pre><span class="selector">.button-link:active</span> <span class="punct">{</span>
+    <span class="property">border-bottom</span><span class="punct">:</span> <span class="value">none</span><span class="punct">;</span>
+    <span class="property">transform</span><span class="punct">:</span> <span class="value">translateY(4px)</span><span class="punct">;</span> <span class="comment">/* 4px沈む */</span>
+<span class="punct">}</span></pre>
+    <p>下線を消す＋transformで沈める → <mark>ボタンを押し込んだ動き</mark>に。</p>
+    <h3>:hover（カーソルが乗った時）</h3>
+    <div class="callout">
+      <span class="label">⚠️ :hover はスマホで効かない</span>
+      <p style="margin:0;">カーソルが乗った時の指定なので<strong>スマホ（タッチ）では反応しない</strong>。PC向けの装飾。普通に <code>:hover</code> と書いてOK（スマホでは自然に無視）。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="effects">
+    <h2 class="section-title"><span class="icon">🎭</span>opacity / box-shadow</h2>
+    <p><strong>opacity</strong>＝要素全体の透明度（0〜1）。RGBAは「色」だけの透明度、opacityは<mark>要素まるごと</mark>。</p>
+<pre><span class="selector">.card</span> <span class="punct">{</span> <span class="property">box-shadow</span><span class="punct">:</span> <span class="value">2px 2px 9px #999</span><span class="punct">;</span> <span class="punct">}</span>
+<span class="comment">/* X方向 Y方向 ぼかし 色 */</span></pre>
+    <p><strong>box-shadow</strong>＝影。1つ目X・2つ目Y・3つ目ぼかし量・4つ目色。border-radiusと組むと今どきのカードに。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="list">
+    <h2 class="section-title"><span class="icon">📋</span>リスト（ul / ol / li）</h2>
+    <div class="compare">
+      <div class="compare-col"><h4 style="color:var(--primary);border-bottom-color:var(--primary);">ul（順不同）</h4><ul><li>順番が関係ない箇条書き</li><li><mark>実務はほぼこれ</mark></li></ul></div>
+      <div class="compare-col"><h4 style="color:var(--accent);border-bottom-color:var(--accent);">ol（順序）</h4><ul><li>1,2,3…順番が決まってる</li><li>使用は少なめ</li></ul></div>
+    </div>
+<pre><span class="selector">ul</span> <span class="punct">{</span> <span class="property">list-style</span><span class="punct">:</span> <span class="value">none</span><span class="punct">;</span> <span class="punct">}</span>  <span class="comment">/* 黒丸を消す */</span></pre>
+    <p style="font-size:14px;color:var(--text-soft);">ul/ol はブラウザが勝手に margin/padding を付けるのでリセットして調整。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="pseudo-element">
+    <h2 class="section-title"><span class="icon">🧩</span>疑似要素（::before / ::after）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <strong>CSSから疑似的に飾りの要素を作る</strong>仕組み。テキストの前後に飾り線やアイコンを付ける時に使います。<mark>あくまで飾りなので選択・コピーできません</mark>。
+      </p>
+    </div>
+<pre><span class="selector">.title::before</span> <span class="punct">{</span>
+    <span class="property">content</span><span class="punct">:</span> <span class="value">""</span><span class="punct">;</span>          <span class="comment">/* ← 必須！空でもOK */</span>
+    <span class="property">background</span><span class="punct">:</span> <span class="value">url(../img/icon.png)</span><span class="punct">;</span>
+    <span class="property">background-repeat</span><span class="punct">:</span> <span class="value">no-repeat</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+    <div class="callout">
+      <span class="label">🔑 content 必須</span>
+      <p style="margin:0;">::before / ::after は<strong>必ず <code>content</code> を書く</strong>（空文字 <code>""</code> でもOK）。これが無いと表示されません。<code>::before</code>＝要素の前、<code>::after</code>＝要素の後ろ。背景画像が小さいとタイル状に繰り返すので <code>background-repeat: no-repeat</code>、位置は <code>background-position</code> で。</p>
+    </div>
+    <figure style="margin:22px 0;">
+      <img src="img/before_after.png" alt="先生の板書：記事タイトルの前後に ::before / ::after で飾りを付けた例" style="width:100%; max-width:760px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：「～ダミータイトル～」の前の飾り＝<code>::before</code>（青）、後ろの飾り＝<code>::after</code>（オレンジ）。本文ではなくCSSで足した飾り</figcaption>
+    </figure>
+  </section>
+
+  <hr class="divider">
+
+  <section id="emmet">
+    <h2 class="section-title"><span class="icon">⚡</span>Emmet・時短技</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>操作</th><th>結果</th></tr></thead>
+        <tbody>
+          <tr><td><code>a*3</code> + Tab</td><td>aタグを3つ展開</td></tr>
+          <tr><td><code>ul&gt;li*3</code> + Tab</td><td>ulの中にli3つ</td></tr>
+          <tr><td><code>h2+ul&gt;li*3</code> + Tab</td><td>h2と（兄弟に）ul&gt;li*3</td></tr>
+          <tr><td><code>p40-20</code> + Tab</td><td><code>padding: 40px 20px;</code></td></tr>
+          <tr><td>Cmd/Ctrl/Alt + クリック</td><td>複数カーソル（一括編集）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">アスタリスク（*）＝Shift+「け」（日本語キーボード）。プログラミングの掛け算記号。<code>a*3</code>＝「aを3つ」。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>px / %</strong></td><td>絶対値 / 親要素の幅に対する割合</td></tr>
+          <tr><td><strong>vw / vh</strong></td><td>画面の幅 / 高さ基準</td></tr>
+          <tr><td><strong>rem</strong></td><td>ルート基準。1rem=16px</td></tr>
+          <tr><td><strong>object-fit: cover</strong></td><td>比率を保ってトリミング</td></tr>
+          <tr><td><strong>max-width / min-width</strong></td><td>最大幅 / 最小幅</td></tr>
+          <tr><td><strong>メディアクエリ</strong></td><td>画面幅でCSSを切り替える（@media）</td></tr>
+          <tr><td><strong>ブレイクポイント</strong></td><td>切り替える画面幅の数値</td></tr>
+          <tr><td><strong>モバイルファースト</strong></td><td>スマホから先に作る考え方</td></tr>
+          <tr><td><strong>aタグ / href / target="_blank"</strong></td><td>リンク / 飛び先 / 別タブ</td></tr>
+          <tr><td><strong>@charset "UTF-8";</strong></td><td>CSS1行目に書く文字コード宣言</td></tr>
+          <tr><td><strong>margin: 0 auto</strong></td><td>左右autoで要素を中央寄せ</td></tr>
+          <tr><td><strong>:active / :hover</strong></td><td>押下中 / カーソル乗った時の疑似クラス</td></tr>
+          <tr><td><strong>opacity</strong></td><td>要素全体の不透明度（0〜1）</td></tr>
+          <tr><td><strong>box-shadow</strong></td><td>影（X / Y / ぼかし / 色）</td></tr>
+          <tr><td><strong>::before / ::after</strong></td><td>CSSで作る飾りの疑似要素（content必須）</td></tr>
+          <tr><td><strong>Emmet</strong></td><td>VSCodeの省略記法（a*3 でタブ展開）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li><strong>まず px と %</strong> を使いこなす（%は親要素基準）</li>
+      <li><strong>1rem = 16px</strong> を覚える</li>
+      <li>画面いっぱい画像の3点セット（width:100%/height:100vh/object-fit:cover）</li>
+      <li><code>width:100% + max-width:1200px</code> のコンビ</li>
+      <li>メディアクエリの<strong>半角スペース</strong>を忘れない</li>
+      <li>モバイルファーストの意味を説明できる</li>
+      <li>aタグの href / target="_blank" / ヌルリンク # を使い分け</li>
+      <li>CSS1行目に <code>@charset "UTF-8";</code></li>
+      <li><strong>要素の中央（margin auto）とテキスト中央（text-align center）</strong>の違い</li>
+      <li>:active で押し込みアニメを再現</li>
+      <li>::before/::after は <strong>content 必須</strong>を覚える</li>
+      <li><strong>Emmet（a*3, ul&gt;li*3, p40-20）</strong>を試す</li>
+    </ul>
+    <h3 style="margin-top:28px;">今日の演習の見本（カードレイアウト）</h3>
+    <figure style="margin:18px 0;">
+      <img src="img/card_exercise.png" alt="先生の板書：カードレイアウト演習の見本と条件（中央揃え・カード間隔80px・上から120px・各カードをリンク化）" style="width:100%; max-width:920px; display:block; margin:0 auto; border:1px solid var(--border); border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">▲ 先生の板書（Figma）：3枚のカードを中央に横並び。カード間隔80px・上から120pxの余白・各カードをリンク化（リンク先はnullでOK）。今日習った単位＋中央寄せ＋リンクの総合演習</figcaption>
+    </figure>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言</h2>
+    <blockquote>% は<strong>画面幅じゃなくて親要素</strong>。よく間違える。あくまでも親要素です。</blockquote>
+    <blockquote>まず <strong>px と % が使いこなせれば大体のものを作れる</strong>。こっから先は次のステップでいい。</blockquote>
+    <blockquote><code>screen and (...)</code> の<strong>半角スペースを入れてください。これがないと動かないです。</strong>めちゃくちゃよくあるミス。</blockquote>
+    <blockquote>ブレイクポイントの数字に<strong>最適解はない</strong>。常に変動する。</blockquote>
+    <blockquote>疑似要素は<strong>あくまで装飾なので選択できない</strong>。詰まるところやっぱり装飾なんでね。</blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-19｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

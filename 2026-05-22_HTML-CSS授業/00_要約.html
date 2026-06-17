@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mdn Tours 講師例：制作手順・リセット・幅と継承・AIコーディング余談｜2026年5月22日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年5月22日｜講師：A先生（訓練校 IT スクール）</div>
+  <h1>Mdn Tours 講師例：制作手順・リセット・幅と継承・AIコーディング余談</h1>
+  <p class="subtitle">訓練校 IT スクール｜全4時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ 3時間36分</span>
+    <span>📖 レッスン5 講師例（総合演習の解説）</span>
+    <span>🎯 講師例, 制作手順, リセットCSS, ress/normalize, クラス命名, ちょこちょこ確認, 等倍/2倍画像, 幅の継承, margin 0 auto, 詳細度, フォント継承, :not対処, strong, AIコーディング, プロンプト, Figmaカンプ</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏰</span>今日の流れ（講師例デー）</h2>
+    <div class="callout primary">
+      <span class="label">💡 今日はこういう日</span>
+      <p style="margin:0;">
+        昨日(5/21)に自力で作った<strong>「Mdn Tours」の講師例</strong>＝先生がゼロから本番コーディングするのを見る日。<mark>HTML構造づくり → リセット → CSSで上から組む</mark>という制作の流れを、実況で追える。最後にAIコーディングの余談も。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:120px">時間</th><th>セクション</th></tr></thead>
+        <tbody>
+          <tr><td>1時間目</td><td><a href="#reset">リセットCSS（外部 vs 自作）</a></td></tr>
+          <tr><td>1時間目</td><td><a href="#flow">制作手順とクラス命名</a></td></tr>
+          <tr><td>2時間目〜</td><td><a href="#check">ちょこちょこブラウザ確認・画像の等倍/2倍</a></td></tr>
+          <tr><td>2〜3時間目</td><td><a href="#inherit">幅の継承・共通設定と上書き</a></td></tr>
+          <tr><td>3時間目</td><td><a href="#font-inherit">フォント系プロパティは孫まで継承</a></td></tr>
+          <tr><td>終盤</td><td><a href="#ai">余談：AIにコーディングしてもらう話</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="must">
+    <h2 class="section-title"><span class="icon">🎯</span>今日おさえる10個</h2>
+    <ul class="check-list">
+      <li>リセットCSSは<strong>外部の有名なもの</strong>でもOK。ただし<mark>中身を理解して使う</mark></li>
+      <li>制作手順＝<strong>HTML構造 → リセット読込 → style.css</strong></li>
+      <li>CSSは<strong>外枠→内側・上→下</strong>（body→header→main→footer、各中身）</li>
+      <li>クラス名は<strong>共通（section-title等）と独自（C/S/P/R…）</strong>を分ける</li>
+      <li><strong>ちょこちょこブラウザ確認</strong>（先生でもやる。まとめ書きは後で大変）</li>
+      <li>画像は高解像度モニター用に<strong>2倍で来る</strong>ことがある→<code>h1</code>等に<code>width</code>指定</li>
+      <li><code>width:100%</code> は<strong>親の幅を上へ上へと継承</strong>していく</li>
+      <li>共通設定はCSSの<strong>上</strong>に、独自の上書きは<strong>下</strong>に書く</li>
+      <li><strong>フォント系（色・サイズ・揃え）は孫要素まで継承</strong>する（flexは子まで）</li>
+      <li>セレクターが効かない時は<mark>divで囲む or クラス名で上書き</mark>（深追いしない）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="reset">
+    <h2 class="section-title"><span class="icon">🧹</span>リセットCSS（外部 vs 自作）</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        ブラウザの初期スタイルを打ち消すCSS。世の中に<strong>有名なリセットCSSがたくさん</strong>あり、ダウンロードして読み込むのもアリ。でも<mark>「何がリセットされるか」を理解せずに使うと、どこを直せばいいか分からなくなる</mark>ので注意。
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px">有名なリセットCSS</th><th>特徴</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ress</strong></td><td>モダンで使いやすい定番</td></tr>
+          <tr><td><strong>The New CSS Reset</strong></td><td>新しめ。ほぼ全部リセット</td></tr>
+          <tr><td><strong>normalize.css</strong></td><td>消しすぎず差を整える</td></tr>
+          <tr><td><strong>sanitize.css</strong></td><td>normalize＋実用的な初期値</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="bullet-pro">
+      <li>便利そうだから読むのではなく、<strong>中身を何回か読んで把握</strong>してから使う</li>
+      <li>難しい記述も入っているので、全部とは言わずとも<mark>ある程度は目を通す</mark></li>
+      <li>仕事では<strong>会社が独自のリセットCSSを1個持っている</strong>のが普通。就職したらそれに沿う</li>
+    </ul>
+    <p style="font-size:14px;color:var(--text-soft);">今回の講師例は最低限を自作：<code>text-decoration</code>消し、<code>list-style: none</code>、<code>border-collapse/spacing</code>、画像の <code>width</code> 調整など。</p>
+  </section>
+
+  <hr class="divider">
+
+  <section id="flow">
+    <h2 class="section-title"><span class="icon">🪜</span>制作手順とクラス命名</h2>
+    <h3>① 制作の順番</h3>
+    <ol class="bullet-pro">
+      <li><strong>HTMLの構造</strong>をサクッと作る（header / main-visual / section×4 / image / footer）</li>
+      <li><strong>リセットCSS</strong>を用意（読み込みだけ先に書く）</li>
+      <li><strong>style.css</strong>を上から：外枠（body→header→main→footer）→各中身</li>
+    </ol>
+    <div class="callout success">
+      <span class="label">🔑 「出来上がったら次」の積み上げ</span>
+      <p style="margin:0;">ヘッダー完成 → メインビジュアル → キャンペーン → スケジュール → … と<strong>1ブロックずつ完成させて次へ</strong>。先生は完成したコードを<mark>折りたたんで隠す</mark>（見やすさのため）。</p>
+    </div>
+
+    <h3>② クラス名の付け方</h3>
+    <ul class="bullet-pro">
+      <li><strong>共通のデザイン</strong>（同じ見た目のタイトル等）＝同じクラス名（例 <code>section-title</code> / <code>section-container</code>）で一括管理</li>
+      <li><strong>独自のもの</strong>＝セクション頭文字（Campaign→C、Schedule→S、Price→P、Reservation→R…）で <code>C〇〇</code> のように</li>
+      <li>「ここ同じデザインだな」と気づいたら<mark>共通クラスにまとめるチャンス</mark></li>
+      <li>※あくまで先生の流儀。他の付け方も不正解ではない</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="check">
+    <h2 class="section-title"><span class="icon">👀</span>ちょこちょこ確認・画像の等倍/2倍</h2>
+    <div class="callout primary">
+      <span class="label">💡 一番大事な習慣</span>
+      <p style="margin:0;">
+        書いたCSSが<strong>頭の中のイメージ通りにブラウザに出ているか</strong>を、<mark>こまめに確認</mark>する。「margin書いたからすき間つく」「font-size上げたから大きくなる」——この感覚が育つと強い。<strong>先生でもちょこちょこ確認する</strong>。まとめ書きしてから間違い探しは大変だから。
+      </p>
+    </div>
+    <h3>画像の等倍・2倍（メモ必須）</h3>
+    <ul class="bullet-pro">
+      <li>高解像度モニター（Retina等）で綺麗に見せるため、画像は<strong>2倍サイズで書き出して縮小表示</strong>することがよくある（バナー等）</li>
+      <li>2倍画像をそのまま置くと大きく出るので、<code>h1</code> などに <strong><code>width</code> を明示指定</strong>して原寸に収める</li>
+      <li>今回は練習なので等倍。実務では「ちょい大きめで送られてくる」前提を覚えておく</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="inherit">
+    <h2 class="section-title"><span class="icon">📦</span>幅の継承・共通設定と上書き</h2>
+    <div class="callout primary">
+      <span class="label">💡 width:100% は上へ継承する</span>
+      <p style="margin:0;">
+        <code>img { width:100% }</code> ＝<strong>親要素の幅いっぱい</strong>。その親がさらに <code>width</code> 未指定なら、<mark>その上の親 → さらに上 → bodyまで遡って</mark>幅が決まる。だからメインビジュアルの画像は何も書かずとも画面幅いっぱいになる（リセットだけでうまくいく）。
+      </p>
+    </div>
+    <p>例：<code>img(100%)</code> → <code>.mv</code>（幅未指定）→ <code>main</code>（幅未指定）→ <code>body</code> ＝ 画面幅。ブロック要素は<strong>親の幅を継承</strong>するのでこうなる。</p>
+
+    <h3>中央配置と共通設定</h3>
+<pre><span class="comment">/* 共通設定はCSSの上の方に */</span>
+<span class="selector">.section-container</span> <span class="punct">{</span>
+    <span class="property">width</span><span class="punct">:</span> <span class="value">70%</span><span class="punct">;</span>
+    <span class="property">margin</span><span class="punct">:</span> <span class="value">0 auto</span><span class="punct">;</span>       <span class="comment">/* 左右autoで中央配置 */</span>
+    <span class="property">padding</span><span class="punct">:</span> <span class="value">40px 0 60px</span><span class="punct">;</span>  <span class="comment">/* 全セクション共通の上下余白 */</span>
+<span class="punct">}</span>
+<span class="selector">.section-title</span> <span class="punct">{</span>
+    <span class="property">border-bottom</span><span class="punct">:</span> <span class="value">4px solid</span><span class="punct">;</span>  <span class="comment">/* 見出し下の線は border（marginではない） */</span>
+    <span class="property">color</span><span class="punct">:</span> <span class="value">white</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+    <div class="callout">
+      <span class="label">📌 上書きは「下に書く」or「クラスの方が強い」</span>
+      <p style="margin:0;">共通設定を上に書き、<strong>個別で変えたい所だけ下で上書き</strong>。<code>.campaign期間</code> のような<mark>クラスセレクターは要素セレクターより優先される（詳細度が高い）</mark>ので上書きできる。</p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="font-inherit">
+    <h2 class="section-title"><span class="icon">🔤</span>フォント系プロパティは孫まで継承</h2>
+    <div class="callout primary">
+      <span class="label">💡 やさしく解説</span>
+      <p style="margin:0;">
+        <code>color</code> / <code>font-size</code> / <code>text-align</code> / <code>letter-spacing</code> などの<strong>文字系プロパティ</strong>は、<mark>子だけでなく孫・その先まで継承される傾向</mark>がある。だから親に <code>color: white</code> を1回書けば、中の文字が全部白くなる。
+      </p>
+    </div>
+    <div class="compare">
+      <div class="compare-col">
+        <h4 style="color:var(--primary);border-bottom-color:var(--primary);">文字系（color等）</h4>
+        <ul><li><strong>孫・ひ孫まで継承</strong>される傾向</li><li>親に1回書けば中身全部に効く</li></ul>
+      </div>
+      <div class="compare-col">
+        <h4 style="color:var(--accent);border-bottom-color:var(--accent);">display: flex</h4>
+        <ul><li><strong>子要素までしか</strong>効かない</li><li>孫は横並びにならない</li></ul>
+      </div>
+    </div>
+    <p style="font-size:14px;color:var(--text-soft);">※「絶対」ではなく「傾向」。でも実務では「文字色は親にまとめて書く」と覚えておくと楽。</p>
+
+    <h3>セレクターが効かない時の対処</h3>
+    <p><code>:not(:last-of-type)</code> や <code>:last-of-type</code> が思った通り効かないことがある。そんな時は<strong>深追いせず</strong>：</p>
+    <ul class="bullet-pro">
+      <li><code>div</code> で囲んで、その中で <code>:first-child</code> 等を使う</li>
+      <li>または<strong>クラス名を付けて</strong>直接上書き（確実）</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="parts">
+    <h2 class="section-title"><span class="icon">🧱</span>講師例で出た細かいタグ・テク</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:180px">項目</th><th>ポイント</th></tr></thead>
+        <tbody>
+          <tr><td><code>&lt;strong&gt;</code></td><td>強調（太字＋意味）。実務では直接書くより<mark>ブログ更新画面で使う</mark>イメージ</td></tr>
+          <tr><td><code>list-style: none</code></td><td>リストの黒丸/番号を消す。逆に出したい所はリセットしすぎ注意</td></tr>
+          <tr><td>テーブル</td><td>料金表は <code>table/tr/th/td</code>（コピペで素早く）</td></tr>
+          <tr><td>フォーム</td><td>ラジオは <code>name</code> 同じ＋<code>label</code>紐付け。ボタンは <code>button</code> でも <code>input</code> でも違いなし</td></tr>
+          <tr><td>フッター</td><td><code>address</code>（連絡先）＋ <code>small</code>（コピーライト）</td></tr>
+          <tr><td>叩き台思考</td><td>まず雑に組んで、CSS書きながら「このタグ要る/要らない」を足し引き</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="ai">
+    <h2 class="section-title"><span class="icon">🤖</span>余談：AIにコーディングしてもらう話</h2>
+    <div class="callout primary">
+      <span class="label">💡 これからの話（今は関係なくてOK）</span>
+      <p style="margin:0;">
+        先生が<strong>AI（Codex / Gemini など）にMdn Toursを丸ごとコーディングさせた例</strong>も共有。<mark>Figmaの共有URLをAIに貼って「このFigmaを解析してコーディングして」と指示するだけ</mark>で、ほぼ手を入れずに形になったとのこと。
+      </p>
+    </div>
+    <ul class="bullet-pro">
+      <li><strong>プロンプト</strong>＝AIへの指示文（チャット欄に入れるお願い）</li>
+      <li>やり取りは数回（レスポンシブ対応して／ここがズレてる、等）＝5回くらい</li>
+      <li>※Figmaデータの読み込みは<strong>有料機能</strong>（別途お金がかかる）</li>
+    </ul>
+    <div class="callout success">
+      <span class="label">🔑 だから今の勉強がムダにならない</span>
+      <p style="margin:0;">
+        AIで作れる時代でも──<br>
+        ① <strong>Figmaでどれだけちゃんとカンプを作れるか</strong>が超重要（AIはそれを読む）<br>
+        ② <strong>最後は自分の手で直さないといけない</strong>ので、今のHTML/CSSの知識は<mark>絶対にムダにならない</mark>
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📖</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><strong>リセットCSS</strong></td><td>ブラウザ初期スタイルを打ち消すCSS（ress/normalize等）</td></tr>
+          <tr><td><strong>制作手順</strong></td><td>HTML構造→リセット→style.css（外枠→内側、上→下）</td></tr>
+          <tr><td><strong>共通クラス / 独自クラス</strong></td><td>同じ見た目はまとめる / 個別はC〇〇等で分ける</td></tr>
+          <tr><td><strong>等倍 / 2倍</strong></td><td>原寸 / 高解像度モニター用に倍サイズ書き出し→縮小表示</td></tr>
+          <tr><td><strong>幅の継承</strong></td><td>width:100%は親の幅、その親が未指定ならさらに上へ遡る</td></tr>
+          <tr><td><strong>margin: 0 auto</strong></td><td>左右autoでブロック要素を中央配置（width必須）</td></tr>
+          <tr><td><strong>詳細度</strong></td><td>セレクターの強さ。クラスセレクターは要素セレクターより強い</td></tr>
+          <tr><td><strong>継承（フォント系）</strong></td><td>color等は孫以降まで効く。display:flexは子まで</td></tr>
+          <tr><td><strong>strong</strong></td><td>強調（太字＋意味）</td></tr>
+          <tr><td><strong>叩き台</strong></td><td>まず雑に組んだ最初の土台。後から足し引きする</td></tr>
+          <tr><td><strong>プロンプト</strong></td><td>AIへの指示文</td></tr>
+          <tr><td><strong>Codex / Gemini</strong></td><td>コードを書けるAIツール</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>チェックリスト</h2>
+    <ul class="check-list">
+      <li>リセットCSSは中身を理解して使う（外部でも自作でも）</li>
+      <li>制作は <strong>HTML構造 → リセット → style.css</strong> の順</li>
+      <li>CSSは外枠→内側・上→下、<strong>1ブロックずつ完成</strong>させて次へ</li>
+      <li>共通デザインは共通クラスで一括、独自は個別クラスで</li>
+      <li><strong>ちょこちょこブラウザ確認</strong>する習慣</li>
+      <li>画像は2倍で来ることがある→<code>width</code>指定で原寸に</li>
+      <li><code>width:100%</code>は親の幅を上へ継承する仕組みを理解</li>
+      <li>共通は上・上書きは下、クラスは要素より優先（詳細度）</li>
+      <li>文字系プロパティ（color等）は<strong>孫まで継承</strong>、flexは子まで</li>
+      <li>セレクターが効かない時は<strong>divで囲む or クラスで上書き</strong></li>
+      <li>AI時代でも<strong>Figmaのカンプ力＋最後の手直し</strong>が大事＝今の勉強は活きる</li>
+    </ul>
+  </section>
+
+  <hr class="divider">
+
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生の名言・小ネタ</h2>
+    <div class="callout">
+      <p style="margin:0;">「<strong>先生でもちょこちょこ確認しますからね。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ こまめなブラウザ確認はプロでも基本。まとめ書きの間違い探しは大変。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>便利そうだから読み込む、では危険。何がリセットされてるか分からないままになる。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ リセットCSSは中身理解が前提、という戒め。</span></p>
+    </div>
+    <div class="callout">
+      <p style="margin:0;">「<strong>結局つまるところ最後は自分の手で直さなきゃいけないので、今の勉強が無駄になることは絶対ない。</strong>」<br>
+      <span style="font-size:14px;color:var(--text-soft);">→ AIコーディング全盛でも、HTML/CSSの基礎力は土台として効く。</span></p>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-05-25｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>
