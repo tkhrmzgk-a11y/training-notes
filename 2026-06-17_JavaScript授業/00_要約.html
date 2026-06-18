@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>JavaScript 4日目：querySelectorAll・配列・for/forEach（複数要素の繰り返し処理）｜2026年6月17日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月17日｜講師：A先生</div>
+  <h1>JavaScript 4日目：querySelectorAll・配列・for/forEach（複数要素の繰り返し処理）</h1>
+  <p class="subtitle">訓練校｜全5時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業（録画分割3本構成）</span>
+    <span>📖 JavaScript（複数要素の取得と繰り返し処理）</span>
+    <span>🎯 querySelectorAll・配列(array)・for文・.length・forEach・命名慣習</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    JavaScript 4日目。まず昨日の<strong>ハンバーガーメニュー実装をゼロから復習演習</strong>。後半は本日の主役 <strong>「複数の要素を一気に扱う」</strong> ための3点セット：<strong>querySelectorAll</strong>（複数要素を取得）／<strong>配列(array)</strong>（番号付きの箱の集まり）／<strong>ループ文(for文・forEach)</strong>（繰り返し処理）。最後にナビゲーションの各リンクをクリックしたら自動でメニューが閉じる動きを <code>forEach</code> で書き直し、<strong>「コピペじゃなくプログラム化する」</strong>感覚を体験。
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#review">ハンバーガーメニュー復習演習（ゼロから）</a></li>
+      <li><a href="#qsa">querySelectorAll（複数要素の取得）</a></li>
+      <li><a href="#array">配列(array)とは？</a></li>
+      <li><a href="#for">for文（ループの基本）</a></li>
+      <li><a href="#length">.length プロパティ（要素数の自動取得）</a></li>
+      <li><a href="#navlinks-event">navLinks[i] にイベントを付ける</a></li>
+      <li><a href="#anti-copypaste">「コピペ厳禁」プログラム的考え方</a></li>
+      <li><a href="#foreach">forEach メソッド（配列専用の便利ループ）</a></li>
+      <li><a href="#naming">命名の慣習（複数形と単数形）</a></li>
+      <li><a href="#object">おまけ：オブジェクトの形式</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>区切りベース（タイムスタンプなしの文字起こしのため）。<span class="star">★★★</span>＝特に重要。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:120px;">区切り</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1時間目 序盤</td><td><a href="#review">ハンバーガーメニュー実装演習（昨日の続き・ゼロから書き直し）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#review">Google Drive から「ハンバーガー演習」フォルダをダウンロード→各自実装</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目 序盤</td><td><a href="#qsa">querySelectorAll の解説（複数要素を nodelist で取得）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#array">配列(array)とは：番号付き(0始まり)の箱の集まり</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#array">配列名[インデックス] で中身を取り出す書き方</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#for">★for文の構造：<code>for (let i=0; i&lt;4; i++) {...}</code></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#for">変数 i を array[i] のインデックスに使う発想</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#length">.length プロパティで要素数を自動取得（"こんにちは!".length → 6）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目 終盤</td><td><a href="#navlinks-event">navLinks[i].addEventListener('click', ...) で全リンクにイベント付与</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目 終盤</td><td><a href="#anti-copypaste">「コピペは急なエラーのきっかけ」プログラム化の考え方</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>4時間目 序盤</td><td><a href="#object">おまけ：オブジェクト形式（キー: 値）の話に少し触れる</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td>5時間目 序盤</td><td><a href="#foreach">★forEach メソッドの紹介（配列専用の便利ループ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>5時間目</td><td><a href="#foreach">for文をforEachに書き換える演習</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>5時間目</td><td><a href="#naming">命名の慣習：navigationLinks（複数形）／navigationLink（単数）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>5時間目 終盤</td><td>残り1時間は質問タイム＆自由制作時間</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>querySelectorAll</h4><p>複数の要素を <strong>NodeList（配列のようなもの）</strong> でまとめて取得。<code>document.querySelectorAll('.link')</code></p></div>
+      <div class="card"><span class="num">2</span><h4>配列＝箱の集まり</h4><p>番号は <strong>0始まり</strong>。番号のことを <strong>「インデックス」</strong> と呼ぶ。<code>array[2]</code> で3番目を取り出す。</p></div>
+      <div class="card"><span class="num">3</span><h4>配列の書き方</h4><p><code>let array = ['hoge1', 'hoge2', 5, true];</code> 文字列・数値・真偽値<strong>何でも入る</strong>。</p></div>
+      <div class="card"><span class="num">4</span><h4>for文の構造</h4><p><code>for (let i=0; i&lt;4; i++) { ... }</code> 「初期値・条件・増減」の3点セット。<strong>条件が true の間繰り返す</strong>。</p></div>
+      <div class="card"><span class="num">5</span><h4>変数 i がインデックス</h4><p>ループのたびに i が 0, 1, 2, 3... と増える。それを <code>array[i]</code> に渡して順番に取り出す。</p></div>
+      <div class="card"><span class="num">6</span><h4>.length で自動化</h4><p>固定の <code>4</code> ではなく <code>array.length</code>。<strong>要素が増減しても自動で対応</strong>する賢いコード。</p></div>
+      <div class="card"><span class="num">7</span><h4>全リンクにクリックイベント</h4><p><code>navLinks[i].addEventListener('click', ...)</code> をループの中で。<strong>1つずつ書かなくていい</strong>。</p></div>
+      <div class="card"><span class="num">8</span><h4>コピペは罪</h4><p>同じ処理を回数分書くのは <strong>エラーの温床</strong>。ループで自動化＝プログラム的考え方。</p></div>
+      <div class="card"><span class="num">9</span><h4>forEach メソッド</h4><p><code>array.forEach((item) =&gt; {...})</code>。<strong>配列専用</strong>のもっと簡潔なループ。for文より読みやすい。</p></div>
+      <div class="card"><span class="num">10</span><h4>命名は複数/単数</h4><p>取得結果は <code>navigationLinks</code>（複数形）、forEach の中の1個は <code>navigationLink</code>（単数）。<strong>マナー的なお作法</strong>。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== ハンバーガーメニュー復習演習 ===== -->
+  <section id="review">
+    <h2 class="section-title"><span class="icon">🔁</span>ハンバーガーメニュー復習演習（ゼロから）</h2>
+    <p>昨日の最後で予告した <strong>「ハンバーガーメニューの開閉」</strong> 実装を、A先生がサンプルサイトを共有して<strong>ゼロから書き直し</strong>する演習からスタート。</p>
+
+    <div class="callout">
+      <span class="label">演習の流れ</span>
+      <ol style="margin:8px 0 0;">
+        <li>Google Drive で共有された「ハンバーガー演習」フォルダをダウンロード</li>
+        <li>JavaScriptディレクトリの中に配置</li>
+        <li>README（A先生は「爆弾ファイル」と命名 笑）を読む</li>
+        <li>各自で <code>classList.toggle()</code> を使って開閉ロジックを書く</li>
+        <li>1時間ほど作業時間 → A先生が解説</li>
+      </ol>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">最小実装の感覚（昨日の予告どおり）</span>
+<pre style="margin:8px 0 0; padding:14px;"><span class="comment">// アイコンと、開閉対象の各要素を取得</span>
+<span class="selector">const</span> <span class="property">hamburgerIcon</span>     = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#hamburgerIcon'</span>)<span class="punct">;</span>
+<span class="selector">const</span> <span class="property">globalNavigation</span>  = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#globalNavigation'</span>)<span class="punct">;</span>
+<span class="selector">const</span> <span class="property">closeArea</span>         = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#closeArea'</span>)<span class="punct">;</span>
+
+<span class="comment">// アイコンをクリックしたら .open を付け外し（CSS側で見え方が変わる）</span>
+<span class="property">hamburgerIcon</span>.<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span>
+  <span class="property">hamburgerIcon</span>.<span class="property">classList</span>.<span class="property">toggle</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+  <span class="property">globalNavigation</span>.<span class="property">classList</span>.<span class="property">toggle</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+  <span class="property">closeArea</span>.<span class="property">classList</span>.<span class="property">toggle</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+<span class="punct">}</span>)<span class="punct">;</span></pre>
+      ※ CSS 側で <code>.open</code> が付いたときのスタイル（×への変形・ナビ表示・暗幕表示）は<strong>既に書いてある前提</strong>。JS は<strong>クラスの付け外しだけ</strong>。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== querySelectorAll ===== -->
+  <section id="qsa">
+    <h2 class="section-title"><span class="icon">🎯</span>querySelectorAll（複数要素の取得）</h2>
+    <p>今日の本題。<strong>「メニュー内のAタグを全部まとめて取得したい」</strong> ような場面で <code>querySelector</code> は1番目しか取れない。そこで <code>querySelectorAll</code>。</p>
+
+    <div class="callout">
+      <span class="label">基本の対比</span>
+      <ul style="margin:8px 0 0;">
+        <li><code>document.querySelector('.link')</code> ← <strong>最初の1個だけ</strong>取得</li>
+        <li><code>document.querySelectorAll('.link')</code> ← <strong>マッチする全部</strong>を取得（NodeList ＝ 配列のようなもの）</li>
+      </ul>
+    </div>
+
+    <pre><span class="comment">// ナビゲーション内の全Aタグを一括取得</span>
+<span class="selector">const</span> <span class="property">navigationLinks</span> = <span class="property">document</span>.<span class="property">querySelectorAll</span>(<span class="value">'.global-navigation a'</span>)<span class="punct">;</span>
+<span class="property">console</span>.<span class="property">log</span>(<span class="property">navigationLinks</span>)<span class="punct">;</span>
+<span class="comment">// → NodeList(4) [a, a, a, a]  ← 4個の要素が「配列っぽい形」で取れる</span></pre>
+
+    <div class="callout primary">
+      <span class="label">「配列のようなもの」とは？</span>
+      取得結果は厳密には <strong>NodeList</strong> という型だが、<strong>番号でアクセスできる・<code>.length</code> が使える・<code>forEach</code> も使える</strong>ので、実用上は配列とほぼ同じ扱いでOK。
+    </div>
+  </section>
+
+  <!-- ===== 配列 ===== -->
+  <section id="array">
+    <h2 class="section-title"><span class="icon">📦</span>配列(array)とは？</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/array_definition.png"
+           alt="先生の板書：配列(array)とは？複数のデータを番号順に入れた大きな箱のイメージ。番号は0から始まりインデックスと呼ぶ。0,1,2,3,4の5マスにデータ。例: let array = ['hoge1','hoge2','hoge3', 5, true]; console.log(array[2]); → hoge3が出力される"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：配列＝番号付きの箱の集まり。<strong>0始まり</strong>の番号を<strong>インデックス</strong>と呼ぶ
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">配列の基本ルール</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>複数のデータを番号順に入れる「大きな箱」</strong></li>
+        <li>番号は <strong>0 から始まる</strong>（1ではない）</li>
+        <li>この番号のことを <strong>「インデックス」</strong> と呼ぶ</li>
+        <li>取り出すときは <strong><code>配列名[インデックス]</code></strong></li>
+        <li>中身は<strong>何でも混ぜられる</strong>（文字列・数値・真偽値…）</li>
+      </ul>
+    </div>
+
+    <pre><span class="comment">// 文字列・数値・真偽値の混在もOK</span>
+<span class="selector">let</span> <span class="property">array</span> = [<span class="value">'hoge1'</span>, <span class="value">'hoge2'</span>, <span class="value">'hoge3'</span>, <span class="value">5</span>, <span class="value">true</span>]<span class="punct">;</span>
+<span class="property">console</span>.<span class="property">log</span>(<span class="property">array</span>[<span class="value">2</span>])<span class="punct">;</span> <span class="comment">// → 'hoge3' （0,1,<strong>2</strong>番目）</span></pre>
+  </section>
+
+  <!-- ===== for文 ===== -->
+  <section id="for">
+    <h2 class="section-title"><span class="icon">🔁</span>for文（ループの基本）</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/for_syntax.png"
+           alt="先生の板書：ループ文〜for文〜。プログラムの得意なことにもう一つ「繰り返す」がある。例えば6件まで記事のカードを表示するとかを繰り返し分で表現すると条件は「6以下」となり処理内容は「カードの表示」。html等で同じコードを6回書くのではなく、繰り返し(for文)で一度のコードの塊を6回繰り返すなどということができたりする。右側に for (let i=0; i < navigationLink.length; i++) {  navigationLink[i].addEventListener('click', ...) classList.removeなど } の完成形コードと「ループ文で作らなかったら？」の手書き"
+           style="width:100%; max-width:1200px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：左＝for文の概念説明、右＝navLinksに対する完成形コード、下に「ループ文で作らなかったら？」の手書き
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">for文の3点セット（書き方）</span>
+<pre style="margin:8px 0 0; padding:14px;"><span class="selector">for</span> (<span class="property">初期値</span><span class="punct">;</span> <span class="property">繰り返し条件</span><span class="punct">;</span> <span class="property">条件を満たす計算</span>) <span class="punct">{</span>
+  <span class="comment">// 繰り返したい処理</span>
+<span class="punct">}</span></pre>
+      代表的な書き方：<code>for (let i = 0; i &lt; 4; i++) { ... }</code><br>
+      <strong>i = 0</strong> から始まり、<strong>i &lt; 4</strong> の間だけ、<strong>i++（i+1）</strong> しながらブロックを実行。
+    </div>
+
+    <pre><span class="comment">// 0,1,2,3 と console に出力される</span>
+<span class="selector">for</span> (<span class="selector">let</span> <span class="property">i</span> = <span class="value">0</span><span class="punct">;</span> <span class="property">i</span> &lt; <span class="value">4</span><span class="punct">;</span> <span class="property">i++</span>) <span class="punct">{</span>
+  <span class="property">console</span>.<span class="property">log</span>(<span class="property">i</span>)<span class="punct">;</span>
+<span class="punct">}</span>
+<span class="comment">// 出力: 0, 1, 2, 3</span></pre>
+
+    <h3>変数 i を「配列のインデックス」として使う</h3>
+
+    <figure style="margin:18px 0;">
+      <img src="img/array_index_for.png"
+           alt="先生の板書：配列+navigationLinkの図、for文と配列の連動。中身を使いたい時 array[index]の書き方をする なので！→navigationLink。for文で定義している変数を巧みに使ってみる。変数iはfor文の条件により1ずつ足されていく変動している変数になっている。i=0,i=1,i=2... そのため、array[]のインデックスを変数にしてあげれば配列内のデータを順番に取り出すことができる！"
+           style="width:100%; max-width:1200px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：<code>navigationLink[i]</code> の <code>i</code> を for文の変数にすることで、配列を順番に取り出せる
+      </figcaption>
+    </figure>
+
+    <pre><span class="comment">// navigationLinks の中身を順番に表示</span>
+<span class="selector">for</span> (<span class="selector">let</span> <span class="property">i</span> = <span class="value">0</span><span class="punct">;</span> <span class="property">i</span> &lt; <span class="value">4</span><span class="punct">;</span> <span class="property">i++</span>) <span class="punct">{</span>
+  <span class="property">console</span>.<span class="property">log</span>(<span class="property">navigationLinks</span>[<span class="property">i</span>])<span class="punct">;</span>
+<span class="punct">}</span>
+<span class="comment">// 出力: &lt;a&gt;サービス&lt;/a&gt;, &lt;a&gt;About&lt;/a&gt;, ... ←各Aタグが1つずつ</span></pre>
+
+    <div class="callout primary">
+      <span class="label">💡 これが今日のキモ</span>
+      <strong>「for文の変数 i を、配列の <code>[i]</code> に入れる」</strong>——たったこれだけで、配列を1個ずつ全部取り出せる。<br>
+      querySelectorAll で取った要素群を1個ずつ操作したいときの<strong>定番パターン</strong>。
+    </div>
+  </section>
+
+  <!-- ===== .length ===== -->
+  <section id="length">
+    <h2 class="section-title"><span class="icon">📏</span>.length プロパティ（要素数の自動取得）</h2>
+    <p>上の例で <code>i &lt; 4</code> と <strong>4 を固定で書いた</strong>が、これは危険。<strong>リンクが5本に増えた瞬間に4のまま＝最後の1本が取れない</strong>。</p>
+
+    <div class="callout">
+      <span class="label">.length とは</span>
+      <code>.value</code> と同じく、取得した要素や配列の中にあるプロパティの1つ。<strong>「データの数（要素数）」</strong>を返してくれる。
+    </div>
+
+    <pre><span class="comment">// 文字列の長さも .length</span>
+<span class="selector">let</span> <span class="property">msg</span> = <span class="value">'こんにちは!'</span><span class="punct">;</span>
+<span class="property">console</span>.<span class="property">log</span>(<span class="property">msg</span>.<span class="property">length</span>)<span class="punct">;</span> <span class="comment">// → 6（6文字）</span>
+
+<span class="comment">// 配列の要素数も .length</span>
+<span class="property">console</span>.<span class="property">log</span>(<span class="property">navigationLinks</span>.<span class="property">length</span>)<span class="punct">;</span> <span class="comment">// → 4</span></pre>
+
+    <div class="callout primary">
+      <span class="label">for文の条件を「数」ではなく「.length」にする</span>
+<pre style="margin:8px 0 0; padding:14px;"><span class="selector">for</span> (<span class="selector">let</span> <span class="property">i</span> = <span class="value">0</span><span class="punct">;</span> <span class="property">i</span> &lt; <span class="property">navigationLinks</span>.<span class="property">length</span><span class="punct">;</span> <span class="property">i++</span>) <span class="punct">{</span>
+  <span class="property">console</span>.<span class="property">log</span>(<span class="property">navigationLinks</span>[<span class="property">i</span>])<span class="punct">;</span>
+<span class="punct">}</span></pre>
+      → <strong>Aタグが増えても減ってもJSは触らなくていい</strong>。配列の中身に合わせて自動で回数が変わる。「非常にプログラム的な考え方」。
+    </div>
+  </section>
+
+  <!-- ===== navLinks イベント ===== -->
+  <section id="navlinks-event">
+    <h2 class="section-title"><span class="icon">🖱️</span>navLinks[i] にイベントを付ける</h2>
+    <p>for文の中で <code>navigationLinks[i]</code> に直接 <code>addEventListener</code> を付ければ、<strong>全リンクに一気にクリックイベント</strong>を設定できる。</p>
+
+    <pre><span class="selector">for</span> (<span class="selector">let</span> <span class="property">i</span> = <span class="value">0</span><span class="punct">;</span> <span class="property">i</span> &lt; <span class="property">navigationLinks</span>.<span class="property">length</span><span class="punct">;</span> <span class="property">i++</span>) <span class="punct">{</span>
+  <span class="property">navigationLinks</span>[<span class="property">i</span>].<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span>
+    <span class="comment">// Aタグをクリックしたらハンバーガーメニューを閉じる</span>
+    <span class="property">globalNavigation</span>.<span class="property">classList</span>.<span class="property">remove</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+    <span class="property">hamburgerIcon</span>.<span class="property">classList</span>.<span class="property">remove</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+    <span class="property">closeArea</span>.<span class="property">classList</span>.<span class="property">remove</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+  <span class="punct">}</span>)<span class="punct">;</span>
+<span class="punct">}</span></pre>
+
+    <div class="callout">
+      <span class="label">無名関数でいい場面</span>
+      コールバックを別の関数に切り出さず、その場で書く <strong>「無名関数」</strong> でOK。<br>
+      理由：このクリック処理は「ナビ閉じる」という<strong>1か所でしか使わない</strong>から、わざわざ名前を付けて関数化する必要がない。
+    </div>
+  </section>
+
+  <!-- ===== コピペ厳禁 ===== -->
+  <section id="anti-copypaste">
+    <h2 class="section-title"><span class="icon">⚠️</span>「コピペ厳禁」プログラム的考え方</h2>
+    <p>もし for文を使わずに <strong>同じことを4回書いた</strong> らどうなるか？</p>
+
+    <pre><span class="comment">// for文を使わない版（悪い例）</span>
+<span class="property">navigationLinks</span>[<span class="value">0</span>].<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span> <span class="comment">/* ... */</span> <span class="punct">}</span>)<span class="punct">;</span>
+<span class="property">navigationLinks</span>[<span class="value">1</span>].<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span> <span class="comment">/* ... */</span> <span class="punct">}</span>)<span class="punct">;</span>
+<span class="property">navigationLinks</span>[<span class="value">2</span>].<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span> <span class="comment">/* ... */</span> <span class="punct">}</span>)<span class="punct">;</span>
+<span class="property">navigationLinks</span>[<span class="value">3</span>].<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span> <span class="comment">/* ... */</span> <span class="punct">}</span>)<span class="punct">;</span>
+<span class="comment">// Aタグが5本に増えたら…全部書き直し</span></pre>
+
+    <div class="callout primary">
+      <span class="label">A先生の考え方</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>コピペは急なエラーのきっかけ</strong>。ケアレスミスの温床。</li>
+        <li><strong>人がやるのが一番怪しい</strong>。エラーの確率が高いのは「人」。</li>
+        <li>だからこそ <strong>プログラム化して自動化</strong> する。ループ文で囲んで条件と実行内容を書く。</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== forEach ===== -->
+  <section id="foreach">
+    <h2 class="section-title"><span class="icon">✨</span>forEach メソッド（配列専用の便利ループ）</h2>
+    <p>5時間目、for文と同じことを<strong>もっと短く・読みやすく</strong>書ける別パターンを紹介。</p>
+
+    <div class="callout">
+      <span class="label">構文とメソッドの違い（A先生の整理）</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>構文</strong>：<code>if</code> / <code>for</code> など、JavaScript の「文法」そのもの</li>
+        <li><strong>メソッド</strong>：<code>querySelectorAll</code> / <code>classList.remove</code> / 今回の <code>forEach</code> など、変数や要素に「ドット」でつなげて呼ぶ機能</li>
+      </ul>
+      forEach は <strong>メソッド</strong>。配列にドットでつなげて使う。
+    </div>
+
+    <h3>forEach の書き方</h3>
+    <pre><span class="property">配列</span>.<span class="property">forEach</span>((<span class="property">中身のデータ</span>) => <span class="punct">{</span>
+  <span class="comment">// 各データに対する処理</span>
+<span class="punct">}</span>)<span class="punct">;</span></pre>
+
+    <p>パラメータ（カッコの中の変数名）は<strong>自分で命名</strong>。意味のある名前にする（後述）。</p>
+
+    <h3>for文 → forEach への書き換え</h3>
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>for文</h4>
+<pre style="margin:0; padding:14px; font-size:12px;"><span class="selector">for</span> (<span class="selector">let</span> <span class="property">i</span> = <span class="value">0</span><span class="punct">;</span> <span class="property">i</span> &lt; <span class="property">navigationLinks</span>.<span class="property">length</span><span class="punct">;</span> <span class="property">i++</span>) <span class="punct">{</span>
+  <span class="property">navigationLinks</span>[<span class="property">i</span>].<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span>
+    <span class="property">globalNavigation</span>.<span class="property">classList</span>.<span class="property">remove</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+  <span class="punct">}</span>)<span class="punct">;</span>
+<span class="punct">}</span></pre>
+      </div>
+      <div class="compare-col right">
+        <h4>forEach（読みやすい！）</h4>
+<pre style="margin:0; padding:14px; font-size:12px;"><span class="property">navigationLinks</span>.<span class="property">forEach</span>((<span class="property">navigationLink</span>) => <span class="punct">{</span>
+  <span class="property">navigationLink</span>.<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span>
+    <span class="property">globalNavigation</span>.<span class="property">classList</span>.<span class="property">remove</span>(<span class="value">'open'</span>)<span class="punct">;</span>
+  <span class="punct">}</span>)<span class="punct">;</span>
+<span class="punct">}</span>)<span class="punct">;</span></pre>
+      </div>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">A先生の結論</span>
+      <ul style="margin:8px 0 0;">
+        <li>for文も forEach も<strong>できることは同じ</strong></li>
+        <li>ただし <strong>配列の中身を取り出すだけ</strong>なら forEach の方が<strong>条件を自分で書かなくていい＝楽</strong></li>
+        <li>現場では「配列処理＝forEach」が定番</li>
+        <li>for文は<strong>もっと汎用</strong>（配列以外の繰り返しも書ける）なので、両方押さえておく</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== 命名 ===== -->
+  <section id="naming">
+    <h2 class="section-title"><span class="icon">🏷️</span>命名の慣習（複数形と単数形）</h2>
+    <p>これは「あるある」のお作法。A先生も「英語は弱いけど複数形ぐらいは知ってる」と笑いながら。</p>
+
+    <div class="callout">
+      <span class="label">複数の要素を入れる変数 → 複数形</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>navigationLinks</strong>（複数のリンク群）</li>
+        <li><strong>items</strong>（複数のアイテム）</li>
+        <li><strong>cards</strong>（複数のカード）</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">forEach の中の1個 → 単数形</span>
+<pre style="margin:8px 0 0; padding:14px;"><span class="comment">// navigationLinks（複数形） を 1個ずつ navigationLink（単数）として扱う</span>
+<span class="property">navigationLinks</span>.<span class="property">forEach</span>((<span class="property">navigationLink</span>) => <span class="punct">{</span>
+  <span class="property">navigationLink</span>.<span class="property">addEventListener</span>(<span class="value">'click'</span>, ...)<span class="punct">;</span>
+<span class="punct">}</span>)<span class="punct">;</span>
+
+<span class="comment">// items → item / cards → card など</span></pre>
+      コードが英文として自然に読めるようになる。
+    </div>
+  </section>
+
+  <!-- ===== オブジェクト ===== -->
+  <section id="object">
+    <h2 class="section-title"><span class="icon">🗂️</span>おまけ：オブジェクトの形式</h2>
+    <p>4時間目、A先生がオブジェクトの話に少し触れた（少しややこしかったが要点だけ）。</p>
+
+    <div class="callout">
+      <span class="label">配列 vs オブジェクト</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>配列</strong>：キー（番号）は <code>0, 1, 2, 3...</code> 自動採番。<code>array[0]</code> で取り出す</li>
+        <li><strong>オブジェクト</strong>：キーが<strong>自分で名前を付けた文字列</strong>。<code>car.name</code> や <code>car['name']</code> で取り出す</li>
+      </ul>
+    </div>
+
+    <pre><span class="comment">// オブジェクトの例（車1台ぶんのデータ）</span>
+<span class="selector">const</span> <span class="property">car</span> = <span class="punct">{</span>
+  <span class="property">name</span>: <span class="value">'プリウス'</span><span class="punct">,</span>
+  <span class="property">maker</span>: <span class="value">'TOYOTA'</span><span class="punct">,</span>
+  <span class="property">year</span>: <span class="value">2024</span>
+<span class="punct">}</span><span class="punct">;</span>
+
+<span class="property">console</span>.<span class="property">log</span>(<span class="property">car</span>.<span class="property">name</span>)<span class="punct">;</span>  <span class="comment">// → 'プリウス'</span></pre>
+
+    <p>※ 今日はサラッと紹介のみ。本格的な使い方は明日以降。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>querySelectorAll</td><td>マッチする全要素を NodeList で取得するメソッド</td></tr>
+          <tr><td>NodeList</td><td>querySelectorAll の返り値の型。配列のような形（番号でアクセス可・<code>.length</code>・<code>forEach</code> あり）</td></tr>
+          <tr><td>配列 / array</td><td>複数のデータを番号順に入れた箱。<code>[要素1, 要素2, ...]</code></td></tr>
+          <tr><td>インデックス</td><td>配列の番号。<strong>0始まり</strong></td></tr>
+          <tr><td>ループ文 / 繰り返し処理</td><td>同じ処理を回数分だけ実行する仕組み</td></tr>
+          <tr><td>for文</td><td>最もシンプルなループ構文。<code>for (初期値; 条件; 増減) {...}</code></td></tr>
+          <tr><td>i / 変数 i</td><td>for文で使う慣習的なカウンタ変数名（index の i）</td></tr>
+          <tr><td>i++</td><td><code>i = i + 1</code> の省略形。1ずつ増やす</td></tr>
+          <tr><td>.length</td><td>配列の要素数 / 文字列の文字数を返すプロパティ</td></tr>
+          <tr><td>forEach メソッド</td><td>配列専用の便利ループ。<code>配列.forEach((要素) =&gt; {...})</code></td></tr>
+          <tr><td>無名関数</td><td>名前を付けずにその場で書く関数。コールバックでよく使う</td></tr>
+          <tr><td>構文 vs メソッド</td><td>構文＝言語の文法（if/for）／メソッド＝変数や要素にドットで呼ぶ機能</td></tr>
+          <tr><td>オブジェクト</td><td>キー（名前）と値のペアで構造化したデータ。<code>{name: '...', maker: '...'}</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li><strong>ハンバーガーメニュー演習</strong>を最後まで通す（querySelectorAll + forEach で全Aタグに閉じる動作）</li>
+      <li>for文を <code>for (let i = 0; i &lt; ◯.length; i++)</code> で書く癖をつける（数を固定にしない）</li>
+      <li>forEach で書き換えてみる：変数名は単数形に（<code>navigationLink</code> など）</li>
+      <li>📝 <strong>A先生からのお題</strong>：いろんなWebサイトを見て<strong>「どこに JS が使われているか」</strong>を観察。ハンバーガー以外にも、開閉・タブ切替・モーダル等いっぱいある。</li>
+      <li>明日まで JavaScript。明後日以降は <strong>レスポンシブWebデザインの制作時間</strong>（実装＋A先生・B先生からのフィードバック）。これまでに作ったポートフォリオに JS を導入するチャンス。</li>
+      <li>余裕がある人：オブジェクト（<code>{key: value}</code> 形式）も軽く調べておくと明日の理解が早い</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">📣 来週以降のスケジュール（A先生告知）</span>
+      <ul style="margin:8px 0 0;">
+        <li>JavaScript は明日まで（5日目）</li>
+        <li>その後 <strong>1週間ちょい</strong>、ガッキー自身のプロジェクト制作時間（HTML/CSS/JS統合）</li>
+        <li>制作中は A先生・B先生が<strong>見守り＋呼べばコメント・フィードバック</strong>するスタイル</li>
+        <li>カンプ（デザインカンプ）にテキストコメントを入れる形式もアリ</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>コピペは急なエラーのきっかけです、ケアレスミスのきっかけです。なのでそれより、プログラム化して自動化させた方がよっぽど安心安全です。<span class="citation">── プログラム的考え方の真髄</span></blockquote>
+    <blockquote>人がやることが一番エラーの確率が高いので、こういったものは一個一個書くのではなく、ちゃんと繰り返し処理とかをしてループ文等で囲んで、しっかり条件を書いて実行内容を書く。<span class="citation">── 自動化が安全</span></blockquote>
+    <blockquote>今からやることが for文でできることなので、別に for文を覚えていればOKです。ただ実際の現場・お仕事になってくると、配列を取り出すぐらいだったら forEach の方が楽よね、っていう考え方があるので、こういう書き方するよ、っていうイメージです。<span class="citation">── forEachを使う理由</span></blockquote>
+    <blockquote>普段見てもらえているうちのサイトのどこに JS が使われているか、調べてみてもらえたら。<span class="citation">── 観察眼を養うお題</span></blockquote>
+    <blockquote>かなり難しいとは思いますが、これを覚えておく必要があるので、ちょっとしっかりどこかで触れておいてください。<span class="citation">── ループ＋配列の重要性</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-18｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

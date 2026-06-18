@@ -224,6 +224,7 @@
     <span>⏱ ライブ授業（録画分割2本構成）</span>
     <span>📖 JavaScript（テンプレートリテラル・条件分岐）</span>
     <span>🎯 テンプレートリテラル・if文・else if・演算子・条件設計</span>
+    <span>🔮 次回予告：classList・ハンバーガーメニュー</span>
   </div>
 </header>
 
@@ -234,6 +235,7 @@
     <span class="label">この日のまとめ（ひと言）</span>
     JavaScript 3日目。前日の演習1の答え合わせから始まり、新トピックは2つ：<strong>テンプレートリテラル</strong>（<code>+</code>連結の進化形）と、本日の主役 <strong>条件分岐（if文・else if文）</strong>。
     カラーピッカーで「<strong>白だったら(white)、黒だったら(black)、それ以外はカラーコード</strong>」と表示を切り替える動きを実装。<strong>演算子</strong>（算術・比較・論理）も整理した。
+    授業の最後に <strong>次回予告：classList で「クラス名の付け外し」を学んで、ハンバーガーメニューの開閉を実装する</strong> と A先生から告知。
   </div>
 
   <!-- ===== 目次 ===== -->
@@ -250,6 +252,7 @@
       <li><a href="#operators">演算子（算術・比較・論理）</a></li>
       <li><a href="#elseif">else if文（複数条件）</a></li>
       <li><a href="#colorpicker-done">カラーピッカー完成コード</a></li>
+      <li><a href="#next-preview">🔮 次回予告：classList とハンバーガーメニュー</a></li>
       <li><a href="#glossary">用語集</a></li>
       <li><a href="#homework">宿題・復習チェック</a></li>
       <li><a href="#quotes">先生のことば</a></li>
@@ -283,6 +286,7 @@
           <tr><td>3時間目 開始</td><td><a href="#elseif">★else if 文（白/黒/その他の3分岐）</a></td><td class="center"><span class="star">★★★</span></td></tr>
           <tr><td>3時間目</td><td><a href="#elseif">else if は何個でも増やせる（PHP・WordPressで活躍）</a></td><td class="center"><span class="star">★★</span></td></tr>
           <tr><td>3時間目</td><td><a href="#colorpicker-done">カラーピッカー完成・ノートまとめタイム</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目 終盤</td><td><a href="#next-preview">🔮 次回予告：classList（クラス名の付け外し）でハンバーガーメニューの開閉を作る</a></td><td class="center"><span class="star">★★</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -573,6 +577,76 @@
 
   <hr class="divider">
 
+  <!-- ===== 次回予告 ===== -->
+  <section id="next-preview">
+    <h2 class="section-title"><span class="icon">🔮</span>次回予告：classList とハンバーガーメニュー</h2>
+    <p>授業の最後（残り40秒）に A先生から告知。<strong>明日は「クラス名の管理」を JavaScript で行い、それを使ってハンバーガーメニューの開閉（表示／非表示）を実装する</strong>。いろんなWebサイトで見るあの動きを、自分で書けるようになる。</p>
+
+    <h3>① classList とは？（クラス名の付け外し）</h3>
+    <figure style="margin:18px 0;">
+      <img src="img/classlist_methods.png"
+           alt="先生の板書：classListとは？HTML要素のclass周りを操作できるプロパティ。classList自体はプロパティで、その後に用意されているメソッド（add/remove/contain/toggle）を使って実際にclassを操作する。例: variable.classList.method('class-name')"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：<code>classList</code> の4メソッド（add / remove / contains / toggle）と書式 <code>variable.classList.method('class-name')</code>
+      </figcaption>
+    </figure>
+
+    <div class="callout primary">
+      <span class="label">classList のメソッド4種類</span>
+      <div class="table-wrap" style="margin-top:8px;">
+        <table>
+          <thead><tr><th style="width:200px;">メソッド</th><th>役割</th></tr></thead>
+          <tbody>
+            <tr><td><code>classList.add('name')</code></td><td>対象の要素に <strong>class名を付与</strong>する</td></tr>
+            <tr><td><code>classList.remove('name')</code></td><td>対象の要素から <strong>class名を削除</strong>する</td></tr>
+            <tr><td><code>classList.contains('name')</code></td><td>対象の要素に <strong>そのクラス名があるか</strong>を判別する（true/false を返す）</td></tr>
+            <tr><td><code>classList.toggle('name')</code></td><td>あれば削除・無ければ付与の <strong>切り替え</strong>。ハンバーガーメニューでめちゃくちゃ便利</td></tr>
+          </tbody>
+        </table>
+      </div>
+      書式は <code>変数.classList.メソッド('class名')</code>。変数 ＝ <code>document.querySelector</code> で取った要素。
+    </div>
+
+    <h3>② ハンバーガーメニューを作ろう！</h3>
+    <figure style="margin:18px 0;">
+      <img src="img/hamburger_menu_preview.png"
+           alt="先生の板書：ハンバーガーメニューを作ろう！ハンバーガーアイコンをXにする・ここをクリックしたら→ナビゲーションを表示させる（positionで画面の右外側に隠しているナビをshowに）。ポイント！すでにCSSでハンバーガー→X切り替えとナビ表示のスタイルは記述済み"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：ハンバーガーメニュー完成イメージ。アイコンをクリック→Xに変形＋画面外のナビが表示される
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">ポイント（先生の板書より）</span>
+      すでに CSS で <strong>ハンバーガー→X の変形スタイル</strong>と <strong>ナビゲーションを表示するスタイル</strong>は「記述済み」。JS でやることは <strong>クラス名を付け外しするだけ</strong>。<br>
+      → 「アイコンをクリックしたら <code>.is-active</code> クラスを付与／削除する」という発想。CSS は <code>.is-active</code> がついた時のスタイルを最初から書いておく＝JS は <code>classList.toggle('is-active')</code> 1行でいい。
+    </div>
+
+    <div class="callout success">
+      <span class="label">実装イメージ（明日やる予定）</span>
+<pre style="margin:8px 0 0; padding:14px;"><span class="comment">// アイコン要素を取得</span>
+<span class="selector">const</span> <span class="property">hamburger</span> = <span class="property">document</span>.<span class="property">querySelector</span>(<span class="value">'#hamburger'</span>)<span class="punct">;</span>
+
+<span class="comment">// クリックしたらクラスを付け外し</span>
+<span class="property">hamburger</span>.<span class="property">addEventListener</span>(<span class="value">'click'</span>, () => <span class="punct">{</span>
+  <span class="property">hamburger</span>.<span class="property">classList</span>.<span class="property">toggle</span>(<span class="value">'is-active'</span>)<span class="punct">;</span>
+<span class="punct">}</span>)<span class="punct">;</span></pre>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">先生のアドバイス</span>
+      「いろんなWebサイトで見ると、こういう実装をやってるんだなって想像がつくと思います」——<strong>プロのサイトを見るときに「これJSで書いてるな」と気付けるようになる</strong>のが今回の到達点。
+    </div>
+  </section>
+
+  <hr class="divider">
+
   <!-- ===== 用語集 ===== -->
   <section id="glossary">
     <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
@@ -591,6 +665,10 @@
           <tr><td>比較演算子</td><td><code>== != &gt; &lt; &gt;= &lt;=</code>（条件用）</td></tr>
           <tr><td>論理演算子</td><td><code>&amp;&amp;</code>（かつ）<code>||</code>（または）<code>!</code>（否定）</td></tr>
           <tr><td>true / false</td><td>真／偽。ifは true なら実行、false なら else へ</td></tr>
+          <tr><td>classList <span style="color:var(--accent); font-weight:600;">[次回]</span></td><td>HTML要素のclass周りを操作するプロパティ。続けてメソッドを呼ぶ</td></tr>
+          <tr><td>classList.add / remove <span style="color:var(--accent); font-weight:600;">[次回]</span></td><td>クラス名を付与 / 削除する</td></tr>
+          <tr><td>classList.toggle <span style="color:var(--accent); font-weight:600;">[次回]</span></td><td>あれば削除・なければ付与の切り替え。ハンバーガーで大活躍</td></tr>
+          <tr><td>classList.contains <span style="color:var(--accent); font-weight:600;">[次回]</span></td><td>そのクラス名があるか判別。true/false を返す</td></tr>
         </tbody>
       </table>
     </div>
@@ -608,6 +686,8 @@
       <li><strong>演算子3種類</strong>（算術・比較・論理）を一通り頭に入れる</li>
       <li>余裕がある人は <strong>else if を増やして</strong>色のバリエーションを追加してみる</li>
       <li>うまくいかない人はノートまとめ・コード見直しの時間に</li>
+      <li>🔮 <strong>次回までに：classList のメソッド4つ</strong>（add / remove / contains / toggle）を見ておく。ハンバーガーメニュー実装で使う</li>
+      <li>🔮 <strong>気が向いたら：いろんなWebサイトのハンバーガーメニュー</strong>を観察してみる（「これJSでクラス付け外ししてるな」と想像できるようになる）</li>
     </ul>
     <div class="callout">
       <span class="label">📣 先生からのアドバイス</span>
@@ -623,18 +703,19 @@
     <blockquote>条件に分けて結果を変えることをプログラミングでは「条件分岐」と呼びます。プログラミングの大の得意な部分です。<span class="citation">── 条件分岐の本質</span></blockquote>
     <blockquote>条件の作り方とかのアイデア出しは、経験則からいろいろ作れるようになるんですけど、最初は多分その辺がちょっと難しいんじゃないかなと思います。<span class="citation">── 慣れるまでの覚悟</span></blockquote>
     <blockquote>年に1人くらい、プログラミング面白いって言って趣味でゲーム作っちゃいましたみたいな人がいますね。時間と余裕のある方はぜひチャレンジしてみるのがいいんじゃないかなと思います。<span class="citation">── インベーダーゲームも作れる</span></blockquote>
+    <blockquote>JavaScriptって何度も言うように初めてやるのは難しいので、なかなかどこをポイントに重きにしてみるか見つけづらいとは思うんですけれども、慣れるまで辛抱というところですかね。<span class="citation">── 演習1の出来具合（半々）を踏まえて</span></blockquote>
+    <blockquote>いろんなWebサイトを見たときに、こんなような実装をやってるんだなっていうのが想像つくと思います。<span class="citation">── ハンバーガーメニューを習う意義</span></blockquote>
+    <blockquote>では残り40秒弱、皆さんも実装して動かしてみてください。では頑張っていきましょ。<span class="citation">── この日の締めくくり</span></blockquote>
   </section>
 
 
   <footer>
     <p>
-      📁 関連ファイル<br>
-      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
-      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+      📁 図版：先生のFigmaボード（板書）から該当箇所を切り抜き → <code>img/</code> に配置
     </p>
     <p style="margin-top:24px;">
-      生成日: 2026-06-17｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
-      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+      初版生成日: 2026-06-17｜2026-06-17 夜にGemini Live caption の文字起こし（3パート）と板書PNGを元に再構築（次回予告セクション・classList/ハンバーガーメニューの図版を追加）<br>
+      ※ 文字起こしは自動生成のため固有名詞・専門用語に誤認識が含まれますが、要約は文脈補正済み
     </p>
   </footer>
 
