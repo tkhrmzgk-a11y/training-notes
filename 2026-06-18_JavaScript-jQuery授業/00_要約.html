@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>JavaScript 5日目：jQuery & Slickプラグイン（フルスクリーンスライダー実装）｜2026年6月18日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月18日｜講師：A先生</div>
+  <h1>JavaScript 5日目：jQuery & Slickプラグイン（フルスクリーンスライダー実装）</h1>
+  <p class="subtitle">訓練校｜全5時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業（録画分割3本構成）</span>
+    <span>📖 JavaScript（jQuery + Slickプラグイン）</span>
+    <span>🎯 jQuery・バニラJS・CDN・.min圧縮・読み込み順・jQueryプラグイン・Slick・スライダー実装</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    JavaScript 5日目（最終日）。バニラJSから一歩進んで <strong>jQuery</strong>（JSをWeb向けに簡単にしたライブラリ）と <strong>jQueryプラグイン</strong> の話へ。今日のメインは <strong>Slick</strong> という超有名スライダープラグインの導入。jQuery本体をCDNで読み込み、Slickプラグインを組み合わせて、メインビジュアル用のフルスクリーン自動スライダーを完成させた。<strong>「読み込み順」</strong>と<strong>「ファイルの圧縮(.min)」</strong>と<strong>「依存関係」</strong>の理解がキモ。
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#jquery-intro">jQueryとは？（歴史と立ち位置）</a></li>
+      <li><a href="#vanilla-js">バニラJSという呼び方</a></li>
+      <li><a href="#prep">スライダー演習：HTML/CSS/画像の準備</a></li>
+      <li><a href="#jquery-load">jQuery本体の読み込み（CDN vs ローカル）</a></li>
+      <li><a href="#min-file">.min ファイル＝圧縮ファイルとは</a></li>
+      <li><a href="#load-order">⚠️ 読み込み順番が超大事</a></li>
+      <li><a href="#googlefonts-q">受講者Bさんの質問：Googleフォントの読み込み順も同じ？</a></li>
+      <li><a href="#jquery-plugin">jQueryプラグインとは？</a></li>
+      <li><a href="#slick-intro">Slick の紹介（国内サイトのスライダーは半分Slick）</a></li>
+      <li><a href="#slick-load">Slick の読み込み（CSS×2 + JS）</a></li>
+      <li><a href="#slick-init">Slick の初期化コード＆オプション</a></li>
+      <li><a href="#slick-customize">Slickのカスタマイズ＆復習タイム</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>区切りベース（タイムスタンプなしの文字起こしのため）。<span class="star">★★★</span>＝特に重要。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:120px;">区切り</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1時間目 序盤</td><td><a href="#jquery-intro">jQueryとは？歴史・なぜ生まれたか・JSのバージョンアップとの関係</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#vanilla-js">「バニラJS」という業界用語（シンプル＝バニラ）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目 中盤</td><td><a href="#prep">jQuery/sliderディレクトリ作成・画像3枚以上ダウンロード（1500px〜）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目 末</td><td><a href="#prep">main-vコンテナ+MVアイテムエリアをdivで・CSSで画面いっぱいに調整</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>2時間目 序盤</td><td><a href="#jquery-load">jQuery公式サイトからダウンロード／CDNJSから読み込み（v3.7.1安定版）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#min-file">.min＝圧縮ファイル（インデント・改行なしの軽量版）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#load-order">★読み込み順番：jQuery → 自作JS（自作は<strong>後</strong>で読み込む）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#googlefonts-q">受講者Bさん：Googleフォントの読み込み順も同じ？→ 同じ</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目 序盤</td><td><a href="#jquery-plugin">jQueryプラグイン＝jQueryの拡張機能（VS Codeの拡張機能と同じ感覚）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#slick-intro">Slick紹介：国内スライダーの半分以上がSlickというレベルの定番</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#slick-load">Slick CSS×2 + jQuery + slick.min.js の4ファイル読み込み</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>4時間目</td><td><a href="#slick-init">★Slick初期化：<code>$('.your-class').slick({ options })</code></a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>4時間目</td><td><a href="#slick-init">主要オプション：arrows / autoplay / autoplaySpeed / speed / fade</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>4時間目</td><td><a href="#slick-init">マウスオーバー時の停止対策（pauseOnHover等を false）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>5時間目</td><td><a href="#slick-customize">残り時間は各自でSlickオプションを触る・JS復習</a></td><td class="center"><span class="star">★★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>jQueryとは</h4><p>JavaScript を <strong>Web向けに簡単な記述</strong> にしてくれた約20年前のライブラリ。今でも現役、特に複雑アニメーション。</p></div>
+      <div class="card"><span class="num">2</span><h4>バニラJS</h4><p>何も使わない <strong>素のJavaScript</strong>。バニラ＝シンプルの業界用語。これまで学んできたJSがバニラJS。</p></div>
+      <div class="card"><span class="num">3</span><h4>CDN vs ローカル</h4><p>jQuery読み込みは <strong>CDNでコピペ</strong> が楽。CDNはサーバー落ちリスクあり（ただしほぼない）。</p></div>
+      <div class="card"><span class="num">4</span><h4>安定版を使う</h4><p>最新が必ずしも良いとは限らない。<strong>1つ前の安定版（今回は3.7.1）</strong> が仕事では安牌。</p></div>
+      <div class="card"><span class="num">5</span><h4>.min＝圧縮ファイル</h4><p>インデント・改行を消した <strong>機械向けの軽量ファイル</strong>。本番公開用。中身は手書きしない/書き換えない。</p></div>
+      <div class="card"><span class="num">6</span><h4>読み込み順番</h4><p>jQuery（依存元） → プラグイン → <strong>自作JSは最後</strong>。後で読み込んだものが強い。</p></div>
+      <div class="card"><span class="num">7</span><h4>本体は触らない</h4><p>jQuery本体ファイルは絶対に <strong>書き換えない／削らない</strong>。壊れると動かなくなる。</p></div>
+      <div class="card"><span class="num">8</span><h4>jQueryプラグイン</h4><p>jQueryの<strong>拡張機能</strong>。jQuery読み込み後にプラグインを読み込むだけで便利機能が使える。</p></div>
+      <div class="card"><span class="num">9</span><h4>Slick</h4><p>スライダー実装の定番プラグイン。<strong>国内サイトの半分以上はSlickで実装</strong>と言われるレベル。</p></div>
+      <div class="card"><span class="num">10</span><h4>Slick初期化</h4><p><code>$('.your-class').slick({ オプション })</code> の<strong>3行で動く</strong>。HTML/CSS/JS の3点セットを揃えるだけ。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== jQueryとは ===== -->
+  <section id="jquery-intro">
+    <h2 class="section-title"><span class="icon">📚</span>jQueryとは？（歴史と立ち位置）</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/jquery_intro.png"
+           alt="先生の板書：jQueryとは？ざっくり言うと「JavaScriptをweb向けの簡単な記述方法にしてくれるライブラリ」。jsはwebページに対して動きをつけることが可能ですが、それ以外にも様々なプログラムを組むこともできます（ブラウザゲーム等）。つまりjsは色んなことができるものです。それゆえに、webコーダー等の職種の人からは「js難しい」と言われ続けていました。世の中の超頭のいい人たちが「jsをwebサイトにだけフォーカスを当てた記述方法」が作れれば、コーダーの人たちも扱いやすくなるんじゃないか？という背景から誕生したのが jQuery。手書きメモ：簡単に言えば ファイルのこと／シンプルなJS"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：jQuery誕生の歴史。「世の中の超頭のいい人たち」が JS を Web向けに簡単化した記述方法
+      </figcaption>
+    </figure>
+
+    <div class="callout primary">
+      <span class="label">A先生の説明（要点）</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>jQuery</strong>＝JavaScriptをWeb向けの簡単な記述方法にしてくれる <strong>ライブラリ（≒ファイル）</strong></li>
+        <li>JSは Web ページ以外にもゲームやアプリ等いろんなことができる → だから初心者には「難しい」と言われ続けた歴史</li>
+        <li>20年ぐらい前、超頭のいい人たちが <strong>「Webサイト向けだけにフォーカスした記述方法」</strong> として作ったのがjQuery</li>
+        <li>HTML/CSSと同じくらいの学習コストでJSのような動きを実装できるようになった → サイトに動きをつける時代の覇権</li>
+        <li>今もハンバーガー・スライダーなどでよく使われる現役の技術</li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">現代の立ち位置（A先生）</span>
+      この10年で <strong>JavaScript自体もバージョンアップ</strong> し、昔は jQuery でしか書けなかったことが <strong>バニラJS でも書ける</strong> ように。簡単な動き（ハンバーガー等）は今やバニラJSが主流。ただし <strong>複雑なアニメーション（スライダー等）</strong> は今でも jQuery+プラグインが圧倒的に楽。
+    </div>
+  </section>
+
+  <!-- ===== バニラJS ===== -->
+  <section id="vanilla-js">
+    <h2 class="section-title"><span class="icon">🍦</span>バニラJSという呼び方</h2>
+    <div class="callout">
+      <span class="label">なぜ「バニラ」？</span>
+      アイスクリームで一番シンプルな味＝バニラ。そこから業界用語で <strong>「シンプルな・素のままの」</strong> という意味で使われる。<br>
+      <strong>バニラJS</strong>＝何も使わずに JavaScript だけで書いた状態。
+    </div>
+    <div class="callout primary">
+      <span class="label">現場での会話例</span>
+      <ul style="margin:8px 0 0;">
+        <li>「このハンバーガーどうやって実装した？」「<strong>バニラで書いたよ</strong>」→ 何も使わずに純粋なJS</li>
+        <li>「<strong>jQueryに依存してるよ</strong>」→ jQuery頼り</li>
+        <li>※ ほかにも TypeScript など JavaScript ベースの書き方は色々あるが、皆さんが今学んでいる「素のJS」のことを業界では「バニラJS」と呼ぶ</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== 準備 ===== -->
+  <section id="prep">
+    <h2 class="section-title"><span class="icon">🛠️</span>スライダー演習：HTML/CSS/画像の準備</h2>
+    <p>jQuery + Slick でフルスクリーンスライダーを作る。まずは入れ物を用意。</p>
+
+    <div class="callout">
+      <span class="label">フォルダ構成</span>
+<pre style="margin:8px 0 0; padding:14px;">JavaScript/
+└── jQuery/
+    └── slider/             <span class="comment">// または carousel/（同義語）</span>
+        ├── index.html
+        ├── css/style.css
+        ├── js/script.js
+        └── images/         <span class="comment">// 画像3枚以上（1500px以上推奨）</span>
+            ├── 01.jpg
+            ├── 02.jpg
+            └── 03.jpg</pre>
+    </div>
+
+    <h3>画像の選び方</h3>
+    <ul class="bullet-pro">
+      <li><strong>3枚以上（最低2枚）</strong>用意</li>
+      <li><strong>1500px 以上</strong>の大きめ画像（メインビジュアル用なので）</li>
+      <li>フリー素材サイト or AI生成（ChatGPT等）でもOK</li>
+    </ul>
+
+    <h3>HTML（メインビジュアル）</h3>
+    <pre><span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-container"</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item-area"</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item"</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item"</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+    <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item"</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+<span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span></pre>
+    <p>CSS で <strong>画面いっぱい（width:100%, height:100vh など）</strong> に表示するよう調整。画像は <code>background-image</code> でセットすると後でうまく動く（Slickは<code>img</code>直接埋め込みで挙動が変わる場合があるため）。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== jQueryの読み込み ===== -->
+  <section id="jquery-load">
+    <h2 class="section-title"><span class="icon">⬇️</span>jQuery本体の読み込み（CDN vs ローカル）</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/jquery_load_order.png"
+           alt="先生の板書：jQueryの読み込みについて。jquery公式サイトよりダウンロードページからjquery本体のファイルをダウンロードできます。またはCDNでの読み込みも可能なので各種配布しているサイトから絶対パスなどをコピーしてきて読み込みでもOK。注意！jquery本体のファイルは絶対にいじらないでください、破損してしまいます。読み込みの順番がとても大事です、自作したファイルの「前」で読み込むようにしましょう。手書き：自作ファイルの前に読み込む／自作ファイル。HTMLコード例：CDNでのjquery読み込み→<script src='https://cdnjs.cloudflare.com/.../jquery.min.js' defer></script>、自作JSは下に。"
+           style="width:100%; max-width:1100px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：CDN読み込みの実例＋手書きメモで「自作ファイルの前に jQuery を読み込む」を強調
+      </figcaption>
+    </figure>
+
+    <h3>2通りの読み込み方法</h3>
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>① ローカルダウンロード</h4>
+        <p style="font-size:13px;">公式サイトの「Download」リンク → 右クリックで「リンク先を別名で保存」→ プロジェクト内に配置</p>
+        <pre style="margin:0; padding:14px; font-size:12px;"><span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"js/jquery-3.7.1.min.js"</span> <span class="property">defer</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span></pre>
+        <p style="font-size:13px;">メリット：オフラインでも動く／デメリット：ファイル管理が必要</p>
+      </div>
+      <div class="compare-col right">
+        <h4>② CDN（おすすめ）</h4>
+        <p style="font-size:13px;">CDNJS等のサイトから絶対パスをコピペ → HTMLに貼り付け</p>
+        <pre style="margin:0; padding:14px; font-size:12px;"><span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"</span> <span class="property">defer</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span></pre>
+        <p style="font-size:13px;">メリット：コピペだけで楽／デメリット：サーバー落ちたら動かない（ほぼないけど）</p>
+      </div>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">バージョン選びのコツ（A先生）</span>
+      最新版が必ずしも正解ではない。最新は <strong>「ベータ」</strong>＝他のものと噛み合うか分からないリスクがある。<br>
+      <strong>1個下の安定版</strong>（今回は <code>3.7.1</code>）を選ぶのが仕事的にも安牌。チーム配属後は先輩・上司の指示に従えばOK。
+    </div>
+  </section>
+
+  <!-- ===== .min ファイル ===== -->
+  <section id="min-file">
+    <h2 class="section-title"><span class="icon">📦</span>.min ファイル＝圧縮ファイルとは</h2>
+    <p>jQuery を取りに行くと <code>jquery.min.js</code> や <code>jquery.js</code> など複数のファイルがあって戸惑う。<strong>.min</strong> の意味を理解しておく。</p>
+
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>style.css（人間向け・読みやすい）</h4>
+<pre style="margin:0; padding:14px; font-size:12px;"><span class="selector">.btn</span> <span class="punct">{</span>
+  <span class="property">padding</span>: <span class="value">10px 20px</span><span class="punct">;</span>
+  <span class="property">color</span>: <span class="value">#fff</span><span class="punct">;</span>
+  <span class="property">background</span>: <span class="value">#1a3a5c</span><span class="punct">;</span>
+<span class="punct">}</span></pre>
+      </div>
+      <div class="compare-col right">
+        <h4>style.min.css（機械向け・軽い）</h4>
+<pre style="margin:0; padding:14px; font-size:12px;"><span class="selector">.btn</span><span class="punct">{</span><span class="property">padding</span>:<span class="value">10px 20px</span><span class="punct">;</span><span class="property">color</span>:<span class="value">#fff</span><span class="punct">;</span><span class="property">background</span>:<span class="value">#1a3a5c</span><span class="punct">}</span></pre>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">なぜ圧縮するの？</span>
+      <ul style="margin:8px 0 0;">
+        <li>インデント・改行・スペースは <strong>人間の読みやすさ用</strong>。コンピュータには不要</li>
+        <li>無駄を削るとファイルサイズが小さくなり、<strong>ページ読み込みが速くなる</strong></li>
+        <li>仕事によっては <strong>納品時にmin化したファイルをサーバーにアップ</strong> する文化もある</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">jQuery のファイル選び</span>
+      <ul style="margin:8px 0 0;">
+        <li><code>jquery.min.js</code>← <strong>圧縮版・全機能入り・本番用</strong>。これを使えばOK</li>
+        <li><code>jquery.js</code>← 非圧縮版（中身を読みたい時用）</li>
+        <li><code>jquery.slim.min.js</code>← Ajax等を省いた軽量版。<strong>初心者は触らない</strong>（何が削られているか分からないと危険）</li>
+        <li><code>.map</code>ファイル← デバッグ用、無視してOK</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== 読み込み順番 ===== -->
+  <section id="load-order">
+    <h2 class="section-title"><span class="icon">⚠️</span>読み込み順番が超大事</h2>
+
+    <div class="callout primary">
+      <span class="label">🚨 鉄則：自作JSは「最後」に読み込む</span>
+      <pre style="margin:8px 0 0; padding:14px;"><span class="comment">&lt;!-- ✅ 正しい順序 --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"jquery.min.js"</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span>           <span class="comment">&lt;!-- 1. 依存元 --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"slick.min.js"</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span>            <span class="comment">&lt;!-- 2. プラグイン（jQuery依存） --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"js/script.js"</span> <span class="property">defer</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span> <span class="comment">&lt;!-- 3. 自作（両方を使う） --&gt;</span></pre>
+    </div>
+
+    <div class="callout">
+      <span class="label">なぜ順番が大事？</span>
+      <ul style="margin:8px 0 0;">
+        <li>コードは <strong>上から下に読み込まれる</strong>（常識）</li>
+        <li>自作JSの中で jQuery の書き方を使うなら、自作JSが読まれる前に jQuery が<strong>準備完了している必要</strong>がある</li>
+        <li>順番が逆だと <strong>「jQuery が見つからない」エラー</strong> になる</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">「後で読み込んだ方が強い」原則</span>
+      ファイルは <strong>後で読み込んだもの</strong> が前のものを上書きできる。<br>
+      自作JSは「自分が書いたことを最終的に反映させたい」から、<strong>必ず最後</strong>に読み込む。
+    </div>
+  </section>
+
+  <!-- ===== Googleフォントの質問 ===== -->
+  <section id="googlefonts-q">
+    <h2 class="section-title"><span class="icon">❓</span>受講者Bさんの質問：Googleフォントの読み込み順も同じ？</h2>
+    <div class="callout">
+      <span class="label">質問</span>
+      「Googleフォントを<code>&lt;link&gt;</code>で読み込むときも、同じ感覚（自作CSSより前で読む）でいいですか？」
+    </div>
+    <div class="callout primary">
+      <span class="label">A先生の答え：はい、同じ</span>
+      <pre style="margin:8px 0 0; padding:14px;"><span class="comment">&lt;!-- ✅ 正しい順序 --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">link</span> <span class="property">rel</span>=<span class="value">"stylesheet"</span> <span class="property">href</span>=<span class="value">"https://fonts.googleapis.com/..."</span><span class="punct">&gt;</span>  <span class="comment">&lt;!-- 1. 外部 --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">link</span> <span class="property">rel</span>=<span class="value">"stylesheet"</span> <span class="property">href</span>=<span class="value">"css/reset.css"</span><span class="punct">&gt;</span>                  <span class="comment">&lt;!-- 2. リセット --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">link</span> <span class="property">rel</span>=<span class="value">"stylesheet"</span> <span class="property">href</span>=<span class="value">"css/style.css"</span><span class="punct">&gt;</span>                  <span class="comment">&lt;!-- 3. 自作CSS --&gt;</span></pre>
+      Googleフォントを <strong>自作CSSの後</strong> に読むと、(a) フォント指定時に「ない」エラー＋ (b) Googleフォント側のCSSで自作スタイルが上書きされる謎の事故、<strong>二重リスク</strong>が発生。
+    </div>
+    <p><strong>覚え方の一言：「自作ファイルは下で読み込め」</strong>（A先生）</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== jQueryプラグイン ===== -->
+  <section id="jquery-plugin">
+    <h2 class="section-title"><span class="icon">🧩</span>jQueryプラグインとは？</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/jquery_plugin.png"
+           alt="先生の板書：jQueryプラグインとは？言葉の通り、jQueryの拡張機能のことを指します。jqueryプラグインはjquery本体に依存しているファイルのことで、「jqueryが読み込まれていたら」そのプラグインファイル（主にjsファイル）を読み込むだけでアニメーションなどを簡単に実装できるもの。ポイント！jqueryプラグインはjquery本体に依存しているファイルなので、「jquery本体の後に読み込む」必要があります。今回使用してみるプラグイン：今回はスライダーを実装してみようと思いますので「slick」というjqueryプラグインを導入したいと思います"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：jQueryプラグイン＝jQueryの拡張機能。本体の<strong>後</strong>に読み込むのが鉄則
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">プラグインのイメージ</span>
+      <ul style="margin:8px 0 0;">
+        <li>VS Code に <strong>Live Server プラグイン</strong>を入れると Live Server 機能が増えるのと同じ感覚</li>
+        <li>jQuery本体＋プラグインファイル＝アニメーションが簡単に実装できる</li>
+        <li>世の中にたくさん公開されているプラグインファイル（主にJSファイル）を活用</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">🔁 読み込み順（再掲・超重要）</span>
+      <strong>jQuery本体 → プラグイン → 自作ファイル</strong> の順。プラグインは jQuery に依存しているので、絶対に jQuery より後で読む。
+    </div>
+  </section>
+
+  <!-- ===== Slick紹介 ===== -->
+  <section id="slick-intro">
+    <h2 class="section-title"><span class="icon">⭐</span>Slick の紹介（業界の定番）</h2>
+
+    <div class="callout">
+      <span class="label">Slick とは</span>
+      <ul style="margin:8px 0 0;">
+        <li>スライダー / カルーセル実装の <strong>超有名 jQuery プラグイン</strong></li>
+        <li>A先生いわく <strong>「日本の国内サイトのスライダー、半分以上はSlickで実装されてる」</strong> レベル</li>
+        <li>公式：<code>kenwheeler.github.io/slick/</code></li>
+        <li>各種デモあり：通常スライド／フェード／レスポンシブ／中央寄せ／無限ループ など</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">A先生の所感</span>
+      「スライダーを自作するのは超めんどくさい（普通に難しい）。とっても便利なものです。<strong>スライダー＝Slick</strong> っていうのは、もうみんなにすり込まれてるレベル」
+    </div>
+  </section>
+
+  <!-- ===== Slick読み込み ===== -->
+  <section id="slick-load">
+    <h2 class="section-title"><span class="icon">📥</span>Slick の読み込み（CSS×2 + JS）</h2>
+    <p>Slickの公式 README に記載の通り、以下を <code>&lt;head&gt;</code> 内で読み込む（CDNでOK）。</p>
+
+    <pre><span class="comment">&lt;!-- 1. Slick の CSS（基本スタイル） --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">link</span> <span class="property">rel</span>=<span class="value">"stylesheet"</span> <span class="property">href</span>=<span class="value">"https://cdn.../slick.css"</span><span class="punct">/&gt;</span>
+
+<span class="comment">&lt;!-- 2. Slick のテーマ CSS（矢印・ドット等の装飾） --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">link</span> <span class="property">rel</span>=<span class="value">"stylesheet"</span> <span class="property">href</span>=<span class="value">"https://cdn.../slick-theme.css"</span><span class="punct">/&gt;</span>
+
+<span class="comment">&lt;!-- 3. jQuery本体（v1.11以上） --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"https://cdnjs.../jquery/3.7.1/jquery.min.js"</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span>
+
+<span class="comment">&lt;!-- 4. Slick本体（jQueryの後！） --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"https://cdn.../slick.min.js"</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span>
+
+<span class="comment">&lt;!-- 5. 自作JS（最後！） --&gt;</span>
+<span class="punct">&lt;</span><span class="selector">script</span> <span class="property">src</span>=<span class="value">"js/script.js"</span> <span class="property">defer</span><span class="punct">&gt;&lt;/</span><span class="selector">script</span><span class="punct">&gt;</span></pre>
+
+    <div class="callout">
+      <span class="label">jquery-migrate は？</span>
+      公式READMEに jquery-migrate という追加ファイルが書かれているが、<strong>今回は不要</strong>。WordPress 導入時に自動で付いてくる程度の認識でOK。
+    </div>
+
+    <div class="callout primary">
+      <span class="label">HTML 構造のルール</span>
+      <ul style="margin:8px 0 0;">
+        <li>親要素に <strong>ユニークなクラス名（your-class）</strong> を付ける</li>
+        <li>子要素を入れる（divでも、imgでも、孫要素入りでも何でもOK）</li>
+        <li>この子要素が<strong>1枚ずつスライド</strong>される</li>
+      </ul>
+<pre style="margin:8px 0 0; padding:14px;"><span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"your-class main-v-item-area"</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item"</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item"</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+  <span class="punct">&lt;</span><span class="selector">div</span> <span class="property">class</span>=<span class="value">"main-v-item"</span><span class="punct">&gt;&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span>
+<span class="punct">&lt;/</span><span class="selector">div</span><span class="punct">&gt;</span></pre>
+    </div>
+  </section>
+
+  <!-- ===== Slick初期化 ===== -->
+  <section id="slick-init">
+    <h2 class="section-title"><span class="icon">🚀</span>Slick の初期化コード＆オプション</h2>
+
+    <figure style="margin:18px 0;">
+      <img src="img/slick_syntax.png"
+           alt="先生の板書：slickを動かすためのコード。slickを動かすためにはトリガーとなるコードを書く必要があります。htmlファイルに直接記述するか（インラインで書く）jsファイルを作成して記述をしましょう。コード： $(document).ready(function(){ $('.your-class').slick({ setting-name: setting-value }); }); 手書き：スライドさせたい要素の「親要素」のcssクラスセレクタの形式で入れる／オプション名を入れてね／オプションの値を入れてね"
+           style="width:100%; max-width:1100px; display:block; margin:0 auto;
+                  border:1px solid var(--border); border-radius:10px;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <figcaption style="font-size:13px; color:var(--muted); text-align:center; margin-top:8px;">
+        ▲ 先生の板書：Slick起動コードの構造。CSSセレクタ→<code>.slick()</code>→オプションのオブジェクト
+      </figcaption>
+    </figure>
+
+    <div class="callout primary">
+      <span class="label">script.js に書く Slick 起動コード</span>
+<pre style="margin:8px 0 0; padding:14px;"><span class="property">$</span>(<span class="property">document</span>).<span class="property">ready</span>(<span class="selector">function</span>() <span class="punct">{</span>
+  <span class="property">$</span>(<span class="value">'.your-class'</span>).<span class="property">slick</span>(<span class="punct">{</span>
+    <span class="property">'setting-name'</span>: <span class="value">'setting-value'</span><span class="punct">,</span>
+    <span class="comment">// ...オプションを並べる</span>
+  <span class="punct">}</span>)<span class="punct">;</span>
+<span class="punct">}</span>)<span class="punct">;</span></pre>
+      ・<code>$('.your-class')</code> ＝ <strong>スライドさせたい親要素</strong> の CSSクラスセレクタ<br>
+      ・<code>.slick({...})</code> でオプションを渡す
+    </div>
+
+    <h3>今日使った主要オプション</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px;">オプション</th><th>値</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>arrows</code></td><td><code>false</code></td><td>左右の矢印を非表示</td></tr>
+          <tr><td><code>autoplay</code></td><td><code>true</code></td><td>自動再生する（初期値は false）</td></tr>
+          <tr><td><code>autoplaySpeed</code></td><td><code>3000</code></td><td>1枚あたりの表示時間（ミリ秒・3000＝3秒）</td></tr>
+          <tr><td><code>speed</code></td><td><code>1500</code></td><td>切り替わるアニメーションの速度（1500＝1.5秒）</td></tr>
+          <tr><td><code>fade</code></td><td><code>true</code></td><td>横スライドではなくフェードイン/アウトで切り替え</td></tr>
+          <tr><td><code>pauseOnHover</code></td><td><code>false</code></td><td>マウスを乗せても止めない（フルスクリーン時の必須対策）</td></tr>
+          <tr><td><code>pauseOnFocus</code></td><td><code>false</code></td><td>フォーカスが当たっても止めない</td></tr>
+          <tr><td><code>pauseOnDotsHover</code></td><td><code>false</code></td><td>ドットにホバーしても止めない</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">⚠️ メインビジュアルの落とし穴</span>
+      Slick のデフォルトは <strong>マウスホバー中はスライドが止まる</strong>。<br>
+      画面いっぱいのメインビジュアルだと <strong>カーソルが常に乗っている状態</strong> になり、自動再生してくれない。<br>
+      → <code>pauseOnHover / pauseOnFocus / pauseOnDotsHover</code> を全部 <code>false</code> に。<strong>ワンセットで覚えてコピペでOK</strong>レベル。
+    </div>
+
+    <h3>完成形（記述例）</h3>
+    <pre><span class="property">$</span>(<span class="property">document</span>).<span class="property">ready</span>(<span class="selector">function</span>() <span class="punct">{</span>
+  <span class="property">$</span>(<span class="value">'.main-v-item-area'</span>).<span class="property">slick</span>(<span class="punct">{</span>
+    <span class="property">arrows</span>: <span class="value">false</span><span class="punct">,</span>
+    <span class="property">autoplay</span>: <span class="value">true</span><span class="punct">,</span>
+    <span class="property">autoplaySpeed</span>: <span class="value">3000</span><span class="punct">,</span>
+    <span class="property">speed</span>: <span class="value">1500</span><span class="punct">,</span>
+    <span class="property">fade</span>: <span class="value">true</span><span class="punct">,</span>
+    <span class="property">pauseOnHover</span>: <span class="value">false</span><span class="punct">,</span>
+    <span class="property">pauseOnFocus</span>: <span class="value">false</span><span class="punct">,</span>
+    <span class="property">pauseOnDotsHover</span>: <span class="value">false</span>
+  <span class="punct">}</span>)<span class="punct">;</span>
+<span class="punct">}</span>)<span class="punct">;</span></pre>
+  </section>
+
+  <!-- ===== Slickカスタマイズ ===== -->
+  <section id="slick-customize">
+    <h2 class="section-title"><span class="icon">🎨</span>Slickのカスタマイズ＆復習タイム</h2>
+    <p>Slick導入後、自動で <code>.slick-slide</code>・<code>.slick-track</code>・<code>.slick-dots</code> などの<strong>クラスが付与される</strong>。これらを利用してさらに細かいスタイルを書ける。</p>
+
+    <div class="callout">
+      <span class="label">カスタマイズの流れ</span>
+      <ol style="margin:8px 0 0;">
+        <li>デベロッパーツール（要素の検証）で<strong>付与されたクラス名</strong>を確認</li>
+        <li>そのクラス名を <code>style.css</code> 側で<strong>上書き</strong>（より具体的なセレクタで）</li>
+        <li>ドット・矢印・トラック幅などを自由に変更</li>
+      </ol>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">残り時間の使い方（A先生指示）</span>
+      <ul style="margin:8px 0 0;">
+        <li>Slickのオプションを<strong>自分で触ってカスタマイズ</strong>（速度・フェード・ドット表示など）</li>
+        <li>これまでの自分のプロジェクト（ポートフォリオ等）に <strong>Slickでスライダーを導入</strong>してみる</li>
+        <li>復習で <strong>JavaScript全般を確認</strong>（querySelectorAll、配列、for文、forEach 等）</li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">明日以降のスケジュール（再確認）</span>
+      JavaScript は今日で一区切り。明日以降は <strong>レスポンシブWebデザインの制作時間</strong>（A先生・B先生の見守り＋フィードバック）。これまで作ったポートフォリオに JS や Slick を導入するチャンス。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>jQuery</td><td>JSをWeb向けに簡単な記述にしてくれるライブラリ（約20年前誕生）</td></tr>
+          <tr><td>ライブラリ</td><td>機能をまとめた外部ファイル（≒「ファイル」と捉えてOK）</td></tr>
+          <tr><td>バニラJS</td><td>何も使わずに書いた素のJavaScript。バニラ＝シンプルの業界用語</td></tr>
+          <tr><td>CDN</td><td>Content Delivery Network。ファイルを外部サーバーから配信する仕組み。コピペで読み込める</td></tr>
+          <tr><td>CDNJS / jsDelivr / Google等</td><td>CDN配布サービス。同じファイルを別サーバーで配ってるだけ、好きなところを使えばOK</td></tr>
+          <tr><td>.min（圧縮ファイル）</td><td>インデント・改行を消した軽量版ファイル。本番公開用</td></tr>
+          <tr><td>.map ファイル</td><td>圧縮版コードのデバッグ用情報。気にしなくてOK</td></tr>
+          <tr><td>slim 版</td><td>jQueryの必要最低限版。初心者は触らない（何が削られているか不明だと危険）</td></tr>
+          <tr><td>安定版（stable）</td><td>最新の一つ前のバージョン。仕事では安牌</td></tr>
+          <tr><td>ベータ版</td><td>最新で実験的なバージョン。何が起きるか分からない</td></tr>
+          <tr><td>jQueryプラグイン</td><td>jQueryに依存して動く拡張機能ファイル</td></tr>
+          <tr><td>Slick</td><td>スライダー/カルーセル実装のド定番 jQuery プラグイン</td></tr>
+          <tr><td>カルーセル</td><td>スライダーの同義語。画像や要素を順番に切り替える表示</td></tr>
+          <tr><td>$（ドル）</td><td>jQuery関数の別名。<code>$('.class')</code>＝<code>jQuery('.class')</code></td></tr>
+          <tr><td>$(document).ready()</td><td>HTMLが読み込まれてからJSを実行するjQueryの書き方</td></tr>
+          <tr><td>依存関係</td><td>あるファイルが別のファイルを必要としている関係。順番が大事</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li><strong>スライダー演習</strong>を最後まで通す（HTML/CSS + jQuery CDN + Slick + 起動JS）</li>
+      <li>読み込み順は <strong>jQuery → Slick → 自作JS</strong> の順を必ず守る（自作は最後！）</li>
+      <li>Slickのオプションを <strong>自分で触って遊ぶ</strong>：速度を変える／fade を切る／矢印・ドットを出す</li>
+      <li>📝 <strong>応用課題</strong>：自分のポートフォリオに Slick でスライダーを1つ追加してみる（メインビジュアル、ギャラリー、お客様の声カードなど）</li>
+      <li><strong>明日以降</strong>：JS は一旦お休み、レスポンシブWebデザインの制作時間に突入。A先生・B先生に見守られながら自分のプロジェクトを進める</li>
+      <li>余裕がある人：Slick の<strong>付与クラス（.slick-slide 等）</strong>を style.css から上書きしてカスタマイズ</li>
+      <li>覚えておく：<code>.min</code>＝圧縮ファイル、<code>.map</code>＝無視OK、<code>.slim</code>＝触らない</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>jQueryというものはずっと覇権を得るというか、サイトを作るんだったら絶対導入してこいつを使って記述しよう、という時代がずっと続いていたんですね。<span class="citation">── jQueryの歴史</span></blockquote>
+    <blockquote>JQuery本体は絶対自分で書き換えないこと。何書いてあるかわかんないですよね。これでも完成品なんで、勝手に手を加えない、勝手に消さない。<span class="citation">── 本体は触らない</span></blockquote>
+    <blockquote>最新バージョンは「ベータ」って書いてあるんで、何が起きるか分かんないよ、みたいな意味合いなわけですよ。なので1個下ぐらいで読み込むのが、一応仕事とかの面では安牌かなと思いますね。<span class="citation">── 安定版を選ぶ</span></blockquote>
+    <blockquote>自作ファイルをとにかく下で読み込め、あとで読み込めっていうことだけでも覚えておけば、とりあえず大丈夫かなという感じもありますね。<span class="citation">── 読み込み順の覚え方</span></blockquote>
+    <blockquote>スライダーを使うならスリック、ってもうみんなすり込まれてるレベル。<span class="citation">── Slickの圧倒的シェア</span></blockquote>
+    <blockquote>これは今回はそんなに長いコードとかを書かないし、あんまりやんないんですけど、一応仕事的に言うと、その会社さんによっては納品するファイルを全部圧縮してから納品するっていうことがあったりします。<span class="citation">── 現場の.min文化</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-19｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

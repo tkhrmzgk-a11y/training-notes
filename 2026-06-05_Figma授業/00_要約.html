@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Figma 5日目：アタラヨデザイン復習・ノーイメージ・スタイル登録（フォント＋カラー）｜2026年6月5日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年6月5日｜講師：A先生</div>
+  <h1>Figma 5日目：アタラヨデザイン復習・ノーイメージ・スタイル登録（フォント＋カラー）</h1>
+  <p class="subtitle">訓練校｜全3時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業（録画分割1本構成・午前のみ）</span>
+    <span>📖 Figma教科書（スタイル登録）</span>
+    <span>🎯 アタラヨデザイン復習・ノーイメージ画像・フォント探し・Lorem Ipsum・Stylerプラグイン・H4限界・カラースタイル5色・真っ黒/真っ白回避</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード ===== -->
+  <div class="callout primary">
+    <span class="label">この日のまとめ（ひと言）</span>
+    Figma 5日目。先輩が作った <strong>「アタラヨデザイン」（キャンプ場のダミーサイト）</strong> を Figma で復習として作り直す日。本日のポイントは <strong>3つ</strong>：①ページ構成の整理（デザインガイド/デザインカンプの分け方）、②<strong>ノーイメージ画像</strong>（画像なし時の代替）、③<strong>フォントとカラーのスタイル登録</strong>（Stylerプラグイン使用）。フォントサイズの定番（64/48/36/24/20/16/14/12）、見出しは H4 までが実用、真っ黒/真っ白は使わず微調整、など実務で効くTipsが多い回。
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#review-intro">「アタラヨデザイン」を復習として作り直す</a></li>
+      <li><a href="#page-structure">ページ構成の整理（デザインガイド／デザインカンプ）</a></li>
+      <li><a href="#no-image">⚠️ ノーイメージ画像（画像なし時の保険）</a></li>
+      <li><a href="#font-search">フォント探しと和文・欧文ダミーテキスト</a></li>
+      <li><a href="#font-tips">フォント選びのコツ（Boldがあるか／時間制限）</a></li>
+      <li><a href="#font-sizes">フォントサイズの定番（64/48/36/24/20/16/14/12）</a></li>
+      <li><a href="#styler-plugin">Stylerプラグインで一括スタイル登録</a></li>
+      <li><a href="#heading-limit">見出しは H4 までが実用</a></li>
+      <li><a href="#style-scope">スタイルの有効範囲（受講者Cさんの質問）</a></li>
+      <li><a href="#trouble-app">トラブル：Web版でStyler動かず→アプリ版で解決</a></li>
+      <li><a href="#color-style">カラースタイル登録（5色設計）</a></li>
+      <li><a href="#color-tips">真っ黒・真っ白は使わない（理由と対処）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>区切りベース（タイムスタンプなしの文字起こしのため）。<span class="star">★★★</span>＝特に重要。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:120px;">区切り</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1時間目 序盤</td><td><a href="#review-intro">「アタラヨデザイン」（先輩制作のキャンプ場サイト）を復習として作り直す</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#review-intro">ドラフトに複製の手順・PCレイアウト＋SPレイアウト両方を見る</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#page-structure">ページを「デザインガイド」「デザインカンプ」に分ける（任意でワイヤーフレームも）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>1時間目</td><td><a href="#page-structure">細かく分ける派 vs フレーム内整理派・どっちでもOK</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>1時間目 末</td><td><a href="#no-image">★ノーイメージ画像：画像なしでレイアウト崩れを防ぐ保険</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目 序盤</td><td><a href="#font-search">フォント探しの手順：和文（明朝系）＋ 欧文（セリフ系）両方</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#font-search">ダミーテキスト：和文＝宮沢賢治／欧文＝Lorem Ipsum（一択）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#font-tips">★フォント選びのコツ：Bold があるか必ず確認</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目</td><td><a href="#font-tips">時間を区切って決める（フォント探しは一瞬で時間が溶ける）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>2時間目 末</td><td><a href="#font-sizes">★フォントサイズの定番セット（64/48/36/24/20/16/14/12）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目 序盤</td><td><a href="#styler-plugin">★Stylerプラグインで一括スタイル登録（レイヤー名＝スタイル名）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#styler-plugin">スラッシュでディレクトリ化（JP/見出し-64 等）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#heading-limit">見出しタグの実用範囲：H4 まで（H5/H6 はほぼ使わない理由）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#style-scope">受講者Cさんの質問：スタイルの有効範囲はファイル単位</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目</td><td><a href="#trouble-app">受講者Eさんのトラブル：Web版でStyler動かず→アプリ版で解決</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>3時間目 末</td><td><a href="#color-style">★カラースタイル登録：5色（メイン／サブ／黒／白／グレー）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目 末</td><td><a href="#color-tips">★真っ黒(#000)・真っ白(#FFF) は使わない（理由と微調整）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td>3時間目 末</td><td><a href="#color-style">色のイメージ画像・アートワークも作ると後で見返しやすい</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td>授業終了</td><td>お昼休憩。続きは午後（録画はここまで）</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>復習はベタ写しじゃない</h4><p>同じ作りを真似しつつ、<strong>文字サイズや余白は自分で考える</strong>。学ぶのは「作り方・操作方法」。</p></div>
+      <div class="card"><span class="num">2</span><h4>ページを目的で分ける</h4><p><strong>デザインガイド／デザインカンプ</strong>。素材が多ければさらに <strong>スタイル一覧／コンポーネント一覧／素材</strong> でも分けられる。</p></div>
+      <div class="card"><span class="num">3</span><h4>ノーイメージは保険</h4><p>画像がないと<strong>レイアウトが崩れる</strong>。サイトに必ず1枚<strong>「ノーイメージ画像」</strong>を用意。会社名入りにすると気が利く。</p></div>
+      <div class="card"><span class="num">4</span><h4>ダミーテキストの定番</h4><p>和文＝宮沢賢治（『野ねずみのノイズミ』等）／欧文＝<strong>Lorem Ipsum（ロレムイプサム）</strong>。業界では一択。</p></div>
+      <div class="card"><span class="num">5</span><h4>フォントは時間を切る</h4><p>「3時間」「半日」と時間を区切って決める。<strong>仮決めOK</strong>、スタイル化しておけば後で一括変更できる。</p></div>
+      <div class="card"><span class="num">6</span><h4>Boldがあるか必ず確認</h4><p>選んだフォントに<strong>太字（Bold）がない</strong>と、コーディング時に <code>font-weight</code> が効かない。Regular＋Boldの2種以上は必須。</p></div>
+      <div class="card"><span class="num">7</span><h4>サイズの定番セット</h4><p><strong>64・48・36・24・20・16・14・12</strong>。Figmaの「よく使われるフォント一覧」がこのセット。悩む前にコピペでOK。</p></div>
+      <div class="card"><span class="num">8</span><h4>Stylerで一括登録</h4><p>レイヤー名がそのままスタイル名に。<strong>1個ずつポチポチが消える</strong>。Figmaのアクション→Stylerで実行。</p></div>
+      <div class="card"><span class="num">9</span><h4>見出しはH4まで</h4><p>H5/H6は<strong>ほぼ使わない</strong>。サイズがPタグ（16）と変わらず、Pでいいじゃんになるから。実用はH3、多くてH4。</p></div>
+      <div class="card"><span class="num">10</span><h4>真っ黒・真っ白を避ける</h4><p>#000/#FFF は<strong>コントラスト強すぎ＋モニター差で不安定</strong>。ベースカラーに合わせて<strong>赤味・青味を少し足す</strong>。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 復習導入 ===== -->
+  <section id="review-intro">
+    <h2 class="section-title"><span class="icon">🔄</span>「アタラヨデザイン」を復習として作り直す</h2>
+    <p>今日は新しい教科書範囲ではなく、<strong>先輩が作った「アタラヨデザイン」というキャンプ場のダミーサイト</strong>を Figma で復習として作り直す。</p>
+
+    <div class="callout">
+      <span class="label">サンプルサイトの渡され方</span>
+      <ul style="margin:8px 0 0;">
+        <li>A先生がチャットでドラフトのURLを共有</li>
+        <li>各自で <strong>「ドラフトに複製を作成」</strong> を使って自分のファイルに持ってくる</li>
+        <li>注意：<strong>「コピーで引っ張る」と内容が変わる</strong>（コンポーネント情報が落ちる）。必ず<strong>ファイルの複製</strong>機能で</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">何を学ぶか</span>
+      <ul style="margin:8px 0 0;">
+        <li>サイトを<strong>そのまま真似</strong>ではなく、操作方法を再確認するのが目的</li>
+        <li>文字サイズや余白は自分で考えていい</li>
+        <li><strong>PCレイアウト＋SPレイアウト</strong>の両方を見る（実務では分けて作る）</li>
+        <li>SPレイアウトの作り方とプレビューの方法も復習</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== ページ構成 ===== -->
+  <section id="page-structure">
+    <h2 class="section-title"><span class="icon">📐</span>ページ構成の整理（デザインガイド／デザインカンプ）</h2>
+    <p>Figma の「ページ」を目的別に分けると整理しやすい。基本は <strong>2ページ構成</strong>。</p>
+
+    <div class="callout primary">
+      <span class="label">基本の2ページ構成</span>
+      <ol style="margin:8px 0 0;">
+        <li><strong>デザインガイド</strong>：フォント・カラー・コンポーネント・素材などのルール集</li>
+        <li><strong>デザインカンプ</strong>：実際のページデザイン（トップ・アバウト・コンタクトなど）</li>
+      </ol>
+    </div>
+
+    <h3>もっと細かく分けたいとき</h3>
+    <ul class="bullet-pro">
+      <li><strong>ワイヤーフレーム</strong>：構造設計のラフ</li>
+      <li><strong>スタイル一覧</strong>：色・フォントだけのまとめ</li>
+      <li><strong>コンポーネント一覧</strong>：ボタン・カードなどの部品</li>
+      <li><strong>素材</strong>：アイコン・写真・イラスト等</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">A先生：これは自由</span>
+      ページを細かく分けるか、1ページの中で<strong>フレームで整理</strong>するかは<strong>本人の考え方次第</strong>。プロジェクトの規模で決めればOK。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== ノーイメージ ===== -->
+  <section id="no-image">
+    <h2 class="section-title"><span class="icon">🖼️</span>⚠️ ノーイメージ画像（画像なし時の保険）</h2>
+    <p>サイトを作るときに <strong>「画像が用意できない時の代替」</strong> として絶対に持っておくべき1枚。</p>
+
+    <div class="callout warn">
+      <span class="label">なぜ必要？</span>
+      <strong>更新型のサイト（WordPress等）で、サムネ画像が用意できないケースが必ず1回は出る</strong>。<br>
+      例：喫茶店サイトでイベント記事を作るが、撮影が間に合わなかった など。<br>
+      → このとき<strong>画像なしのままだとカードのレイアウトが崩れる</strong>。<br>
+      → 保険として「ノーイメージ画像」を当てておく。
+    </div>
+
+    <h3>カードレイアウトの崩れイメージ</h3>
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>❌ 画像なし → レイアウト崩壊</h4>
+        <pre style="margin:0; padding:14px; font-size:12px;">┌─────────┐  ┌─────────┐  ┌─────────┐
+│ [画像]   │  │           │  │ [画像]   │
+│ タイトル │  │ タイトル  │  │ タイトル │
+│ 本文     │  │ 本文      │  │ 本文     │
+└─────────┘  └─────────┘  └─────────┘
+              ↑高さが違って不揃い</pre>
+      </div>
+      <div class="compare-col right">
+        <h4>✅ ノーイメージで保険</h4>
+        <pre style="margin:0; padding:14px; font-size:12px;">┌─────────┐  ┌─────────┐  ┌─────────┐
+│ [画像]   │  │ [No-Img] │  │ [画像]   │
+│ タイトル │  │ タイトル │  │ タイトル │
+│ 本文     │  │ 本文     │  │ 本文     │
+└─────────┘  └─────────┘  └─────────┘
+              ↑高さ揃う・崩れない</pre>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">作り方のヒント</span>
+      <ul style="margin:8px 0 0;">
+        <li>「No Image」とテキストだけ入れた灰色背景の画像が定番</li>
+        <li>コーポレートサイトなら<strong>会社名・ロゴ入り</strong>がよくある</li>
+        <li><strong>A先生の個人的おすすめ</strong>：つまんないノーイメージより、エッジが効いた・一癖あるデザインにする。<strong>「このサイト面白いな」と思ってもらえる可能性</strong>がある。アイデア勝負。</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== フォント探し ===== -->
+  <section id="font-search">
+    <h2 class="section-title"><span class="icon">🔤</span>フォント探しと和文・欧文ダミーテキスト</h2>
+    <p>サイト用のフォントを決めるとき、A先生がいつもやる手順。</p>
+
+    <h3>準備するもの</h3>
+    <ul class="bullet-pro">
+      <li>適当なフレームを1個作る</li>
+      <li>欧文・和文の<strong>ダミーテキスト</strong>を貼る（タイトル＋本文の両方）</li>
+      <li>そこにいろんなフォントを当てて、見比べながら決める</li>
+    </ul>
+
+    <h3>ダミーテキストの定番</h3>
+    <div class="callout primary">
+      <span class="label">和文：宮沢賢治（A先生の場合）</span>
+      <ul style="margin:8px 0 0;">
+        <li>『野ねずみのノイズミ』など、宮沢賢治の作品から抜粋</li>
+        <li>これは人それぞれ。「あの会社の社長メッセージ」等でもOK</li>
+      </ul>
+    </div>
+    <div class="callout primary">
+      <span class="label">欧文：Lorem Ipsum（ロレムイプサム）一択</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>業界の定番中の定番</strong>。「これからWeb業界でやっていくなら死ぬほど見ることになる」（A先生）</li>
+        <li>意味のないラテン語のテキスト。可読性に依存しないので<strong>純粋にフォントの見た目だけで判断できる</strong></li>
+        <li>「Lorem Ipsum ジェネレーター」等で大量に生成可能</li>
+      </ul>
+    </div>
+
+    <h3>フォント探しの場所</h3>
+    <ul class="bullet-pro">
+      <li><strong>Google Fonts</strong>：無料・商用OK・Web実装も楽（最有力）</li>
+      <li>絞り込み：Language＝Japanese、Categories＝Serif（明朝系を探すなら）</li>
+      <li>Figmaのテキストツール選択時の<strong>「よく使われるフォント一覧」</strong>もそのまま使える</li>
+    </ul>
+  </section>
+
+  <!-- ===== フォント選びのコツ ===== -->
+  <section id="font-tips">
+    <h2 class="section-title"><span class="icon">💡</span>フォント選びのコツ</h2>
+
+    <div class="callout primary">
+      <span class="label">★最重要：Bold（太字）があるか確認</span>
+      <ul style="margin:8px 0 0;">
+        <li>気に入っても <strong>Regular（標準）しかない</strong> フォントが意外と多い（特に欧文）</li>
+        <li>これだとコーディング時に <code>font-weight: bold</code> が効かない＝太字にできない</li>
+        <li><strong>太字を使う場面はWebでほぼ必須</strong>。タイトルや強調で使う</li>
+        <li>最低でも <strong>Regular + Bold の2種類</strong> あるフォントを選ぶ</li>
+        <li>逆にウェイトが10種類とか多すぎるのも使い切れない。<strong>2〜3種類で十分</strong></li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">時間を区切って決める</span>
+      <ul style="margin:8px 0 0;">
+        <li>フォント探しは「一瞬で時間が溶ける」（A先生）</li>
+        <li><strong>3時間・半日</strong>など事前に時間を決める</li>
+        <li><strong>仮決めでもOK</strong>。スタイル登録しておけば、後で違和感あれば<strong>元のフォントを変えるだけで一括変更</strong>できる</li>
+      </ul>
+    </div>
+
+    <blockquote>今ここに時間をあったら後で直せばいい、という感じなので覚えておいてください。<span class="citation">── A先生</span></blockquote>
+  </section>
+
+  <!-- ===== フォントサイズ ===== -->
+  <section id="font-sizes">
+    <h2 class="section-title"><span class="icon">📏</span>フォントサイズの定番セット</h2>
+
+    <div class="callout primary">
+      <span class="label">A先生がベースにする数値</span>
+      <strong>64 / 48 / 36 / 24 / 20 / 16 / 14 / 12</strong>（px）
+    </div>
+
+    <p>これは<strong>Figmaのテキストツール選択時に表示される「よく使われるフォント一覧」と同じセット</strong>。悩むぐらいなら、まずはこの中から必要なものを登録すればOK。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>サイズ</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><strong>64px</strong></td><td>巨大見出し（メインビジュアルのキャッチコピー等）</td></tr>
+          <tr><td><strong>48px</strong></td><td>大きな見出し（セクションタイトル）</td></tr>
+          <tr><td><strong>36px</strong></td><td>中見出し</td></tr>
+          <tr><td><strong>24px</strong></td><td>小見出し</td></tr>
+          <tr><td><strong>20px</strong></td><td>強調された本文・リード</td></tr>
+          <tr><td><strong>16px</strong></td><td>本文（標準）</td></tr>
+          <tr><td><strong>14px</strong></td><td>キャプション・注釈</td></tr>
+          <tr><td><strong>12px</strong></td><td>注意書き・コピーライト</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>足りなくなったら後から追加（例：40, 18, 10 など）して登録すればOK。</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== Styler ===== -->
+  <section id="styler-plugin">
+    <h2 class="section-title"><span class="icon">🧩</span>Stylerプラグインで一括スタイル登録</h2>
+    <p>サイズごとにスタイルを1個ずつ登録していくのは面倒。<strong>Stylerプラグイン</strong>を使うと一気にまとめて登録できる。</p>
+
+    <h3>使い方</h3>
+    <ol class="bullet-pro" style="list-style:decimal; margin-left:22px;">
+      <li>下のツールバーの<strong>「アクション」</strong>から「Styler」を検索 → 保存（保存すれば次回以降ずっと使える）</li>
+      <li>登録したいテキストを作成（<strong>レイヤー名がそのままスタイル名になる</strong>のがポイント）</li>
+      <li>レイヤー名は <code>見出し-64-Bold</code> のように、後で見て分かる名前にしておく</li>
+      <li>テキストを選択した状態で<strong>プラグイン → Styler → Generate Style</strong></li>
+      <li>サクッと一括登録完了</li>
+    </ol>
+
+    <div class="callout primary">
+      <span class="label">ディレクトリ化（フォルダ分け）</span>
+      <ul style="margin:8px 0 0;">
+        <li>スタイル名に <strong><code>/</code>（スラッシュ）</strong> を入れると、Figma側で自動でディレクトリ（フォルダ）扱いになる</li>
+        <li>例：<code>JP/見出し-64-Bold</code>、<code>EN/Heading-64-Bold</code></li>
+        <li>これで「JPフォルダ」「ENフォルダ」に分類されて見やすい</li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">同じ機能のプラグインは他にもある</span>
+      Styler以外にも一括登録系プラグインは多数。<strong>アイコン挿入系プラグイン</strong>も便利。作業時間を設けて色々試してみるのがおすすめ。
+    </div>
+  </section>
+
+  <!-- ===== 見出しの実用範囲 ===== -->
+  <section id="heading-limit">
+    <h2 class="section-title"><span class="icon">🪧</span>見出しは H4 までが実用</h2>
+    <p>HTMLの見出しタグ <code>&lt;h1&gt;〜&lt;h6&gt;</code> のうち、<strong>実際に使うのはH4まで</strong>というのがA先生の話。</p>
+
+    <div class="callout primary">
+      <span class="label">使用頻度の目安</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>H1〜H3</strong>：よく使う（A先生もこの範囲が多い）</li>
+        <li><strong>H4</strong>：「結構使ってるな」という印象</li>
+        <li><strong>H5/H6</strong>：ほぼ見たことがない</li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">理由</span>
+      <ul style="margin:8px 0 0;">
+        <li>H5/H6のデフォルトフォントサイズは<strong>16px（Pタグと同じ）</strong></li>
+        <li>「対コンピュータ・対ブラウザに『見出しです』と伝えられる」のは確かに意味あり</li>
+        <li>でも見た目はPタグと変わらない＝<strong>「だったらPでいいじゃん」</strong>になる</li>
+        <li>そもそも文章にそんなに見出しの階層は不要</li>
+      </ul>
+    </div>
+
+    <p>Figmaでスタイル登録するときも、見出しは <strong>4種類（H1〜H4相当）</strong> 用意しておけば十分。</p>
+  </section>
+
+  <!-- ===== スタイル有効範囲 ===== -->
+  <section id="style-scope">
+    <h2 class="section-title"><span class="icon">❓</span>受講者Cさんの質問：スタイルの有効範囲は？</h2>
+    <div class="callout">
+      <span class="label">質問</span>
+      「今登録している文字スタイルは、このアタラヨデザインのファイル内だけ有効？それとも他のファイルでも使える？」
+    </div>
+    <div class="callout primary">
+      <span class="label">A先生の答え</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>基本はファイル単位</strong>（このファイル内でだけ有効）</li>
+        <li>「ファイル」＝ドラフトをクリックして開いた1つ1つの中身</li>
+        <li>ただし<strong>ファイルを超えて他ファイルに適用する機能</strong>も存在（今回のカリキュラムでは触れない）</li>
+        <li>気になる人は「Figma ライブラリ」「Team Library」で調べると出てくる</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== トラブル ===== -->
+  <section id="trouble-app">
+    <h2 class="section-title"><span class="icon">🛠️</span>受講者Eさんのトラブル：Web版でStyler動かない</h2>
+    <div class="callout warn">
+      <span class="label">症状</span>
+      テキストを選んでスタイル登録しようとしても、<strong>スタイルが適用されない</strong>。タイポグラフィパネルからクリックしても反応なし。
+    </div>
+
+    <h3>切り分け（A先生のリモート対応）</h3>
+    <ol class="bullet-pro" style="list-style:decimal; margin-left:22px;">
+      <li>画面共有で状況確認</li>
+      <li>テキストを削除→書き直し→もう一度試す → 変わらず</li>
+      <li>他のスタイルでも同じか確認 → 同じ</li>
+      <li>原因に気づく：<strong>Web版（ブラウザのFigma）でやっていた</strong></li>
+      <li>解決：<strong>Figmaアプリ版（デスクトップアプリ）で立ち上げ直す</strong> → 動いた</li>
+    </ol>
+
+    <div class="callout">
+      <span class="label">教訓</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>Figma Web版だとプラグインが入りきっていない</strong>ことがある</li>
+        <li>ファイル複製の直後はWeb版で開くので、<strong>明示的にアプリ版を起動して開き直す</strong></li>
+        <li>普段からアプリ版を使うのが安全</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== カラースタイル ===== -->
+  <section id="color-style">
+    <h2 class="section-title"><span class="icon">🎨</span>カラースタイル登録（5色設計）</h2>
+    <p>フォント登録が終わったら、次は色。アタラヨデザインを参考に<strong>5色構成</strong>でスタイル登録する。</p>
+
+    <div class="callout primary">
+      <span class="label">5色の内訳</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>メインカラー</strong>：サイトの主役の色（暖色系で1色）</li>
+        <li><strong>サブカラー</strong>：メインに次ぐ色（メインと同系統＝暖色系で1色）</li>
+        <li><strong>ブラック系</strong>：文字色など</li>
+        <li><strong>ホワイト系</strong>：背景色など</li>
+        <li><strong>グレー系</strong>：補助・区切り線等</li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">トンマナの注意</span>
+      アタラヨデザインのサンプルは<strong>暖色系（赤・茶）</strong>。<br>
+      → メイン/サブを<strong>青などの補色にすると全体のトーンが壊れる</strong>。<br>
+      → 真似する範囲を <strong>「暖色系で2色」</strong> までに守るのが無難。
+    </div>
+
+    <h3>仕上げのアイデア</h3>
+    <ul class="bullet-pro">
+      <li>色チップだけでなく、<strong>グラデーション・透過（オパシティ）</strong>も置いておくと使い勝手UP</li>
+      <li><strong>色のイメージ画像／アートワーク</strong>を1枚作っておくと、後でガイドを見返したときに「このサイトはこういう雰囲気だな」と一発で思い出せる（A先生おすすめ）</li>
+    </ul>
+  </section>
+
+  <!-- ===== 真っ黒・真っ白 ===== -->
+  <section id="color-tips">
+    <h2 class="section-title"><span class="icon">⚫</span>真っ黒・真っ白は使わない（理由と対処）</h2>
+
+    <div class="callout primary">
+      <span class="label">A先生の鉄則</span>
+      ブラック系・ホワイト系の色を作るとき、<strong><code>#000000</code> や <code>#FFFFFF</code> といった真っ黒・真っ白は基本使わない</strong>。<br>
+      → ベースカラーに合わせて<strong>少しだけ赤味・青味・緑味を足す</strong>。
+    </div>
+
+    <h3>2つの理由</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px;">理由</th><th>詳細</th></tr></thead>
+        <tbody>
+          <tr><td><strong>① モニター差で不安定</strong></td><td>完璧な黒・完璧な白はモニターによってズレる。「世の中に完璧な黒と白は存在しない」</td></tr>
+          <tr><td><strong>② コントラストが強すぎる</strong></td><td>純粋な #000 と #FFF を組み合わせるとコントラストが極端で、<strong>目に刺激</strong>を与える。長時間見ると疲れる</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>微調整の例</h3>
+    <ul class="bullet-pro">
+      <li><strong>赤系のサイト</strong> → 黒に少しだけ赤を足す（例：<code>#1A0F0F</code> 等）</li>
+      <li><strong>青系のサイト</strong> → 黒に少しだけ青を足す（例：<code>#0F0F1A</code> 等）</li>
+      <li><strong>緑系のサイト</strong> → 黒に少しだけ緑を足す（例：<code>#0F1A0F</code> 等）</li>
+      <li>白も同様に微調整。一見しただけでは「ほぼ白／ほぼ黒」に見えるが、整って見える</li>
+    </ul>
+
+    <div class="callout">
+      <span class="label">パッと見の見分けは不要</span>
+      微調整した黒・白は、一瞬で「真っ黒・真っ白」と判別できる。<strong>パッと見の見え方は変わらない</strong>が、<strong>仕上がりの質感が違ってくる</strong>。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>ドラフト（Draft）</td><td>Figmaの個人ファイル領域。ここに作成・保管</td></tr>
+          <tr><td>ドラフトに複製</td><td>共有されたファイルを自分のドラフトにコピーする機能</td></tr>
+          <tr><td>デザインガイド</td><td>サイト全体のルール集（フォント・カラー・コンポーネント・素材）をまとめるページ</td></tr>
+          <tr><td>デザインカンプ</td><td>実際のページデザイン（画面）</td></tr>
+          <tr><td>ノーイメージ画像</td><td>画像が用意できない時の代替ダミー画像。レイアウト崩れ防止</td></tr>
+          <tr><td>ダミーテキスト</td><td>仮置きの文字列。和文＝宮沢賢治／欧文＝Lorem Ipsum が定番</td></tr>
+          <tr><td>Lorem Ipsum</td><td>欧文の定番ダミーテキスト。意味のないラテン語</td></tr>
+          <tr><td>セリフ体／明朝体</td><td>文字の縦横に飾り（ヒゲ）がある書体。和文の明朝体・欧文のSerif</td></tr>
+          <tr><td>サンセリフ／ゴシック体</td><td>飾りのない書体。和文のゴシック・欧文のSans-serif</td></tr>
+          <tr><td>フォントウェイト</td><td>文字の太さ。Regular（標準）・Bold（太字）など</td></tr>
+          <tr><td>Stylerプラグイン</td><td>Figmaで複数のスタイルを一括登録できるプラグイン</td></tr>
+          <tr><td>カーニング</td><td>文字と文字の間隔の調整。タイトルで気を使う</td></tr>
+          <tr><td>ラインハイト（line-height）</td><td>行の高さ。本文の読みやすさを左右する</td></tr>
+          <tr><td>レタースペーシング</td><td>文字間隔（letter-spacing）。フォント全体での文字の詰め具合</td></tr>
+          <tr><td>トンマナ（トーン&マナー）</td><td>サイト全体の雰囲気・統一感。配色や書体で決まる</td></tr>
+          <tr><td>補色</td><td>カラーホイール上で正反対の色。混ぜると無彩色になる関係</td></tr>
+          <tr><td>オパシティ（不透明度）</td><td>色の透け具合。0%（完全透明）〜100%（完全不透明）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li>アタラヨデザインを<strong>ファイル複製</strong>（Webからのコピペではなく）して自分のドラフトに持ってくる</li>
+      <li>ページを<strong>デザインガイド／デザインカンプ</strong>に分ける</li>
+      <li>サイト用の<strong>ノーイメージ画像</strong>を1枚用意（つまんないやつより一癖あるデザインで）</li>
+      <li>和文・欧文フォントを<strong>時間を切って決める</strong>（3時間目安・仮決めOK）</li>
+      <li>選んだフォントに<strong>Bold（太字）があるか必ず確認</strong></li>
+      <li>フォントサイズ <strong>64/48/36/24/20/16/14/12</strong> でスタイル登録（Styler使うと楽）</li>
+      <li>カラー5色（メイン／サブ／黒／白／グレー）を登録</li>
+      <li><strong>真っ黒・真っ白は使わない</strong>。ベースカラーに合わせて少しずらす</li>
+      <li>色のイメージ画像・アートワークもガイドに添える（後で見返した時に分かりやすくなる）</li>
+      <li>Figmaは<strong>アプリ版</strong>を使う（Web版だとプラグインが動かないことがある）</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>ノーイメージってつまんない画像なので、エッジの効いたというか、一癖あるようなデザインとかを取ってあげると、そのサイト面白いなと思ってもらえる可能性があるので。<span class="citation">── ノーイメージで個性を出す</span></blockquote>
+    <blockquote>欧文のダミーテキストといえば<strong>ロレムイプサム</strong>。今日踏ん切りに、これからこの業界でやっていくには死ぬほど見ていくことになるでしょう。<span class="citation">── 業界の常識</span></blockquote>
+    <blockquote>今ここに時間をあったら後で直せばいいという感じなので覚えておいてください。<span class="citation">── 仮決めの勧め</span></blockquote>
+    <blockquote>いいなと思ったフォントに、ちゃんと太字とかボールドがあるかどうかまで確認しておくこと。<span class="citation">── フォント選びの罠</span></blockquote>
+    <blockquote>真っ白と真っ黒はコントラストが強いので、目に刺激を与える。一応若干書いてたりします。<span class="citation">── 真っ黒・真っ白を避ける理由</span></blockquote>
+    <blockquote>世の中に完璧な黒と白がない、っていうのが一つですね。モニターによってもずれちゃうし。<span class="citation">── 色を微調整する理由</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-06-26｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>
