@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Illustrator 2日目：ダイレクト選択・アンカー編集・画像トレース｜2026年7月7日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年7月7日｜講師：A先生</div>
+  <h1>Illustrator 2日目：ダイレクト選択・アンカー編集・画像トレース</h1>
+  <p class="subtitle">訓練校｜全4時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業（録画 約3時間30分）</span>
+    <span>📖 Illustrator教科書 60〜89ページ</span>
+    <span>🎯 画像トレース・AI生成・ダイレクト選択・アンカー編集・削除2方式・パス切断連結・コーナー/スムーズ・自由変形</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード（この日のひと言＝目次に出る） ===== -->
+  <div class="callout primary">
+    <span class="label">📌 今日のひと言まとめ</span>
+    <p>Illustrator 2日目。前半は<strong>画像トレース</strong>（写真をパスに変換）と、直近アプデで入った<strong>AI生成機能</strong>（プロンプトでベクターアートを作る／<mark>編集できる形で生成されるのがラスターAIとの決定的な違い</mark>）。後半は今日の主役 <strong>ダイレクト選択ツール（A）</strong> で、アンカーポイント・ハンドル・セグメントを直接いじってパスを変形する練習。特に重要だったのは <mark>アンカーの「削除」に2通りあり、結果が「クローズパス」か「オープンパス」かで変わる</mark>こと、そして<strong>コーナー↔スムーズの切り替え</strong>。全体を通して「<strong>同じ結果でもやり方は3〜5通りある</strong>」のがイラレ。今日と昨日はペンツール（パス）の練習日。</p>
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#image-trace">画像トレース（写真→パス化）</a></li>
+      <li><a href="#ai-generate">AI生成（ベクターアートを作る）★新機能</a></li>
+      <li><a href="#move-transform">移動・複製・自由変形／遠近変形</a></li>
+      <li><a href="#direct-select">ダイレクト選択ツールでパスを変形</a></li>
+      <li><a href="#anchor-edit">アンカーの追加・削除・整列</a></li>
+      <li><a href="#delete-diff">⚠️ 削除の2方式（クローズ／オープン）★重要</a></li>
+      <li><a href="#cut-connect">パスの切断と連結</a></li>
+      <li><a href="#handle-convert">方向線・コーナー↔スムーズの切り替え</a></li>
+      <li><a href="#pen-shortcuts">ペンツール中の便利ショートカット</a></li>
+      <li><a href="#trace-practice">トレース練習（レイヤーのロック・不透明度）</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>タイムスタンプ付き文字起こしベース。<span class="star">★★★</span>＝特に重要。全4コマ・約3時間30分の録画（午後は各自のペン練習が中心）。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#image-trace">01:51</a></td><td><a href="#image-trace">画像トレース：JPEG写真をパス情報に変換。プリセット→拡張で確定。単調な画像向き</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#ai-generate">09:50</a></td><td><a href="#ai-generate">AI生成（新機能）。プロンプトでベクターアート生成。編集できる形で出るのが強み</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#ai-generate">16:00</a></td><td><a href="#ai-generate">生成塗りつぶし（プロパティパネル）。プロンプトはGemini等に考えてもらうと効率的。クレジット消費に注意</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#move-transform">31:46</a></td><td><a href="#move-transform">移動・複製はほぼFigma同じ（V／⌥複製／⌘⇧V＝同じ位置に貼付）</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#move-transform">35:00</a></td><td><a href="#move-transform">自由変形・遠近変形で立体感。イラレはフレーム化なし＝グループ（⌘G）一択</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#direct-select">51:33</a></td><td><a href="#direct-select">ダイレクト選択ツール（A）でアンカー・ハンドル・セグメントを直接編集。スプーン型に変形</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#anchor-edit">58:19</a></td><td><a href="#anchor-edit">ペンツールでパス上クリック＝アンカー追加。整列で等間隔に分布（選択中は青）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#delete-diff">106:15</a></td><td><a href="#delete-diff">削除は2方式。アンカーポイントの削除＝クローズ維持／バックスペース＝オープンに</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#cut-connect">76:22</a></td><td><a href="#cut-connect">パスの切断（パスをカット）と連結。同じ結果でもやり方は3〜5通り</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#handle-convert">86:28</a></td><td><a href="#handle-convert">方向線の操作。コーナー↔スムーズ切り替え。アンカーポイントツール</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#handle-convert">92:20</a></td><td><a href="#handle-convert">片方のハンドルを動かすと連動が切れる→⌥＋クリックで連動に戻す（要メモ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#pen-shortcuts">94:17</a></td><td><a href="#pen-shortcuts">ペン中に⌘でダイレクト選択／⌥でアンカーポイントツールに一時切替</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#trace-practice">106:28</a></td><td><a href="#trace-practice">ペンツール練習サイトでトレース。元画像はレイヤーでロック・不透明度を下げる</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#trace-practice">201:07〜</a></td><td><a href="#trace-practice">午後は各自ペン練習・トレース・ベジェゲーム。切り返しの個別フォロー</a></td><td class="center"><span class="star">★</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>ダイレクト選択ツール（A）</h4><p><strong>アンカー・ハンドル・セグメントを直接いじって</strong>パスを変形するツール。今日の主役。</p></div>
+      <div class="card"><span class="num">2</span><h4>どのアンカーを選ぶかが命</h4><p>複雑な形ほど<strong>「どの点を選ぶと、どこがどう動くか」</strong>の見極めが大事。<strong>練習あるのみ</strong>。</p></div>
+      <div class="card"><span class="num">3</span><h4>削除は2方式で結果が違う</h4><p><strong>「アンカーポイントの削除」＝クローズパスを保つ</strong>／<strong>バックスペース＝オープンパスになる</strong>。基本は前者。</p></div>
+      <div class="card"><span class="num">4</span><h4>アンカー追加はペンツール</h4><p>パスの上にペンを合わせると<strong>カーソル右下が＋</strong>。クリックでアンカーを追加できる。</p></div>
+      <div class="card"><span class="num">5</span><h4>コーナー↔スムーズ</h4><p><strong>コーナー＝ハンドル無し（角）／スムーズ＝ハンドル有り（曲線）</strong>。プロパティで相互に変換できる。</p></div>
+      <div class="card"><span class="num">6</span><h4>片側ハンドル→連動が切れる</h4><p>片方だけ動かすと連動が切れる。戻すには<strong>⌥＋クリック</strong>（＝要メモ・先生も忘れる）。</p></div>
+      <div class="card"><span class="num">7</span><h4>やり方は3〜5通りある</h4><p>切断・連結など、<strong>同じ結果でもアプローチが複数</strong>。好きなやり方でOK。</p></div>
+      <div class="card"><span class="num">8</span><h4>AI生成は「編集できる形」</h4><p>Gemini等のラスター生成と違い、イラレのAIは<strong>後から編集できるベクター</strong>で生成される。</p></div>
+      <div class="card"><span class="num">9</span><h4>画像トレース＝写真をパス化</h4><p>JPEGを<strong>パスのイラストに変換</strong>。単調な画像向き。写真集合は苦手。</p></div>
+      <div class="card"><span class="num">10</span><h4>トレースは元をロック</h4><p>なぞる時は<strong>元画像をレイヤーでロック＋不透明度を下げる</strong>。Figmaと同じ発想。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 画像トレース（図解1） ===== -->
+  <section id="image-trace">
+    <h2 class="section-title"><span class="icon">🖼️</span>画像トレース（写真→パス化）</h2>
+    <p>教科書60ページ。JPEG/PNGなどの<strong>ラスター画像</strong>を、イラレの<strong>パス情報</strong>に変換する機能。要は「写真をイラスト（ベクター）化」する。</p>
+
+    <figure style="margin:22px 0;">
+      <svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="画像トレースの図解。左はピクセルでできた写真、トレースすると右のようにアンカーポイントとパスの集まりに変換される"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid #e5e5e0; border-radius:10px; background:#fff;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <!-- 左：ラスター写真（ピクセルの葉） -->
+        <text x="200" y="42" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">ラスター画像（JPEG）</text>
+        <g>
+          <rect x="150" y="90" width="18" height="18" fill="#7aa86b"/><rect x="168" y="90" width="18" height="18" fill="#8fb87e"/>
+          <rect x="186" y="90" width="18" height="18" fill="#6a9a5b"/><rect x="150" y="108" width="18" height="18" fill="#8fb87e"/>
+          <rect x="168" y="108" width="18" height="18" fill="#5c8a4e"/><rect x="186" y="108" width="18" height="18" fill="#7aa86b"/>
+          <rect x="204" y="108" width="18" height="18" fill="#8fb87e"/><rect x="132" y="126" width="18" height="18" fill="#6a9a5b"/>
+          <rect x="150" y="126" width="18" height="18" fill="#5c8a4e"/><rect x="168" y="126" width="18" height="18" fill="#7aa86b"/>
+          <rect x="186" y="126" width="18" height="18" fill="#5c8a4e"/><rect x="204" y="126" width="18" height="18" fill="#6a9a5b"/>
+          <rect x="222" y="126" width="18" height="18" fill="#8fb87e"/><rect x="168" y="144" width="18" height="18" fill="#6a9a5b"/>
+          <rect x="186" y="144" width="18" height="18" fill="#5c8a4e"/><rect x="204" y="144" width="18" height="18" fill="#7aa86b"/>
+        </g>
+        <text x="200" y="210" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">ピクセルの集まり</text>
+
+        <!-- 矢印 -->
+        <path d="M400 150 L520 150" stroke="#e07b00" stroke-width="3" marker-end="url(#arrow2)"/>
+        <text x="460" y="138" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="15" font-weight="700" fill="#e07b00">トレース</text>
+        <text x="460" y="172" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">→ 拡張で確定</text>
+
+        <!-- 右：パス化された葉 -->
+        <text x="710" y="42" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">パス（ベクター）</text>
+        <path d="M710 95 C 770 110, 790 160, 720 200 C 660 165, 650 120, 710 95 Z" fill="#dceccf" stroke="#2c5a8a" stroke-width="2"/>
+        <line x1="710" y1="95" x2="720" y2="200" stroke="#2c5a8a" stroke-width="1.2"/>
+        <!-- アンカーポイント -->
+        <rect x="705" y="90" width="9" height="9" fill="#e07b00"/>
+        <rect x="766" y="106" width="9" height="9" fill="#e07b00"/>
+        <rect x="786" y="156" width="9" height="9" fill="#e07b00"/>
+        <rect x="716" y="196" width="9" height="9" fill="#e07b00"/>
+        <rect x="656" y="116" width="9" height="9" fill="#e07b00"/>
+        <rect x="646" y="161" width="9" height="9" fill="#e07b00"/>
+        <text x="710" y="230" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">アンカー＋パスの集まり</text>
+
+        <defs>
+          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#e07b00"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:13px; color:#888; text-align:center; margin-top:8px;">
+        ▲ 図解：ピクセルの写真を<strong>パス（アンカー＋線）に変換</strong>するのが画像トレース。複雑な写真だと膨大なアンカーになる
+      </figcaption>
+    </figure>
+
+    <div class="callout">
+      <span class="label">操作の流れ</span>
+      <ul style="margin:8px 0 0;">
+        <li>画像を開く（JPEGはドラッグ&ドロップでもOK）</li>
+        <li><strong>ウィンドウ→画像トレース</strong>パネルを開く</li>
+        <li><strong>プリセット</strong>（写真高精度・3色変換・白黒シルエット・グレースケール等）から選ぶ</li>
+        <li><strong>「拡張」</strong>を押すと、実際のパスに確定される</li>
+      </ul>
+    </div>
+    <div class="callout primary">
+      <span class="label">向き・不向き</span>
+      集合写真や風景など複雑な画像は<strong>うまくいかない</strong>。ロゴやワンポイントなど<strong>単調な画像</strong>なら使い道あり。写真高精度で拡張すると、セグメント1800個・アンカー1万6000個のような<strong>膨大なパス</strong>になる（＝重い）。必要に応じて使う機能。
+    </div>
+  </section>
+
+  <!-- ===== AI生成 ===== -->
+  <section id="ai-generate">
+    <h2 class="section-title"><span class="icon">🤖</span>AI生成（ベクターアートを作る）★新機能</h2>
+    <p>教科書62ページ。直近の大型アップデートで入った<strong>最新機能</strong>。プロンプト（文章）で、ロゴ・アイコン・イラストなどの<strong>ベクターアート</strong>を生成できる。</p>
+
+    <div class="callout" style="background:#e7f5ec; border-left:6px solid var(--success);">
+      <span class="label" style="color:var(--success);">💡 ここが一番のポイント</span>
+      Gemini・ChatGPTなどの画像生成は、たいてい<strong>ラスター（JPEG/PNG）</strong>で出てくる。イラレのAI生成は <mark>編集できるベクターとして生成される</mark>ので、<strong>後から自分の手で修正できる</strong>のが決定的な違い＝大きなメリット。
+    </div>
+
+    <div class="callout">
+      <span class="label">2つの使い方</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>ホーム画面のプロンプト欄</strong>：ゼロから素材（ベクターアート）を生成</li>
+        <li><strong>生成塗りつぶし</strong>（オブジェクトを選択→プロパティパネル）：形の中をAIで塗る。シェイプの強度・ディテール・効果（ミニマリズム等）・カラー/トーン（パステル等）を指定できる</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">プロにつながるコツ</span>
+      プロンプトを直接ここで考えるより、<strong>先にGemini/ChatGPTに「こういうイラストを生成するためのプロンプトを作って」と頼む</strong>→ その結果をコピペする方が効率的（英語に変換してくれると、より正確に伝わることも）。
+    </div>
+
+    <div class="callout warn" style="background:var(--accent-soft); border-left:6px solid var(--danger); padding:20px 24px; border-radius:0 8px 8px 0; margin:24px 0;">
+      <span class="label" style="color:var(--danger);">⚠️ クレジット消費に注意</span>
+      AI生成は<strong>クレジットを消費</strong>する（1回およそ50前後）。訓練は<strong>アカウント共有</strong>なので、<strong>1人あたり1000以下・10〜20回まで</strong>くらいの感覚で、使いすぎないこと。
+    </div>
+  </section>
+
+  <!-- ===== 移動・変形 ===== -->
+  <section id="move-transform">
+    <h2 class="section-title"><span class="icon">↔️</span>移動・複製・自由変形／遠近変形</h2>
+    <p>教科書82ページ。移動・回転はほぼ<strong>Figmaと同じ</strong>なので要点だけ。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:230px;">操作</th><th>内容（Figmaと共通が多い）</th></tr></thead>
+        <tbody>
+          <tr><td><strong>V（選択ツール）</strong></td><td>まず選択してから操作。一番よく使う。バウンディングボックスで拡大縮小（Shiftで比率保持）</td></tr>
+          <tr><td><strong>⌥（option）＋ドラッグ</strong></td><td>複製（コピー＆ペーストでも可）</td></tr>
+          <tr><td><strong>⌘⇧V</strong></td><td><strong>同じ位置（真上）にペースト</strong></td></tr>
+          <tr><td><strong>⌘G</strong></td><td><strong>グループ化</strong>。イラレに「フレーム化」は無く<strong>グループ一択</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">遠近変形・自由変形（イラレらしい機能）</span>
+      <strong>自由変形ツール</strong>の中に、<strong>遠近変形</strong>（奥行き・立体感を出す）と<strong>自由変形</strong>（各辺を自由に動かす）がある。エッジの効いたアートワークに便利。<br>
+      ※ 自由変形は<strong>グループ化していないと効かない</strong>（グループを解除すると使えなくなる）。
+    </div>
+  </section>
+
+  <!-- ===== ダイレクト選択ツール ===== -->
+  <section id="direct-select">
+    <h2 class="section-title"><span class="icon">🎯</span>ダイレクト選択ツールでパスを変形</h2>
+    <p>教科書85ページ。<strong>今日の主役ツール（ショートカット A）</strong>。描いたオブジェクトの<strong>アンカーポイント・ハンドル・セグメント</strong>を直接いじって、意図した形に変形できる。</p>
+
+    <div class="callout">
+      <span class="label">通常の選択ツール（V）との違い</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>V（選択ツール）</strong>：バウンディングボックスが出る＝全体を動かす／拡大縮小</li>
+        <li><strong>A（ダイレクト選択ツール）</strong>：<strong>パス情報が見える</strong>＝アンカー1つ・ハンドル・セグメント単位で編集</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">一番のポイント：どのアンカーを選ぶか</span>
+      複雑なオブジェクトでは、<strong>間違ったアンカーを選ぶと、動かしたくない所まで動いてしまう</strong>。「どの点を選ぶと、どこがどう動くか」を体で覚えるのが大事。<mark>とにかく練習あるのみ</mark>。<br>
+      ※ 選択中のアンカーは<strong>青く塗りつぶし</strong>／未選択は<strong>白</strong>。この見分けが基本。
+    </div>
+    <div class="callout">
+      <span class="label">拡大縮小ツール（限定的だが便利）</span>
+      複数のアンカーを<strong>均等に</strong>広げたいとき、1つずつ動かすと不揃いになる。選択した状態で<strong>拡大縮小ツール</strong>を使うと、<strong>基準点を中心に均等に</strong>拡大できる（基準点は自由に変えられる）。
+    </div>
+  </section>
+
+  <!-- ===== アンカー追加・整列 ===== -->
+  <section id="anchor-edit">
+    <h2 class="section-title"><span class="icon">➕</span>アンカーの追加・削除・整列</h2>
+    <p>教科書86〜87ページ。パスの点を増やしたり、揃えたりする。</p>
+
+    <div class="callout">
+      <span class="label">アンカーポイントの追加</span>
+      オブジェクトを選択した状態で<strong>ペンツール</strong>にし、<strong>パスの線上</strong>にカーソルを合わせると<strong>カーソル右下が「＋」</strong>になる。その状態でクリックすると<strong>アンカーが増える</strong>。<br>
+      ※ 何もない所でクリックすると新しい線が始まってしまうので、必ず<strong>パス上</strong>でクリック。
+    </div>
+    <div class="callout primary">
+      <span class="label">アンカーの数＝アートワークの肝</span>
+      アンカーを増やすと、その間のセグメントを動かして<strong>ジグザグ（王冠風）</strong>なども作れる。イラストを作る時、<strong>「アンカーが何個必要か・不要か」</strong>の判断がとても重要になる。
+    </div>
+    <div class="callout">
+      <span class="label">整列（等間隔に分布）</span>
+      ダイレクト選択ツールで複数アンカーを範囲選択 → <strong>プロパティパネルの整列</strong>で、中央揃え・左右揃え・<strong>等間隔に分布</strong>ができる。きれいに揃えたい時に。
+    </div>
+  </section>
+
+  <!-- ===== 削除の2方式（図解2・最重要） ===== -->
+  <section id="delete-diff">
+    <h2 class="section-title"><span class="icon">⚠️</span>削除の2方式（クローズ／オープン）★重要</h2>
+    <p>教科書86ページ。<strong>ここは今日いちばん大事</strong>と先生が強調。アンカーの「削除」には<strong>2つの方法</strong>があり、<strong>結果がまったく違う</strong>。</p>
+
+    <figure style="margin:22px 0;">
+      <svg viewBox="0 0 920 340" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="アンカー削除の2方式の図解。アンカーポイントの削除ではセグメントがつながってクローズパスのまま、バックスペース削除では両隣のセグメントも消えてオープンパスになる"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid #e5e5e0; border-radius:10px; background:#fff;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <!-- 元の五角形（中央上） -->
+        <text x="150" y="40" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="15" font-weight="700" fill="#1a3a5c">元の形（五角形）</text>
+        <polygon points="150,70 205,112 184,178 116,178 95,112" fill="#eef3f8" stroke="#1a3a5c" stroke-width="2.5"/>
+        <rect x="145" y="65" width="10" height="10" fill="#c53030"/>
+        <rect x="200" y="107" width="10" height="10" fill="#2c5a8a"/>
+        <rect x="179" y="173" width="10" height="10" fill="#2c5a8a"/>
+        <rect x="111" y="173" width="10" height="10" fill="#2c5a8a"/>
+        <rect x="90" y="107" width="10" height="10" fill="#2c5a8a"/>
+        <text x="150" y="205" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#c53030">この上の赤い点を消すと…</text>
+
+        <!-- 上の矢印 -->
+        <path d="M230 120 L330 85" stroke="#2d7a4a" stroke-width="2.5" marker-end="url(#arrowG)"/>
+        <path d="M230 150 L330 250" stroke="#c53030" stroke-width="2.5" marker-end="url(#arrowR)"/>
+
+        <!-- 右上：アンカーポイントの削除（クローズ維持） -->
+        <text x="560" y="40" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="15" font-weight="700" fill="#2d7a4a">① アンカーポイントの削除</text>
+        <polygon points="490,72 545,110 524,168 456,168 435,110" fill="#e7f5ec" stroke="#2d7a4a" stroke-width="2.5" transform="translate(70,0)"/>
+        <!-- 上の頂点だけ消えて4点で閉じる -->
+        <g transform="translate(70,0)">
+          <rect x="540" y="105" width="10" height="10" fill="#2c5a8a"/>
+          <rect x="519" y="163" width="10" height="10" fill="#2c5a8a"/>
+          <rect x="451" y="163" width="10" height="10" fill="#2c5a8a"/>
+          <rect x="430" y="105" width="10" height="10" fill="#2c5a8a"/>
+        </g>
+        <text x="560" y="195" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#2d7a4a" font-weight="700">セグメントは繋がったまま＝クローズパス</text>
+        <text x="560" y="214" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#888">（塗りが保てる・基本こっち）</text>
+
+        <!-- 右下：バックスペース削除（オープンに） -->
+        <text x="560" y="252" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="15" font-weight="700" fill="#c53030">② バックスペースで削除</text>
+        <!-- 両隣のセグメントも消えて開いたV字 -->
+        <path d="M525,290 L505,320 M615,290 L635,320 M505,320 L560,300 L635,320" fill="none" stroke="#c53030" stroke-width="2.5"/>
+        <path d="M525,290 L560,272 L615,290" fill="none" stroke="#c53030" stroke-width="2.5"/>
+        <rect x="520" y="285" width="10" height="10" fill="#2c5a8a"/>
+        <rect x="610" y="285" width="10" height="10" fill="#2c5a8a"/>
+        <rect x="500" y="315" width="10" height="10" fill="#2c5a8a"/>
+        <rect x="630" y="315" width="10" height="10" fill="#2c5a8a"/>
+        <text x="740" y="303" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#c53030" font-weight="700">両隣も消えて</text>
+        <text x="740" y="321" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#c53030" font-weight="700">オープンパスに</text>
+
+        <defs>
+          <marker id="arrowG" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#2d7a4a"/></marker>
+          <marker id="arrowR" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,3 L0,6 Z" fill="#c53030"/></marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:13px; color:#888; text-align:center; margin-top:8px;">
+        ▲ 図解：<strong>①アンカーポイントの削除</strong>＝残りが繋がって<strong>クローズパス</strong>のまま／<strong>②バックスペース</strong>＝両隣のセグメントも消えて<strong>オープンパス</strong>になる
+      </figcaption>
+    </figure>
+
+    <div class="compare">
+      <div class="compare-col right">
+        <h4>① アンカーポイントの削除（推奨）</h4>
+        <ul>
+          <li>コントロールパネル or プロパティパネルの<strong>「アンカーポイントの削除」</strong></li>
+          <li>消した所の<strong>セグメントが繋がったまま</strong></li>
+          <li><strong>クローズパスを保てる</strong>（塗りが崩れない）</li>
+          <li>ペンツールでアンカーをクリックしても同じ（先生はこれ派）</li>
+        </ul>
+      </div>
+      <div class="compare-col left">
+        <h4>② バックスペースで削除</h4>
+        <ul>
+          <li>ただ Delete / Backspace で消す</li>
+          <li>そのアンカーの<strong>両隣のセグメントまで消える</strong></li>
+          <li><strong>オープンパスになる</strong></li>
+          <li>意図的に開きたい時以外は<strong>おすすめしない</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">結論（メモ推奨）</span>
+      <strong>基本は「アンカーポイントの削除」を使う</strong>。これなら間違いない。クローズパスでないと作れないものが後々よくあるので、この違いは今のうちに覚えておく。
+    </div>
+  </section>
+
+  <!-- ===== 切断・連結 ===== -->
+  <section id="cut-connect">
+    <h2 class="section-title"><span class="icon">✂️</span>パスの切断と連結</h2>
+    <p>教科書87ページ。パスを切ったり繋げたりできると、作れるアートワークの幅が広がる。</p>
+    <div class="callout">
+      <span class="label">切断</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>セグメントだけ範囲選択→バックスペース</strong>：その線が消える</li>
+        <li><strong>アンカーを選択→「パスをカット」</strong>：その点でパスが分断され、動かせるようになる</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <span class="label">連結</span>
+      切れたアンカー同士を、<strong>ペンツールでつなぐ</strong>／<strong>「アンカーポイントを連結」</strong>で結合。どちらでも同じ結果。
+    </div>
+    <div class="callout primary">
+      <span class="label">イラレの大原則</span>
+      <strong>同じ結果でも、やり方は3つ〜5つある</strong>ことがよくある。全部覚える必要はなく、<strong>使い慣れて好きなやり方</strong>を選べばよい。「時間のかかるツールだな」と気づき始めた人も多いはず。
+    </div>
+  </section>
+
+  <!-- ===== 方向線・コーナー/スムーズ（図解3） ===== -->
+  <section id="handle-convert">
+    <h2 class="section-title"><span class="icon">🔀</span>方向線・コーナー↔スムーズの切り替え</h2>
+    <p>教科書88〜89ページ。アンカーには<strong>2種類</strong>あり、相互に切り替えられる。</p>
+
+    <figure style="margin:22px 0;">
+      <svg viewBox="0 0 920 260" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="コーナーポイントとスムーズポイントの図解。コーナーはハンドルがなく角ばる、スムーズはハンドルが出て曲線になる"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid #e5e5e0; border-radius:10px; background:#fff;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <!-- 左：コーナーポイント -->
+        <text x="230" y="42" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">コーナーポイント</text>
+        <text x="230" y="64" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="#888">ハンドル無し＝カクッと角</text>
+        <polyline points="100,190 230,100 360,190" fill="none" stroke="#1a3a5c" stroke-width="3"/>
+        <rect x="223" y="93" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="93" y="183" width="12" height="12" fill="#2c5a8a"/>
+        <rect x="353" y="183" width="12" height="12" fill="#2c5a8a"/>
+
+        <line x1="460" y1="30" x2="460" y2="230" stroke="#e5e5e0" stroke-width="2" stroke-dasharray="4 4"/>
+
+        <!-- 右：スムーズポイント -->
+        <text x="690" y="42" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">スムーズポイント</text>
+        <text x="690" y="64" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="#888">ハンドル有り＝なめらか曲線</text>
+        <path d="M560 190 Q 690 100 820 190" fill="none" stroke="#1a3a5c" stroke-width="3"/>
+        <line x1="690" y1="118" x2="620" y2="118" stroke="#e07b00" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="690" y1="118" x2="760" y2="118" stroke="#e07b00" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="620" cy="118" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <circle cx="760" cy="118" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <rect x="683" y="111" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="553" y="183" width="12" height="12" fill="#2c5a8a"/>
+        <rect x="813" y="183" width="12" height="12" fill="#2c5a8a"/>
+      </svg>
+      <figcaption style="font-size:13px; color:#888; text-align:center; margin-top:8px;">
+        ▲ 図解：<strong>コーナー＝ハンドル無しで角ばる</strong>／<strong>スムーズ＝ハンドルが出て曲線</strong>。プロパティパネルの「変換」で相互に切り替えられる
+      </figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:240px;">操作</th><th>結果</th></tr></thead>
+        <tbody>
+          <tr><td><strong>コーナーポイントに切り替え</strong></td><td>ハンドルが消えて<strong>角（直線）</strong>になる</td></tr>
+          <tr><td><strong>スムーズポイントに切り替え</strong></td><td>ハンドルが出て<strong>曲線</strong>にできる</td></tr>
+          <tr><td><strong>アンカーポイントツール</strong>でクリック/ドラッグ</td><td>その場でコーナー↔スムーズを切り替え。片方のハンドルだけも動かせる</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn" style="background:var(--accent-soft); border-left:6px solid var(--danger); padding:20px 24px; border-radius:0 8px 8px 0; margin:24px 0;">
+      <span class="label" style="color:var(--danger);">🚨 片方のハンドルを動かすと「連動が切れる」</span>
+      アンカーポイントツールで<strong>片方のハンドルだけ</strong>動かすと、左右のハンドルの<strong>連動が切れる</strong>（別々にしか動かせなくなる）。<br>
+      → 連動に戻したいときは、<strong>⌥（option）を押しながらそのハンドルをクリック</strong>。先生いわく<mark>「これはメモらないと絶対忘れる。私もよく忘れます」</mark>。教科書89ページ左下に付箋を。
+    </div>
+  </section>
+
+  <!-- ===== ペンツール中のショートカット ===== -->
+  <section id="pen-shortcuts">
+    <h2 class="section-title"><span class="icon">⌨️</span>ペンツール中の便利ショートカット</h2>
+    <div class="callout primary">
+      <span class="label">持ち替えずに一時切り替え（慣れたら効率UP）</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>ペンツール中に ⌘（Ctrl）押しっぱなし</strong> → その間だけ<strong>ダイレクト選択ツール</strong></li>
+        <li><strong>ペンツール中に ⌥（option）押しっぱなし</strong> → その間だけ<strong>アンカーポイントツール</strong></li>
+      </ul>
+      （スペースキー押しっぱなしで手のひらツールになるのと同じ発想）
+    </div>
+    <p>最初はツールを普通に切り替えてOK。慣れてきたら、<strong>ペンで描きながらキー押しで微調整</strong>できると作業時間が格段に短くなる。</p>
+  </section>
+
+  <!-- ===== トレース練習 ===== -->
+  <section id="trace-practice">
+    <h2 class="section-title"><span class="icon">✏️</span>トレース練習（レイヤーのロック・不透明度）</h2>
+    <p>午後は各自でペンツールの練習。<strong>トレース元の画像をなぞる</strong>のがおすすめの練習法。</p>
+
+    <div class="callout">
+      <span class="label">トレースをやりやすくする準備</span>
+      <ul style="margin:8px 0 0;">
+        <li>元画像を<strong>レイヤーパネルでロック</strong>（鍵アイコン）→ 誤って動かさない（Figmaと同じ）</li>
+        <li>元画像の<strong>不透明度を下げる</strong>（プロパティパネル）→ うっすら透かしてなぞりやすく</li>
+        <li><strong>新規レイヤーを追加</strong>して、トレース用レイヤーを分ける（元画像と描画を分離）</li>
+      </ul>
+    </div>
+    <div class="callout primary">
+      <span class="label">切り返しのコツ（受講生の質問より）</span>
+      直線→曲線／曲線→直線の切り替えが難しいという質問に、A先生が個別フォロー。<br>
+      <strong>ポイント：クリックしたら次は「直線」／ハンドルを伸ばしたら次は「曲線」</strong>。切り返したいときは <strong>⌥（片側ハンドル）＋Shift（水平キープ）</strong> で、次に伸びる方向だけを整える。「ハンドルは“次の線が向かう先”」とイメージすると掴みやすい。<br>
+      ※ できた人は<strong>ベジェゲーム</strong>や好きなキャラのトレースで練習。バナー制作期間が長めなので、今はペン練習にじっくり時間を使う日。
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:230px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>画像トレース</td><td>ラスター画像（写真）をパス情報（ベクター）に変換する機能。プリセット→拡張で確定</td></tr>
+          <tr><td>拡張（画像トレース）</td><td>トレース結果を実際のパスに確定させる操作</td></tr>
+          <tr><td>AI生成（Illustrator）</td><td>プロンプトでベクターアートを生成する新機能。編集できる形で出るのが特徴</td></tr>
+          <tr><td>生成塗りつぶし</td><td>選択した形の中をAIで塗る機能（プロパティパネル）。強度・ディテール・効果を指定</td></tr>
+          <tr><td>クレジット</td><td>AI生成で消費する回数の元。1回およそ50前後。共有アカウントなので使いすぎ注意</td></tr>
+          <tr><td>ダイレクト選択ツール（A）</td><td>アンカー・ハンドル・セグメントを直接編集するツール。今日の主役</td></tr>
+          <tr><td>選択ツール（V）</td><td>オブジェクト全体を選択・移動・拡大縮小するツール</td></tr>
+          <tr><td>アンカーポイントの削除</td><td>セグメントを繋げたまま点を消す（クローズパスを保つ）。基本こちら</td></tr>
+          <tr><td>クローズパス／オープンパス</td><td>閉じたパス（塗れる）／開いたパス（線だけ）。削除方法で変わる</td></tr>
+          <tr><td>整列（等間隔に分布）</td><td>複数のアンカーやオブジェクトをきれいに揃える機能</td></tr>
+          <tr><td>パスをカット</td><td>選択したアンカーでパスを分断する</td></tr>
+          <tr><td>アンカーポイントを連結</td><td>切れたアンカー同士をつなぐ</td></tr>
+          <tr><td>コーナーポイント</td><td>ハンドルの無いアンカー。角ばる（直線）</td></tr>
+          <tr><td>スムーズポイント</td><td>ハンドルの有るアンカー。なめらかな曲線</td></tr>
+          <tr><td>アンカーポイントツール</td><td>コーナー↔スムーズの切り替えや、片側ハンドル操作をするツール</td></tr>
+          <tr><td>方向線（ハンドル）の連動</td><td>左右のハンドルは通常連動。片方だけ動かすと切れる。⌥＋クリックで連動に戻る</td></tr>
+          <tr><td>自由変形／遠近変形</td><td>オブジェクトを自由な角度・立体感に変形（グループ化が前提）</td></tr>
+          <tr><td>グループ化（⌘G）</td><td>複数オブジェクトをまとめる。イラレはフレーム化が無くグループ一択</td></tr>
+          <tr><td>レイヤーのロック</td><td>レイヤー/オブジェクトを固定して動かせなくする（トレース元の固定に便利）</td></tr>
+          <tr><td>不透明度</td><td>透け具合。下げると下絵として透かせる</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li><strong>ダイレクト選択ツール（A）</strong>で、アンカー・ハンドル・セグメントを動かす練習</li>
+      <li>アンカー削除の<strong>2方式の違い</strong>（アンカーポイントの削除＝クローズ／バックスペース＝オープン）を覚える</li>
+      <li>基本は<strong>「アンカーポイントの削除」</strong>を使う、と手を動かして確認</li>
+      <li><strong>コーナー↔スムーズ</strong>の切り替えを試す（プロパティの「変換」／アンカーポイントツール）</li>
+      <li>片側ハンドルの<strong>連動を戻す ⌥＋クリック</strong>を教科書89ページ左下にメモ／付箋</li>
+      <li><strong>ペンツール中の ⌘／⌥</strong>で一時的にツールを切り替える練習</li>
+      <li>好きな画像を<strong>トレース</strong>（元をロック＋不透明度を下げて、新規レイヤーになぞる）</li>
+      <li>直線↔曲線の<strong>切り返し</strong>を重点練習（クリック＝直線／ドラッグ＝曲線）</li>
+      <li>余裕があれば<strong>AI生成</strong>を1回試す（クレジット使いすぎ注意）＋Geminiでプロンプトを作る流れも体験</li>
+      <li><strong>ベジェゲーム</strong>でカーブ感覚を掴む</li>
+      <li>（希望者）作ったサイトの<strong>フィードバック</strong>は、授業終わりに口頭で相談可能</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>どのアンカーポイントを選択するのかっていうのは、もうとにかく練習あるのみかなと思う。<span class="citation">── ダイレクト選択ツールの肝</span></blockquote>
+    <blockquote>基本削除するんだったら、こっちのアンカーポイントの削除。これやっとけば基本間違いはないです。<span class="citation">── クローズパスを保つ削除</span></blockquote>
+    <blockquote>これはもうメモらないと絶対忘れちゃいますね。私もよく忘れます。<span class="citation">── 片側ハンドルの連動を戻す（⌥＋クリック）</span></blockquote>
+    <blockquote>同じ結果だけど、様々なアプローチがいっぱいあります。やり方は3つから5つみたいなのもよくある。<span class="citation">── イラレという道具の性格</span></blockquote>
+    <blockquote>（AIで）生成する場合は編集ファイルとして生成されるので、この後自分でいじれるっちゅうのが大きなメリット。<span class="citation">── イラレのAI生成の強み</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-07-08｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Illustrator入門：ベクター・パス・ペンツール｜2026年7月6日</title>
+<style>
+  :root {
+    --primary: #1a3a5c;
+    --primary-light: #2c5a8a;
+    --accent: #e07b00;
+    --accent-soft: #fff4e0;
+    --highlight: #fef3c7;
+    --success: #2d7a4a;
+    --danger: #c53030;
+    --bg: #fafaf7;
+    --card-bg: #ffffff;
+    --text: #2d2d2d;
+    --text-soft: #555;
+    --muted: #888;
+    --border: #e5e5e0;
+    --code-bg: #f4f4ef;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", Meiryo, sans-serif;
+    font-size: 17px; line-height: 1.9; color: var(--text); background: var(--bg);
+    margin: 0; padding: 0; -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  header.hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white; padding: 60px 24px 50px; text-align: center;
+  }
+  header.hero .date-badge {
+    display: inline-block; background: rgba(255,255,255,0.15);
+    padding: 6px 16px; border-radius: 20px; font-size: 14px; letter-spacing: 0.05em; margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: 36px; font-weight: 700; margin: 0 0 12px; letter-spacing: 0.02em; line-height: 1.4; }
+  header.hero .subtitle { font-size: 18px; opacity: 0.85; margin: 0; font-weight: 400; }
+  header.hero .meta {
+    margin-top: 24px; font-size: 14px; opacity: 0.7;
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+  }
+  header.hero .meta span::before { content: "•"; margin-right: 8px; opacity: 0.5; }
+  header.hero .meta span:first-child::before { display: none; }
+
+  section { margin: 60px 0; scroll-margin-top: 20px; }
+  h2.section-title {
+    font-size: 28px; color: var(--primary); border-bottom: 3px solid var(--accent);
+    padding-bottom: 12px; margin-bottom: 28px; display: flex; align-items: center; gap: 14px;
+  }
+  h2.section-title .icon { font-size: 32px; line-height: 1; }
+  h3 {
+    font-size: 21px; color: var(--primary); margin-top: 32px; margin-bottom: 14px;
+    padding-left: 14px; border-left: 5px solid var(--accent);
+  }
+  h4 { font-size: 18px; color: var(--primary-light); margin-top: 24px; margin-bottom: 12px; }
+  p { margin: 14px 0; }
+  strong { color: var(--primary); font-weight: 700; }
+
+  .toc {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 28px 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .toc h2 { font-size: 18px; color: var(--primary); margin: 0 0 16px; }
+  .toc ol { margin: 0; padding-left: 0; list-style: none; counter-reset: toc; column-count: 2; column-gap: 24px; }
+  @media (max-width: 600px) { .toc ol { column-count: 1; } }
+  .toc li { counter-increment: toc; padding: 6px 0; break-inside: avoid; }
+  .toc li::before { content: counter(toc, decimal-leading-zero); color: var(--accent); font-weight: 700; margin-right: 10px; font-feature-settings: "tnum"; }
+  .toc a { color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--border); }
+  .toc a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .callout { background: var(--accent-soft); border-left: 6px solid var(--accent); padding: 20px 24px; border-radius: 0 8px 8px 0; margin: 24px 0; }
+  .callout.primary { background: #e8f0f8; border-left-color: var(--primary); }
+  .callout.success { background: #e7f5ec; border-left-color: var(--success); }
+  .callout .label { font-weight: 700; color: var(--accent); font-size: 14px; letter-spacing: 0.05em; margin-bottom: 8px; display: block; }
+  .callout.primary .label { color: var(--primary); }
+  .callout.success .label { color: var(--success); }
+
+  mark { background: var(--highlight); padding: 2px 6px; border-radius: 3px; color: var(--text); }
+
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { border-collapse: collapse; width: 100%; background: var(--card-bg); font-size: 15px; }
+  th { background: var(--primary); color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: #fafaf7; }
+  td.center { text-align: center; }
+  td.time { font-family: "SF Mono", Menlo, monospace; color: var(--accent); font-weight: 600; }
+
+  /* テーブル内リンク（タイムマップ用） */
+  table td a {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px dotted transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  table td a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  table td.time a { color: var(--accent); }
+  table td.time a:hover { color: var(--primary); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .card {
+    background: var(--card-bg); border-radius: 10px; padding: 22px 24px;
+    border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.08); }
+  .card .num { display: inline-block; background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: 700; margin-bottom: 12px; font-size: 15px; }
+  .card h4 { margin: 0 0 10px; font-size: 17px; color: var(--primary); }
+  .card p { margin: 0; font-size: 14px; line-height: 1.7; color: var(--text-soft); }
+
+  pre, code { font-family: "SF Mono", Menlo, Consolas, monospace; }
+  pre { background: #1a3a5c; color: #e0e8f0; padding: 18px 22px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.7; margin: 18px 0; }
+  pre .selector { color: #ffd479; }
+  pre .property { color: #88d0ff; }
+  pre .value { color: #c5e8b7; }
+  pre .punct { color: #aaa; }
+  pre .comment { color: #7a8fa5; font-style: italic; }
+  p code, li code, td code { background: var(--code-bg); padding: 2px 8px; border-radius: 4px; font-size: 0.92em; color: var(--danger); border: 1px solid var(--border); }
+
+  ul.check-list { list-style: none; padding-left: 0; }
+  ul.check-list li { padding: 10px 0 10px 32px; position: relative; border-bottom: 1px solid var(--border); }
+  ul.check-list li:last-child { border-bottom: none; }
+  ul.check-list li::before { content: "☐"; position: absolute; left: 0; top: 8px; color: var(--accent); font-size: 20px; font-weight: 700; }
+
+  ul.bullet-pro { padding-left: 22px; }
+  ul.bullet-pro li { padding: 4px 0; }
+  ul.bullet-pro li::marker { color: var(--accent); }
+
+  blockquote {
+    background: linear-gradient(135deg, #f8f4ed 0%, #fff 100%);
+    border-left: 5px solid var(--primary); padding: 22px 28px; margin: 20px 0; border-radius: 0 10px 10px 0;
+    font-size: 17px; font-style: italic; color: var(--text); line-height: 1.8; position: relative;
+  }
+  blockquote::before { content: """; position: absolute; top: -10px; left: 16px; font-size: 56px; color: var(--primary); opacity: 0.2; font-family: Georgia, serif; }
+  blockquote .citation { display: block; text-align: right; font-style: normal; font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-col { background: var(--card-bg); border-radius: 10px; padding: 22px; border: 1px solid var(--border); }
+  .compare-col h4 { margin-top: 0; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+  .compare-col.left h4 { color: var(--danger); border-bottom-color: var(--danger); }
+  .compare-col.right h4 { color: var(--success); border-bottom-color: var(--success); }
+  .compare-col ul { margin: 8px 0 0; padding-left: 20px; }
+  .compare-col li { padding: 4px 0; }
+
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-right: 6px; }
+  .badge.must { background: var(--danger); color: white; }
+  .badge.know { background: var(--accent); color: white; }
+  .badge.nice { background: var(--success); color: white; }
+
+  .star { color: var(--accent); letter-spacing: 2px; }
+
+  hr.divider { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border), transparent); margin: 50px 0; }
+
+  footer { text-align: center; margin-top: 80px; padding-top: 30px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; line-height: 1.7; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    header.hero { padding: 40px 20px 36px; }
+    header.hero h1 { font-size: 26px; }
+    .container { padding: 24px 16px 60px; }
+    h2.section-title { font-size: 22px; }
+    h3 { font-size: 18px; }
+    pre { font-size: 12px; padding: 14px; }
+  }
+
+  /* 編集モード用 UI */
+  .editor-toolbar {
+    position: fixed; bottom: 24px; right: 24px; background: var(--card-bg);
+    border-radius: 14px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(26,58,92,0.18), 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+    border: 1px solid var(--border); font-family: -apple-system, "Hiragino Sans", sans-serif; min-width: 220px;
+  }
+  .editor-toolbar .row { display: flex; gap: 8px; }
+  .editor-toolbar button { flex: 1; border: none; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .editor-toolbar button.btn-edit { background: var(--primary); color: white; }
+  .editor-toolbar button.btn-edit:hover { background: var(--primary-light); }
+  .editor-toolbar button.btn-edit.active { background: var(--accent); }
+  .editor-toolbar button.btn-save { background: var(--success); color: white; }
+  .editor-toolbar button.btn-save:hover { background: #1f6038; }
+  .editor-toolbar button.btn-save:disabled { background: #ccc; cursor: not-allowed; }
+  .editor-toolbar button.btn-pick { background: #f0f0ed; color: var(--text); font-size: 12px; }
+  .editor-toolbar button.btn-pick:hover { background: #e4e4dd; }
+  .editor-toolbar .status { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.5; padding-top: 4px; border-top: 1px solid var(--border); }
+  .editor-toolbar .status.dirty { color: var(--danger); font-weight: 600; }
+  .editor-toolbar .status.saved { color: var(--success); font-weight: 600; }
+  .editor-toolbar .filename { font-family: "SF Mono", Menlo, monospace; font-size: 10px; color: var(--muted); word-break: break-all; line-height: 1.4; }
+
+  body.editing-mode [contenteditable="true"] { outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.15s, background 0.15s; border-radius: 3px; }
+  body.editing-mode [contenteditable="true"]:hover { outline-color: var(--accent); background: rgba(224,123,0,0.05); }
+  body.editing-mode [contenteditable="true"]:focus { outline-color: var(--primary); outline-style: solid; background: rgba(26,58,92,0.04); }
+  body.editing-mode::before {
+    content: "✏️ 編集モード中 — クリックして文章を直接編集"; position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 8px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; z-index: 9998; box-shadow: 0 4px 12px rgba(224,123,0,0.4);
+    font-family: -apple-system, "Hiragino Sans", sans-serif;
+  }
+
+  .editor-toast { position: fixed; top: 16px; right: 16px; background: var(--success); color: white; padding: 14px 22px; border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 10000; transform: translateX(120%); transition: transform 0.3s; font-family: -apple-system, "Hiragino Sans", sans-serif; }
+  .editor-toast.show { transform: translateX(0); }
+  .editor-toast.error { background: var(--danger); }
+  .editor-toast.info { background: var(--primary); }
+
+  @media (max-width: 600px) {
+    .editor-toolbar { bottom: 12px; right: 12px; left: 12px; min-width: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="date-badge">2026年7月6日｜講師：A先生</div>
+  <h1>Illustrator入門：ベクター・パス・ペンツール</h1>
+  <p class="subtitle">訓練校｜全6時間の集中授業</p>
+  <div class="meta">
+    <span>⏱ ライブ授業（録画 約5時間50分）</span>
+    <span>📖 Illustrator教科書 6〜53ページ</span>
+    <span>🎯 ベクター/ラスター・パス・アンカー・ベジェ曲線・ペンツール・RGB・単位px・AI保存・ライブシェイプ・ブラシ</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ===== リード（この日のひと言＝目次に出る） ===== -->
+  <div class="callout primary">
+    <span class="label">📌 今日のひと言まとめ</span>
+    <p>今日から <strong>Adobe Illustrator（イラレ）</strong> に入った初日。これまでの Figma は「設計図（デザインカンプ）」を作る道具、Illustrator は <strong>ロゴ・アイコン・バナーなどの「素材」を作る道具</strong>という役割の違いを押さえる。一番の核心は、<strong>Illustrator＝図形（ベクター）／Photoshop＝写真（ラスター）</strong>という区別と、図形の正体である <strong>パス（アンカーポイント・セグメント・ハンドル）</strong>。そして <mark>「イラレはペンツールをどれだけ上手に使えるかがすべて」</mark>という言葉どおり、直線・曲線をペンツールで描く練習に時間を使った。Web で使う設定（<strong>単位＝px／カラー＝RGB／ラスタライズ＝72ppiスクリーン</strong>）も要暗記。</p>
+  </div>
+
+  <!-- ===== 目次 ===== -->
+  <nav class="toc">
+    <h2>📌 もくじ</h2>
+    <ol>
+      <li><a href="#timemap">タイムマップ（時間割）</a></li>
+      <li><a href="#top10">今日の最重要10項目</a></li>
+      <li><a href="#adobe-role">Adobeツールの立ち位置（素材づくり）</a></li>
+      <li><a href="#vector-raster">ベクター と ラスター（イラレ＝図形／ポトショ＝写真）</a></li>
+      <li><a href="#path-structure">パスの構造（アンカー・セグメント・ハンドル）</a></li>
+      <li><a href="#new-file">新規ファイル作成とキャンバスサイズ</a></li>
+      <li><a href="#web-settings">Webで作るときの必須設定（px・RGB・72ppi）</a></li>
+      <li><a href="#banner-ratio">バナーは「サイズ」でなく「比率」で作る</a></li>
+      <li><a href="#save">ファイル保存（AI形式・ローカル必須・バージョン）</a></li>
+      <li><a href="#workspace">画面構成（ツールバー・パネル）と操作</a></li>
+      <li><a href="#shapes">図形を描く（塗り／線・長方形・数値指定）</a></li>
+      <li><a href="#pen-tool">ペンツールで直線・曲線を描く ★最重要</a></li>
+      <li><a href="#connect-brush">線をつなぐ・ブラシ・アウトライン表示</a></li>
+      <li><a href="#pref-units">環境設定で単位をピクセルに統一</a></li>
+      <li><a href="#bezier-game">息抜き：ベジェゲーム</a></li>
+      <li><a href="#glossary">用語集</a></li>
+      <li><a href="#homework">宿題・復習チェック</a></li>
+      <li><a href="#quotes">先生のことば</a></li>
+    </ol>
+  </nav>
+
+  <!-- ===== タイムマップ ===== -->
+  <section id="timemap">
+    <h2 class="section-title"><span class="icon">⏱</span>タイムマップ（時間割）</h2>
+    <p>タイムスタンプ付き文字起こしベース。<span class="star">★★★</span>＝特に重要。全6コマ・約5時間50分の録画。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:88px;">時刻</th><th>内容</th><th style="width:80px;" class="center">重要度</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="time"><a href="#adobe-role">00:00</a></td><td><a href="#adobe-role">今の時代、設計図はFigma。Adobeは主に「素材（ロゴ・アイコン・バナー等）」を作る道具</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#adobe-role">03:20</a></td><td><a href="#adobe-role">教科書ダウンロード（6ページのURL・パスワード）→ 12ページから読む</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#vector-raster">16:28</a></td><td><a href="#vector-raster">イラレ＝ベクター（1987〜）／Photoshop＝ラスター（1990〜）。数式で記憶＝拡大しても劣化しない</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#path-structure">21:12</a></td><td><a href="#path-structure">パス＝アンカーポイント＋セグメント。曲線はハンドルで操作。クローズ/オープンパス</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#new-file">31:00</a></td><td><a href="#new-file">ホーム画面・新規ファイル。キャンバス（アートボード）のサイズを決める</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#web-settings">52:48</a></td><td><a href="#web-settings">Web業界は単位＝ピクセル一択。ミリは印刷用</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#web-settings">60:08</a></td><td><a href="#web-settings">打ち落とし＝印刷のズレ対策なのでWebは無視。カラー＝RGB／ラスタライズ＝72ppiスクリーン</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#banner-ratio">70:12</a></td><td><a href="#banner-ratio">アートボードは何でもいいがバナーは「比率」で作る。書き出しは2〜3倍で</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#save">73:44</a></td><td><a href="#save">保存＝⌘S。AI形式。訓練はアカウント共有→必ずローカル保存（Adobeクラウドは×）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#save">79:04</a></td><td><a href="#save">古いイラレ相手には保存時にバージョンを下げる（機能は落ちる）</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time"><a href="#workspace">85:16</a></td><td><a href="#workspace">ツールバー＝左／パネル＝ウィンドウから開く。初期設定のクラシック・リセットで戻せる</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#workspace">110:44</a></td><td><a href="#workspace">拡大縮小のショートカットがFigmaと違う（⌥＋ホイール／Zツール）。⌘Zで取り消し</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#shapes">122:16</a></td><td><a href="#shapes">塗り／線を変える3つの場所（ツールバー左下・コントロールパネル・プロパティ）</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#shapes">129:00</a></td><td><a href="#shapes">長方形ツール。Shift＝正方形／⌥＝中央から。クリックで数値指定</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#pen-tool">201:52</a></td><td><a href="#pen-tool">ペンツール：クリック＝直線／ドラッグ＝ハンドルを出して曲線。⌥で片側だけ操作</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#pen-tool">222:52</a></td><td><a href="#pen-tool">「イラレはペンツールが命」。就活でも“パスが触れる”は強い</a></td><td class="center"><span class="star">★★★</span></td></tr>
+          <tr><td class="time"><a href="#connect-brush">265:16</a></td><td><a href="#connect-brush">2つの線をアンカーでつなぐ。ブラシで質感を足す。⌘Yでアウトライン表示</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#pref-units">131:52</a></td><td><a href="#pref-units">環境設定→単位を全部ピクセルに統一しておく</a></td><td class="center"><span class="star">★★</span></td></tr>
+          <tr><td class="time"><a href="#bezier-game">304:24</a></td><td><a href="#bezier-game">最後は息抜きに「ベジェゲーム」でペン操作の練習</a></td><td class="center"><span class="star">★</span></td></tr>
+          <tr><td class="time">〜349:00</td><td>各コマの間に休憩・お昼。初日で詰め込み多め</td><td class="center">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 最重要10 ===== -->
+  <section id="top10">
+    <h2 class="section-title"><span class="icon">⭐</span>今日の最重要10項目</h2>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>イラレ＝図形／ポトショ＝写真</h4><p>まずこれだけは忘れない。<strong>Illustrator＝図形（ベクター）</strong>、<strong>Photoshop＝写真（ラスター）</strong>。</p></div>
+      <div class="card"><span class="num">2</span><h4>ベクターは劣化しない</h4><p>ベクターは形を<strong>数式で記憶</strong>している。だから<strong>拡大・変形しても荒れない</strong>。ラスターはピクセルの集まりなので拡大すると荒れる。</p></div>
+      <div class="card"><span class="num">3</span><h4>図形の正体は「パス」</h4><p>パス＝<strong>アンカーポイント</strong>（点）＋<strong>セグメント</strong>（点をつなぐ線）。曲線は<strong>ハンドル</strong>で形を決める。</p></div>
+      <div class="card"><span class="num">4</span><h4>ペンツールがすべて</h4><p><strong>「イラレはペンツールをどれだけ上手に使えるかが肝」</strong>。まずはペンで直線・曲線を描けるように。</p></div>
+      <div class="card"><span class="num">5</span><h4>Webは単位＝px 一択</h4><p>モニターに「ミリ」は無い。<strong>Web制作の単位はピクセル一択</strong>。ミリ・ポイントは印刷用。</p></div>
+      <div class="card"><span class="num">6</span><h4>カラー＝RGB／72ppi</h4><p>新規作成で <strong>カラーモード＝RGB</strong>、<strong>ラスタライズ効果＝72ppiスクリーン</strong>。CMYKは印刷用なのでWebでは使わない。</p></div>
+      <div class="card"><span class="num">7</span><h4>打ち落としは無視でOK</h4><p>打ち落とし（塗り足し）は<strong>印刷のズレ対策</strong>。モニターはズレないので<strong>Webでは無視</strong>。</p></div>
+      <div class="card"><span class="num">8</span><h4>保存は必ずローカル</h4><p>訓練は<strong>Adobeアカウントを共有</strong>している。<strong>Adobeクラウドに保存すると他人に消される</strong>。必ず自分のPC（ローカル）へ。</p></div>
+      <div class="card"><span class="num">9</span><h4>バナーは「比率」で作る</h4><p>バナーはサイズより<strong>比率</strong>が大事。きれいに表示させるため<strong>2〜3倍の大きさ</strong>で書き出す。</p></div>
+      <div class="card"><span class="num">10</span><h4>こまめに⌘Sで保存</h4><p>Adobeは重くて<strong>普通に落ちる</strong>（特にPhotoshop）。頑張って作ったものが消える前に、<strong>人としてこまめに保存</strong>。</p></div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== Adobeの立ち位置 ===== -->
+  <section id="adobe-role">
+    <h2 class="section-title"><span class="icon">🎨</span>Adobeツールの立ち位置（素材づくり）</h2>
+    <p>今日から Adobe に入るが、まず「今の時代、Adobe を何に使うのか」という前提から。</p>
+
+    <div class="compare">
+      <div class="compare-col left">
+        <h4>Figma の役割</h4>
+        <ul>
+          <li><strong>設計図</strong>を作る（デザインカンプ・ワイヤーフレーム）</li>
+          <li>Webサイトのレイアウトを組むのはこっち</li>
+          <li>「皆さんが現場に出る頃には、カンプ作りはFigmaが主流」</li>
+        </ul>
+      </div>
+      <div class="compare-col right">
+        <h4>Adobe（イラレ／ポトショ）の役割</h4>
+        <ul>
+          <li>主に<strong>素材の作成</strong>（メインビジュアル・イラスト・アイコン・ロゴ 等）</li>
+          <li>写真の加工・色味の変更</li>
+          <li>Webのレイアウト自体は基本作らない</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">A先生のたとえ</span>
+      イラレもPhotoshopも<strong>多機能すぎて、最初はどこに何のボタンがあるか分からない</strong>。「<strong>急に飛行機の操縦をお願いされるようなイメージ</strong>」。だからこの訓練では、まず<strong>操作方法</strong>をしっかり触っていく。
+    </div>
+    <div class="callout primary">
+      <span class="label">自習のヒント</span>
+      世の中のバナー・電車広告を観察して真似る、企業ロゴをトレースする等、<strong>自分から何か作ろうとするマインド</strong>がないとAdobeの授業は置いていかれる。ホーム画面の<strong>「学ぶ」</strong>（Adobe公式のラーニング教材）が一番わかりやすくておすすめ。1日1レッスンが目安。
+    </div>
+    <div class="callout">
+      <span class="label">イラレ／ポトショの使い分け</span>
+      <ul style="margin:8px 0 0;">
+        <li>はっきりした図形・線、拡大縮小しながらデザイン → <strong>Illustrator</strong></li>
+        <li>文字（タイポグラフィ）のデザイン → どちらでも可だが<strong>ベクターのイラレ向き</strong></li>
+        <li>写真そのものの加工・色味変更 → <strong>Photoshop 一択</strong>（イラレでは写真加工できない）</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== ベクター vs ラスター（自作図解1） ===== -->
+  <section id="vector-raster">
+    <h2 class="section-title"><span class="icon">🔍</span>ベクター と ラスター（イラレ＝図形／ポトショ＝写真）</h2>
+    <p>Adobe を理解する土台になる、一番大事な考え方。教科書12〜13ページ。<strong>手元の蛍光ペンで線を引いておくレベル</strong>と先生が強調した部分。</p>
+
+    <figure style="margin:22px 0;">
+      <svg viewBox="0 0 920 320" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="ベクターとラスターの違いの図解。ベクターは拡大しても輪郭が滑らかなまま、ラスターは拡大するとピクセルが四角く荒れる"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid #e5e5e0; border-radius:10px; background:#fff;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <!-- 左：ベクター -->
+        <text x="230" y="42" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="20" font-weight="700" fill="#1a3a5c">ベクター（Illustrator）</text>
+        <text x="230" y="66" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="#2d7a4a">拡大しても なめらか（数式で記憶）</text>
+        <!-- 元の円 -->
+        <circle cx="120" cy="180" r="45" fill="none" stroke="#e07b00" stroke-width="3"/>
+        <text x="120" y="250" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">元のサイズ</text>
+        <!-- 拡大の矢印 -->
+        <path d="M180 180 L235 180" stroke="#2c5a8a" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="207" y="170" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="16" fill="#2c5a8a">拡大</text>
+        <!-- 拡大後の円（滑らか） -->
+        <circle cx="330" cy="180" r="80" fill="none" stroke="#e07b00" stroke-width="3"/>
+        <text x="330" y="285" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">拡大後もキレイ</text>
+
+        <!-- 区切り線 -->
+        <line x1="460" y1="30" x2="460" y2="290" stroke="#e5e5e0" stroke-width="2" stroke-dasharray="4 4"/>
+
+        <!-- 右：ラスター -->
+        <text x="690" y="42" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="20" font-weight="700" fill="#1a3a5c">ラスター（Photoshop）</text>
+        <text x="690" y="66" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" fill="#c53030">拡大すると ピクセルが荒れる</text>
+        <!-- 元の円（小さいピクセル風） -->
+        <circle cx="580" cy="180" r="45" fill="none" stroke="#2c5a8a" stroke-width="3"/>
+        <text x="580" y="250" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">元のサイズ</text>
+        <!-- 矢印 -->
+        <path d="M640 180 L695 180" stroke="#2c5a8a" stroke-width="2" marker-end="url(#arrow)"/>
+        <text x="667" y="170" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="16" fill="#2c5a8a">拡大</text>
+        <!-- 拡大後（ギザギザのピクセル階段） -->
+        <g fill="#2c5a8a" opacity="0.85">
+          <rect x="800" y="120" width="20" height="20"/><rect x="820" y="120" width="20" height="20"/>
+          <rect x="780" y="140" width="20" height="20"/><rect x="840" y="140" width="20" height="20"/>
+          <rect x="770" y="160" width="20" height="20"/><rect x="850" y="160" width="20" height="20"/>
+          <rect x="770" y="180" width="20" height="20"/><rect x="850" y="180" width="20" height="20"/>
+          <rect x="780" y="200" width="20" height="20"/><rect x="840" y="200" width="20" height="20"/>
+          <rect x="800" y="220" width="20" height="20"/><rect x="820" y="220" width="20" height="20"/>
+        </g>
+        <text x="810" y="285" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">階段状に荒れる</text>
+
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L8,3 L0,6 Z" fill="#2c5a8a"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption style="font-size:13px; color:#888; text-align:center; margin-top:8px;">
+        ▲ 図解：<strong>ベクター＝数式で記憶するから拡大しても滑らか</strong>／<strong>ラスター＝ピクセルの集まりなので拡大すると階段状に荒れる</strong>
+      </figcaption>
+    </figure>
+
+    <div class="compare">
+      <div class="compare-col right">
+        <h4>ベクター系（Illustrator）</h4>
+        <ul>
+          <li>円や長方形などの図形が<strong>1つのオブジェクト</strong>になる</li>
+          <li>形を<strong>数式で記憶</strong>→ 拡大・変形しても<strong>劣化しない</strong></li>
+          <li>オブジェクトごとに選択・移動・重ねられる</li>
+          <li>点と点を線で結ぶ<strong>「パス情報」</strong>で描かれている</li>
+        </ul>
+      </div>
+      <div class="compare-col left">
+        <h4>ラスター系（Photoshop）</h4>
+        <ul>
+          <li>画像を<strong>小さなピクセル</strong>で描く</li>
+          <li>拡大・変形すると<strong>画像が荒くなる</strong></li>
+          <li>写真（スマホ・デジカメ）も同じくピクセルの集まり</li>
+          <li>画像の一部だけ移動・削除には<strong>向いていない</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">合言葉</span>
+      <strong>「いられが図形、ポトショが写真」</strong>。忘れそうな人は今すぐメモ。ここから少しずつ難しくなっていくので、この土台だけは絶対に忘れない。
+    </div>
+  </section>
+
+  <!-- ===== パスの構造（自作図解2） ===== -->
+  <section id="path-structure">
+    <h2 class="section-title"><span class="icon">✒️</span>パスの構造（アンカー・セグメント・ハンドル）</h2>
+    <p>教科書13ページ。イラレで作る円や四角などの図形を <strong>パス</strong> と呼ぶ。パスは次の部品でできている。</p>
+
+    <figure style="margin:22px 0;">
+      <svg viewBox="0 0 920 300" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="パスの構造図解。アンカーポイント（点）、セグメント（点をつなぐ線）、曲線部分から出るハンドル（方向線）を示す"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid #e5e5e0; border-radius:10px; background:#fff;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <!-- 曲線パス本体 -->
+        <path d="M120 210 C 220 90, 360 90, 460 200 S 700 250, 800 130" fill="none" stroke="#1a3a5c" stroke-width="3"/>
+        <!-- ハンドル（方向線） -->
+        <line x1="290" y1="120" x2="220" y2="95" stroke="#e07b00" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="290" y1="120" x2="360" y2="95" stroke="#e07b00" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="220" cy="95" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <circle cx="360" cy="95" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <!-- アンカーポイント（■） -->
+        <rect x="113" y="203" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="283" y="113" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="453" y="193" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="793" y="123" width="14" height="14" fill="#2c5a8a"/>
+        <!-- ラベル -->
+        <text x="120" y="245" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#2c5a8a">アンカーポイント</text>
+        <text x="120" y="263" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#888">＝形を決める「点」</text>
+
+        <text x="600" y="150" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#1a3a5c">セグメント</text>
+        <text x="600" y="168" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#888">＝点と点を結ぶ「線」</text>
+
+        <text x="290" y="70" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="700" fill="#e07b00">ハンドル（方向線）</text>
+        <text x="290" y="88" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="11" fill="#888">＝曲線のカーブを操作</text>
+      </svg>
+      <figcaption style="font-size:13px; color:#888; text-align:center; margin-top:8px;">
+        ▲ 図解：<strong>アンカーポイント（点）</strong>をつなぐのが<strong>セグメント（線）</strong>。曲線のアンカーからは<strong>ハンドル</strong>が伸び、その長さ・角度でカーブが決まる
+      </figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:200px;">部品</th><th>役割</th></tr></thead>
+        <tbody>
+          <tr><td><strong>アンカーポイント</strong></td><td>図形の形状を決める<strong>点</strong></td></tr>
+          <tr><td><strong>セグメント</strong></td><td>アンカーポイント同士を結ぶ<strong>線</strong></td></tr>
+          <tr><td><strong>ハンドル（方向線）</strong></td><td>曲線部分のアンカーから出る線。<strong>長さと角度でカーブを操作</strong></td></tr>
+          <tr><td><strong>クローズパス</strong></td><td>始点と終点がつながって<strong>閉じた</strong>パス（塗りができる）</td></tr>
+          <tr><td><strong>オープンパス</strong></td><td>閉じずに<strong>開いている</strong>パス（線だけ）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">色のつけ方</span>
+      オブジェクトの色は「<strong>塗り</strong>（パスの内部）」と「<strong>線</strong>（パスそのもの）」にそれぞれ設定できる。この考え方は Figma と同じ。
+    </div>
+    <div class="callout primary">
+      <span class="label">ベジェ曲線</span>
+      ハンドルでカーブを操作する仕組みを <strong>「ベジェ曲線」</strong> という（ベジェさんが作ったからベジェ）。今回のカリキュラムでは軽く触れる程度だが、<strong>ペンツールの土台</strong>なのでどこかで確認しておくと理解が深まる。
+    </div>
+  </section>
+
+  <!-- ===== 新規ファイル ===== -->
+  <section id="new-file">
+    <h2 class="section-title"><span class="icon">📄</span>新規ファイル作成とキャンバスサイズ</h2>
+    <p>教科書14ページ。イラレを開いて、左上の<strong>家アイコン＝ホーム画面</strong>。青い<strong>「新規ファイル」</strong>ボタンでキャンバス（アートボード）のサイズを決める画面が出る。</p>
+
+    <div class="callout">
+      <span class="label">たとえ</span>
+      新規作成の画面は、<strong>「自分が絵描きだとして、絵を描くキャンバスを画材屋に買いに行く」</strong>ようなもの。まずキャンバス（＝アートボード）を選ぶ。
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:170px;">項目</th><th>設定の考え方</th></tr></thead>
+        <tbody>
+          <tr><td><strong>単位</strong></td><td><mark>Webは「ピクセル」一択</mark>。ミリは印刷用（モニターにミリは無い）</td></tr>
+          <tr><td><strong>幅・高さ</strong></td><td>Figmaのフレームサイズと同じイメージ。悩んだら「Web」用のプリセット（1440px 等）</td></tr>
+          <tr><td><strong>ファイル名</strong></td><td>ここに入れた名前がそのまま保存時のファイル名になる</td></tr>
+          <tr><td><strong>アートボード数</strong></td><td>フレームの数のイメージ。最初は<strong>1</strong>でOK</td></tr>
+          <tr><td><strong>方向</strong></td><td>幅・高さを入れれば自動で決まる。基本ノータッチ</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">イラレは「レイアウト」を組む道具ではない</span>
+      イラレで作るのは主に素材（ロゴ・バナー・セクションタイトル画像・背景パターン等）。<strong>Webサイトの設計図（レイアウト）はイラレでは作らない</strong>ので、アートボードのサイズは実はそこまで神経質にならなくていい（拡大縮小を多用するため）。
+    </div>
+  </section>
+
+  <!-- ===== Web設定 ===== -->
+  <section id="web-settings">
+    <h2 class="section-title"><span class="icon">⚙️</span>Webで作るときの必須設定（px・RGB・72ppi）</h2>
+    <p>新規作成の<strong>詳細オプション</strong>で、Web制作なら必ずこう設定する。<strong>作る前に毎回ここを確認</strong>と先生が強調。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:180px;">設定項目</th><th>Web制作での正解</th><th>理由</th></tr></thead>
+        <tbody>
+          <tr><td><strong>単位</strong></td><td><mark>ピクセル（px）</mark></td><td>モニターの単位はpx。ミリ・ポイントは印刷用</td></tr>
+          <tr><td><strong>カラーモード</strong></td><td><mark>RGB</mark></td><td>CMYKは印刷の色表現。モニター表示が意図と変わる</td></tr>
+          <tr><td><strong>ラスタライズ効果</strong></td><td><mark>72ppi スクリーン</mark></td><td>これ以上上げてもモニターでは表現できず、ファイルが重くなるだけ</td></tr>
+          <tr><td><strong>打ち落とし（塗り足し）</strong></td><td>無視（0でOK）</td><td>印刷時のズレ対策。モニターはズレないので不要</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">打ち落とし（塗り足し）とは</span>
+      名刺やポスターを印刷会社に入稿すると、<strong>裁断（カット）が少しズレる</strong>ことがある。そのズレで端が白く欠けないよう、あらかじめ<strong>デザインを少しはみ出して作る余白</strong>のこと。プリンターで端が少しズレて印刷される、あの現象への対策。<strong>Webは関係ないのでメモして無視</strong>。
+    </div>
+    <div class="callout primary">
+      <span class="label">覚える3点セット</span>
+      <strong>単位＝px／カラー＝RGB／ラスタライズ＝72ppiスクリーン</strong>。この3つだけは新規作成のたびに必ず確認する。
+    </div>
+  </section>
+
+  <!-- ===== バナー比率 ===== -->
+  <section id="banner-ratio">
+    <h2 class="section-title"><span class="icon">📐</span>バナーは「サイズ」でなく「比率」で作る</h2>
+    <p>アートボードのサイズは何でもいいが、<strong>バナーを作るときだけは例外</strong>。</p>
+
+    <div class="callout primary">
+      <span class="label">大事なのは比率</span>
+      例：ハーフページバナー <strong>300×600</strong> は、数字そのものより <strong>1：2 という比率</strong>が大事。実際には<strong>2倍の 600×1200</strong> くらいで作る。
+    </div>
+    <div class="callout">
+      <span class="label">なぜ2〜3倍で作るのか</span>
+      Mac の Retina のような<strong>高解像度モニター</strong>で表示すると、等倍の画像は<strong>ぼやけて</strong>しまう。あらかじめ<strong>2〜3倍の大きさ</strong>で書き出しておけば、きれいに表示される。<br>
+      ※ ある受講生（バナー制作の実務経験者）も「いろんな所で出す可能性があるものは大きめに作る」と実体験を共有。ただしWeb用は<strong>WebP（ウェッピー）</strong>など軽い形式に合わせることも多い。
+    </div>
+  </section>
+
+  <!-- ===== 保存 ===== -->
+  <section id="save">
+    <h2 class="section-title"><span class="icon">💾</span>ファイル保存（AI形式・ローカル必須・バージョン）</h2>
+    <p>教科書18ページ。保存は <strong>⌘S（Ctrl+S）</strong>。イラレの作業ファイルは <strong>.ai（AIファイル）</strong> 形式。</p>
+
+    <div class="callout warn" style="background:var(--accent-soft); border-left:6px solid var(--danger); padding:20px 24px; border-radius:0 8px 8px 0; margin:24px 0;">
+      <span class="label" style="color:var(--danger);">🚨 訓練での最重要ルール：必ずローカルに保存</span>
+      <ul style="margin:8px 0 0;">
+        <li>訓練では<strong>Adobeアカウントを他の受講生と共有</strong>している</li>
+        <li>だから <strong>「Adobeクラウドストレージに保存」は絶対NG</strong></li>
+        <li>クラウドに保存すると<strong>他人からも見えて・消される</strong>（文句を言えない）</li>
+        <li>保存先は<strong>自分のPCの中（ローカル）</strong>。iCloud / Google Drive / OneDrive はOK</li>
+      </ul>
+    </div>
+
+    <div class="callout">
+      <span class="label">保存済みかの確認（VSコードと同じ）</span>
+      タブのファイル名の横に <strong>アスタリスク（*）</strong> が付いていたら<strong>未保存</strong>。⌘Sで上書き保存すると<strong>*が消える</strong>。
+    </div>
+    <div class="callout primary">
+      <span class="label">バージョンを下げて保存</span>
+      納品先が<strong>古いイラレ</strong>を使っていると、新機能付きのファイルは開けずエラーになる（PS5でPS2のソフトが動かないイメージ）。その場合は保存時に<strong>バージョンを下げる</strong>と開ける（ただし新機能の効果は落ちる）。<strong>「稀にある」程度</strong>なので、こういう選択肢があると知っておけば十分。実務では事前に「バージョンいくつですか？」と相手に聞く。
+    </div>
+    <div class="callout" style="background:#e7f5ec; border-left:6px solid var(--success);">
+      <span class="label" style="color:var(--success);">こまめに保存する癖を</span>
+      Adobe系は重くて<strong>途中で普通に落ちる</strong>（特にPhotoshop）。頑張って作ったファイルが破損して消えることが「たまに」ではなく<strong>本当に全然ある</strong>。<strong>人としてこまめに⌘S</strong>を強く推奨。
+    </div>
+  </section>
+
+  <!-- ===== ワークスペース ===== -->
+  <section id="workspace">
+    <h2 class="section-title"><span class="icon">🖥️</span>画面構成（ツールバー・パネル）と操作</h2>
+    <p>教科書25ページ。作業画面は「飛行機の操縦室」レベルにボタンが多い。まずは各部の名前と、基本操作。</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:190px;">名前</th><th>役割・場所</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ツールバー</strong></td><td>主に<strong>左側</strong>。長方形ツール・ペンツール・文字など（Figmaのツール群に相当）</td></tr>
+          <tr><td><strong>コントロールパネル</strong></td><td><strong>上のバー</strong>。選択中のものの設定。呼び方は色々（上のバー等）</td></tr>
+          <tr><td><strong>パネル</strong></td><td>各種の設定画面。<mark>迷子になったら「ウィンドウ」メニューから開く</mark>（チェックが付いているのが開いているパネル）</td></tr>
+          <tr><td><strong>ワークスペース</strong></td><td>パネルの配置。<strong>ウィンドウ→ワークスペース→「初期設定のクラシック」</strong>で標準に。崩れたら<strong>リセット</strong>で戻せる</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">操作の取り消し・拡大縮小（Figmaとの違い）</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>取り消し</strong>：⌘Z（およそ100回まで戻せる）。<strong>ヒストリーパネル</strong>で履歴一覧から戻すことも可</li>
+        <li><strong>やり直し</strong>：⇧⌘Z</li>
+        <li><strong>拡大縮小</strong>：<mark>Figmaと違って ⌥（option）＋ホイール</mark>。または Z（ズームツール）で右ドラッグ＝拡大／左ドラッグ＝縮小。Macならピンチイン/アウトでも可</li>
+        <li><strong>手のひらツール</strong>：スペースキー押しっぱなし（Figmaと同じ）</li>
+      </ul>
+    </div>
+    <div class="callout">
+      <span class="label">パネルは自由に動かせる</span>
+      ツールバーもパネルも<strong>好きな位置に移動</strong>できる。ただし「1年くらい触ってどこに何があるか完全に分かってから」自分好みに変えるのがおすすめ。最初は初期設定のまま。
+    </div>
+  </section>
+
+  <!-- ===== 図形を描く ===== -->
+  <section id="shapes">
+    <h2 class="section-title"><span class="icon">⬛</span>図形を描く（塗り／線・長方形・数値指定）</h2>
+    <p>教科書34〜37ページ。ここは<strong>ほぼFigmaの復習</strong>。操作感が似ていて「Figmaやっといてよかった」と実感できる部分。</p>
+
+    <h3>塗り・線の色を変える3つの場所</h3>
+    <div class="card-grid">
+      <div class="card"><span class="num">1</span><h4>ツールバー左下</h4><p>左下の塗り／線のアイコン。<strong>ダブルクリックでカラーピッカー</strong>が開く。</p></div>
+      <div class="card"><span class="num">2</span><h4>コントロールパネル</h4><p>上のバーの塗り／線から変更。</p></div>
+      <div class="card"><span class="num">3</span><h4>プロパティパネル</h4><p><strong>アピアランス</strong>の項目に塗り／線がある。</p></div>
+    </div>
+
+    <h3>長方形ツールとショートカット（Figmaと同じ）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">操作</th><th>結果</th></tr></thead>
+        <tbody>
+          <tr><td>ドラッグ</td><td>長方形を描く</td></tr>
+          <tr><td><strong>Shift＋ドラッグ</strong></td><td>正方形（1：1）</td></tr>
+          <tr><td><strong>⌥（option）＋ドラッグ</strong></td><td>中央から描く</td></tr>
+          <tr><td><strong>クリック</strong>（ドラッグせず）</td><td>ダイアログが出て<strong>数値でサイズ指定</strong>。リンクアイコンで縦横比を固定</td></tr>
+          <tr><td><strong>V</strong>／選択ツール</td><td>移動・拡大縮小・角丸（Figmaと同じ）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>角の変形・ライブシェイプ</h3>
+    <div class="callout">
+      <span class="label">教科書38〜39ページ</span>
+      <ul style="margin:8px 0 0;">
+        <li>角の丸（コーナーウィジェット）は<strong>プロパティパネル→変形</strong>で細かく調整。角1つだけ変えることも可</li>
+        <li>シェイプツールで描いた直後は<strong>ライブシェイプ</strong>（サイズや角を後から変えられる状態）</li>
+        <li>ただし<strong>ダイレクト選択ツールでパスをいじるとライブシェイプは解除</strong>される</li>
+        <li>スターツール（星）などは実務でほぼ使わない（フリー素材で足りる）。<strong>長方形・楕円をしっかり</strong>覚える方が大事</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== ペンツール（自作図解3・最重要） ===== -->
+  <section id="pen-tool">
+    <h2 class="section-title"><span class="icon">🖋️</span>ペンツールで直線・曲線を描く ★最重要</h2>
+    <p>教科書43〜47ページ。<strong>今日の中心</strong>。先生いわく<strong>「イラレはペンツール（パス）をどれだけ上手に使えるかがすべて」</strong>。線ツールでできることは全部ペンツールでできるので、<strong>ペンツール（ショートカット P）だけ覚えれば十分</strong>。</p>
+
+    <h3>基本：クリック＝直線／ドラッグ＝曲線</h3>
+    <figure style="margin:22px 0;">
+      <svg viewBox="0 0 920 340" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="ペンツールの操作図解。クリックすると直線、ドラッグするとハンドルが出て曲線になる。オプションキーで片側のハンドルだけ操作できる"
+           style="width:100%; max-width:920px; display:block; margin:0 auto;
+                  border:1px solid #e5e5e0; border-radius:10px; background:#fff;
+                  box-shadow:0 2px 8px rgba(0,0,0,.06);">
+        <!-- 左：クリック＝直線 -->
+        <text x="160" y="40" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">① クリック＝直線</text>
+        <polyline points="60,180 160,110 260,180" fill="none" stroke="#1a3a5c" stroke-width="3"/>
+        <rect x="53" y="173" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="153" y="103" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="253" y="173" width="14" height="14" fill="#2c5a8a"/>
+        <text x="160" y="230" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">点を置くだけ＝カクカクの直線</text>
+
+        <line x1="300" y1="40" x2="300" y2="300" stroke="#e5e5e0" stroke-width="2" stroke-dasharray="4 4"/>
+
+        <!-- 中央：ドラッグ＝曲線 -->
+        <text x="470" y="40" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">② ドラッグ＝曲線</text>
+        <path d="M360 200 Q 470 90 580 200" fill="none" stroke="#1a3a5c" stroke-width="3"/>
+        <!-- ハンドル -->
+        <line x1="470" y1="120" x2="410" y2="120" stroke="#e07b00" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="470" y1="120" x2="530" y2="120" stroke="#e07b00" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <circle cx="410" cy="120" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <circle cx="530" cy="120" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <rect x="353" y="193" width="14" height="14" fill="#2c5a8a"/>
+        <rect x="573" y="193" width="14" height="14" fill="#2c5a8a"/>
+        <text x="470" y="230" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">押しながら引く＝ハンドルが出て曲がる</text>
+
+        <line x1="610" y1="40" x2="610" y2="300" stroke="#e5e5e0" stroke-width="2" stroke-dasharray="4 4"/>
+
+        <!-- 右：オプションで片側だけ -->
+        <text x="770" y="40" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="17" font-weight="700" fill="#1a3a5c">③ ⌥で片側だけ</text>
+        <path d="M670 200 Q 730 110 780 160" fill="none" stroke="#1a3a5c" stroke-width="3"/>
+        <line x1="780" y1="160" x2="850" y2="120" stroke="#e07b00" stroke-width="2"/>
+        <circle cx="850" cy="120" r="6" fill="#fff" stroke="#e07b00" stroke-width="2"/>
+        <rect x="773" y="153" width="14" height="14" fill="#2c5a8a"/>
+        <text x="770" y="230" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">切り返しは⌥で</text>
+        <text x="770" y="248" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="12" fill="#888">片方のハンドルだけ動かす</text>
+      </svg>
+      <figcaption style="font-size:13px; color:#888; text-align:center; margin-top:8px;">
+        ▲ 図解：<strong>クリックで直線／ドラッグでハンドルを出して曲線</strong>。カーブを切り返したいときは<strong>⌥（option）で片側のハンドルだけ</strong>動かす
+      </figcaption>
+    </figure>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:230px;">操作</th><th>結果</th></tr></thead>
+        <tbody>
+          <tr><td>アンカーをクリック</td><td>直線のセグメントを作る</td></tr>
+          <tr><td>アンカーで<strong>ドラッグ</strong></td><td>ハンドルが出て<strong>曲線</strong>になる。長さ・角度でカーブを調整</td></tr>
+          <tr><td><strong>⌥（option）＋ドラッグ</strong></td><td>片方のハンドルだけ動かす（S字などの<strong>切り返し</strong>用）</td></tr>
+          <tr><td><strong>Shift</strong>＋操作</td><td>45°単位で水平・垂直をキープ</td></tr>
+          <tr><td>始点のアンカーをクリック（右下に○）</td><td><strong>クローズパス</strong>で閉じる</td></tr>
+          <tr><td><strong>Enter</strong>／⌘＋別の場所をクリック</td><td>オープンパスのまま<strong>描画を終わらせる</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout">
+      <span class="label">初心者あるあるミス</span>
+      アンカーをつなぐとき、少しズレてクリックして<strong>「閉じたつもりが閉じてない」</strong>。イラレを触り始めの1ヶ月はよくあるミスなので、<strong>まず自分を疑う</strong>。1回戻ってやり直す。<br>
+      ※ トラックパッドやトラックボールだと曲線は指が疲れる。<strong>安くていいのでマウスが1つあると楽</strong>。
+    </div>
+    <div class="callout primary">
+      <span class="label">なぜペンツールが最重要なのか</span>
+      短い訓練期間でAdobe全部はマスターできない。だからプロ目線では<strong>「とにかくペンツール（パス）だけでも使えるようになってくれ」</strong>。就活の面接で「イラレ使えます」→「どれくらい？」と聞かれたとき、<strong>「パスはしっかり触れます」</strong>と言えれば信用される。下手にあれこれ言うよりずっといい。
+    </div>
+  </section>
+
+  <!-- ===== つなぐ・ブラシ ===== -->
+  <section id="connect-brush">
+    <h2 class="section-title"><span class="icon">🔗</span>線をつなぐ・ブラシ・アウトライン表示</h2>
+
+    <h3>2つのオープンパスをつなぐ（教科書48ページ）</h3>
+    <div class="callout">
+      <span class="label">アンカーポイントで接続</span>
+      ペンツールで<strong>片方のパスのアンカー</strong>にカーソルを合わせ（右下に接続アイコンが出る）、そこから<strong>もう片方のアンカーをクリック</strong>すると1本につながる。つなぐと閉じた領域になり<strong>塗り</strong>ができる。ドラッグでつなげば曲線で接続。<br>
+      ※ アンカーの位置が分からなくなったら<strong>ダイレクト選択ツール</strong>でパスをクリックすると位置が分かる。
+    </div>
+
+    <h3>ブラシツールで質感を足す（教科書53ページ）</h3>
+    <div class="callout">
+      <span class="label">パスに“筆のエッセンス”を乗せる</span>
+      <ul style="margin:8px 0 0;">
+        <li>対象オブジェクトを選択 → <strong>ブラシパネル</strong>（ウィンドウ→ブラシ）を開く</li>
+        <li>デフォルトは種類が少ない → 左下の<strong>ブラシライブラリメニュー</strong>から追加（例：アート→木炭鉛筆）</li>
+        <li>選ぶとパスの線が<strong>鉛筆・水彩などの質感</strong>になる。線幅で太さも変わる</li>
+        <li>ブラシ自体は実務で使うことは少ない（ペンタブ向き）が、<strong>「パスに効果を乗せられる」</strong>という考え方が大事</li>
+      </ul>
+    </div>
+
+    <div class="callout primary">
+      <span class="label">重要な気づき：オブジェクト＝パスの集合体</span>
+      長方形も楕円も、すべて<strong>パスの集合体</strong>。だからブラシは長方形にも楕円にも適用できる。「ペンで描いた線だけがパス」ではない。<br>
+      <strong>⌘Y＝アウトライン表示</strong>：装飾を消して<strong>パスの骨組みだけ</strong>を表示できる。もう一度⌘Yで戻る。パスを細かくいじりたいときに便利。
+    </div>
+  </section>
+
+  <!-- ===== 環境設定 ===== -->
+  <section id="pref-units">
+    <h2 class="section-title"><span class="icon">🔧</span>環境設定で単位をピクセルに統一</h2>
+    <div class="callout">
+      <span class="label">最初にやっておく設定</span>
+      <ul style="margin:8px 0 0;">
+        <li><strong>環境設定</strong>を開く（Windows＝編集メニュー／Mac＝Illustratorメニューあたり）</li>
+        <li>左の<strong>「単位」</strong>を選び、文字・ポイントなどを<strong>全てピクセルに統一</strong></li>
+        <li>これで線幅なども px で扱えて、Web制作が一貫する</li>
+      </ul>
+    </div>
+    <div class="callout" style="background:#e7f5ec; border-left:6px solid var(--success);">
+      <span class="label" style="color:var(--success);">トラブル対処メモ（この日実際に発生）</span>
+      イラレが<strong>固まって動かなくなった</strong>受講生がいた。原因は<strong>タブやファイルを開きすぎてメモリ不足</strong>で落ちたこと。対処は<strong>イラレを再起動</strong>。<br>
+      → タブを開きすぎるとイラレは重くなるので、使い終わったファイルは<strong>こまめに閉じる</strong>。マルチモニター時は、画面共有はウィンドウ単位でなく<strong>「画面全体」</strong>を選ぶと細部まで見える（B先生の助言）。
+    </div>
+  </section>
+
+  <!-- ===== ベジェゲーム ===== -->
+  <section id="bezier-game">
+    <h2 class="section-title"><span class="icon">🎮</span>息抜き：ベジェゲーム</h2>
+    <div class="callout">
+      <span class="label">最後の時間は遊びながら練習</span>
+      初日で詰め込みが多かったので、最後は <strong>「ベジェゲーム（Bézier Game）」</strong> でペン操作の練習。<strong>「ベジェ ゲーム」で検索すると出てくる</strong>ブラウザゲーム。
+      <ul style="margin:8px 0 0;">
+        <li>スタートからゴールまで、<strong>なるべく少ないアンカーポイント</strong>で描く</li>
+        <li>Shift（45°）や ⌥（片側ハンドル）もイラレと同じように使える</li>
+        <li>ペンツールとほぼ同じ挙動なので<strong>いい練習になる</strong></li>
+        <li>初めてなら3面クリアできれば十分。全クリアは1時間内でクラスに1〜2人</li>
+      </ul>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ===== 用語集 ===== -->
+  <section id="glossary">
+    <h2 class="section-title"><span class="icon">📚</span>用語集</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th style="width:220px;">用語</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>Illustrator（イラレ）</td><td>Adobeのベクター系グラフィックソフト。図形・ロゴ・アイコン向き。作業ファイルは.ai</td></tr>
+          <tr><td>Photoshop（ポトショ）</td><td>Adobeのラスター系ソフト。写真の加工・色味変更向き</td></tr>
+          <tr><td>ベクター（ベクトル）</td><td>形を数式で記憶する方式。拡大・変形しても劣化しない</td></tr>
+          <tr><td>ラスター（ビットマップ）</td><td>ピクセルの集まりで描く方式。拡大すると荒れる。写真もこれ</td></tr>
+          <tr><td>パス</td><td>イラレで図形を作る線。アンカーポイントとセグメントでできている</td></tr>
+          <tr><td>アンカーポイント</td><td>図形の形を決める点</td></tr>
+          <tr><td>セグメント</td><td>アンカーポイント同士を結ぶ線</td></tr>
+          <tr><td>ハンドル（方向線）</td><td>曲線のアンカーから出る線。長さ・角度でカーブを操作</td></tr>
+          <tr><td>ベジェ曲線</td><td>ハンドルでカーブを制御する仕組み。ペンツールの土台</td></tr>
+          <tr><td>クローズパス</td><td>始点と終点が閉じたパス（塗りができる）</td></tr>
+          <tr><td>オープンパス</td><td>閉じていないパス（線だけ）</td></tr>
+          <tr><td>アートボード</td><td>作業するキャンバス（Figmaのフレームに相当）</td></tr>
+          <tr><td>RGB / CMYK</td><td>RGB＝モニター（Web）用の色／CMYK＝印刷用の色</td></tr>
+          <tr><td>ラスタライズ効果（72ppi）</td><td>効果の解像度。モニター用は72ppiスクリーンで十分</td></tr>
+          <tr><td>打ち落とし（塗り足し）</td><td>印刷の裁断ズレ対策の余白。Webは不要</td></tr>
+          <tr><td>AIファイル（.ai）</td><td>Illustratorの作業ファイル形式</td></tr>
+          <tr><td>ライブシェイプ</td><td>描いた直後の、サイズや角を後から変えられる状態。パスをいじると解除</td></tr>
+          <tr><td>ツールバー／パネル</td><td>ツールバー＝左のツール群／パネル＝各種設定画面（ウィンドウから開く）</td></tr>
+          <tr><td>ヒストリーパネル</td><td>操作履歴の一覧。過去の状態に戻せる</td></tr>
+          <tr><td>ダイレクト選択ツール</td><td>アンカーやハンドル単位でパスを編集するツール</td></tr>
+          <tr><td>アウトライン表示（⌘Y）</td><td>装飾を消してパスの骨組みだけ表示するモード</td></tr>
+          <tr><td>ブラシ</td><td>パスの線に鉛筆・水彩などの質感を乗せる機能</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 宿題 ===== -->
+  <section id="homework">
+    <h2 class="section-title"><span class="icon">✅</span>宿題・復習チェック</h2>
+    <ul class="check-list">
+      <li>教科書の<strong>ベクター／ラスター</strong>の説明に蛍光ペンで線を引く（拡大しても劣化しない／荒れる）</li>
+      <li><strong>「イラレ＝図形／ポトショ＝写真」</strong>を暗記する</li>
+      <li>新規作成の<strong>3点セット</strong>（単位＝px／カラー＝RGB／ラスタライズ＝72ppiスクリーン）を覚える</li>
+      <li>ペンツール（P）で<strong>直線・曲線</strong>を描く練習（教科書43〜47ページの図をなぞる）</li>
+      <li><strong>⌥で片側ハンドル</strong>を動かす「切り返し」を何度も練習（ここが最初の難関）</li>
+      <li>作ったファイルは<strong>必ずローカルに保存</strong>（Adobeクラウドは使わない）</li>
+      <li>操作に慣れるまで<strong>安いマウス</strong>を用意しておくと曲線が楽</li>
+      <li>環境設定→<strong>単位を全部ピクセル</strong>に統一しておく</li>
+      <li>余裕があれば<strong>「ベジェゲーム」</strong>でペン操作を練習（3面クリア目標）</li>
+      <li>Adobe公式の<strong>「学ぶ」</strong>（ホーム画面）を1日1レッスン、自習に使う</li>
+      <li>PCスペックが不安な人は、ミートをスマホ/タブレット参加にして<strong>作業用PCをイラレ専用</strong>にする等の対策を</li>
+    </ul>
+  </section>
+
+  <!-- ===== 名言 ===== -->
+  <section id="quotes">
+    <h2 class="section-title"><span class="icon">💬</span>先生のことば</h2>
+    <blockquote>イラストレーターは詰まるところ、ペンツール・このパスをどれだけ上手に使うかがもう肝と言っても過言ではないです。<span class="citation">── イラレの本質</span></blockquote>
+    <blockquote>いられが図形、ポシ（Photoshop）が写真ですね。忘れそうな人は今メモるように。<span class="citation">── まず覚える一言</span></blockquote>
+    <blockquote>（多機能すぎて）急に飛行機の運転をお願いされるようなイメージですね。<span class="citation">── 最初にぶつかる壁</span></blockquote>
+    <blockquote>こういう時は、まずは間違いなく自分を疑ってください。<span class="citation">── ペンツールが閉じない時</span></blockquote>
+    <blockquote>現場から言わしてもらうと、とにかくペンツールだけでも使えるようになってくれ。パスが触れるようになる、それだけでも十分強いんで。<span class="citation">── プロ目線のアドバイス</span></blockquote>
+    <blockquote>人としてこまめに保存する癖をつけておくことを強くお勧めします。<span class="citation">── Adobeは落ちるから</span></blockquote>
+  </section>
+
+
+  <footer>
+    <p>
+      📁 関連ファイル<br>
+      <code>01_全文文字起こし.md</code>（タイムスタンプ付き全文）<br>
+      <code>02_時間別詳細/hour_1〜N.md</code>（1時間ごとの詳細）
+    </p>
+    <p style="margin-top:24px;">
+      生成日: 2026-07-08｜Claude（ブル）が Vrew プロジェクトの字幕データから自動生成<br>
+      ※ Vrew自動字幕の特性上、固有名詞や専門用語に誤認識がありますが、要約は文脈補正済み
+    </p>
+  </footer>
+
+</div>
+
+<!-- 編集ツールバー（保存時に除外される） -->
+<div class="editor-toolbar" id="editor-toolbar">
+  <div class="row">
+    <button class="btn-edit" id="btn-edit" title="編集モードを切り替え（Esc で終了）">✏️ 編集する</button>
+  </div>
+  <div class="row">
+    <button class="btn-save" id="btn-save" disabled title="保存（⌘+S / Ctrl+S）">💾 保存</button>
+    <button class="btn-pick" id="btn-pick" title="上書き先のファイルを選択">📁</button>
+  </div>
+  <div class="status" id="status">初回保存時にファイルを選択してください</div>
+  <div class="filename" id="filename">未選択</div>
+</div>
+
+<div class="editor-toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+  let fileHandle = null;
+  let isEditing = false;
+  let isDirty = false;
+
+  const btnEdit = document.getElementById('btn-edit');
+  const btnSave = document.getElementById('btn-save');
+  const btnPick = document.getElementById('btn-pick');
+  const statusEl = document.getElementById('status');
+  const filenameEl = document.getElementById('filename');
+  const toast = document.getElementById('toast');
+
+  const EDITABLE_SELECTOR = 'h1, h2, h3, h4, h5, p, li, td, th, blockquote, figcaption, .card, .callout, .compare-col';
+
+  function showToast(msg, type) {
+    toast.className = 'editor-toast ' + (type || '');
+    toast.textContent = msg;
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function setEditableElements(enable) {
+    const root = document.querySelector('.container');
+    root.querySelectorAll(EDITABLE_SELECTOR).forEach(el => {
+      if (el.closest('.editor-toolbar')) return;
+      if (el.tagName === 'PRE') return;
+      if (enable) { el.setAttribute('contenteditable', 'true'); el.setAttribute('spellcheck', 'false'); }
+      else { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); }
+    });
+    document.querySelectorAll('header.hero h1, header.hero p, header.hero span').forEach(el => {
+      if (enable) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+  }
+
+  function toggleEdit() {
+    isEditing = !isEditing;
+    document.body.classList.toggle('editing-mode', isEditing);
+    btnEdit.classList.toggle('active', isEditing);
+    btnEdit.textContent = isEditing ? '✅ 編集完了' : '✏️ 編集する';
+    setEditableElements(isEditing);
+    showToast(isEditing ? '編集モードON。クリックして編集してください' : '編集モードOFF', 'info');
+  }
+
+  function markDirty() {
+    if (!isDirty) { isDirty = true; statusEl.textContent = '● 未保存の変更があります'; statusEl.className = 'status dirty'; }
+  }
+  function markClean() { isDirty = false; statusEl.textContent = '✅ 保存済み'; statusEl.className = 'status saved'; }
+
+  document.addEventListener('input', (e) => { if (isEditing && e.target.hasAttribute('contenteditable')) markDirty(); });
+
+  function getCleanHTML() {
+    const docClone = document.documentElement.cloneNode(true);
+    docClone.querySelectorAll('.editor-toolbar, .editor-toast').forEach(el => el.remove());
+    docClone.querySelectorAll('[contenteditable]').forEach(el => { el.removeAttribute('contenteditable'); el.removeAttribute('spellcheck'); });
+    const bodyEl = docClone.querySelector('body');
+    if (bodyEl) bodyEl.classList.remove('editing-mode');
+    return '<!DOCTYPE html>\n<html lang="ja">\n' + docClone.innerHTML + '\n</html>';
+  }
+
+  async function pickFile() {
+    if (!window.showOpenFilePicker) { showToast('このブラウザは上書き保存に未対応。Chromeでお試しください', 'error'); return; }
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'HTML files', accept: { 'text/html': ['.html', '.htm'] }}], multiple: false
+      });
+      const perm = await handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { showToast('書き込み権限が拒否されました', 'error'); return; }
+      }
+      fileHandle = handle;
+      filenameEl.textContent = '📄 ' + handle.name;
+      statusEl.textContent = '保存先を選択しました';
+      btnSave.disabled = false;
+      showToast('保存先を設定しました', 'info');
+    } catch (err) {
+      if (err.name !== 'AbortError') showToast('ファイル選択でエラー: ' + err.message, 'error');
+    }
+  }
+
+  async function saveFile() {
+    if (!fileHandle) { await pickFile(); if (!fileHandle) return; }
+    try {
+      const html = getCleanHTML();
+      const writable = await fileHandle.createWritable();
+      await writable.write(html);
+      await writable.close();
+      markClean();
+      showToast('💾 上書き保存しました（' + fileHandle.name + '）', 'info');
+    } catch (err) { showToast('保存失敗: ' + err.message, 'error'); }
+  }
+
+  btnEdit.addEventListener('click', toggleEdit);
+  btnPick.addEventListener('click', pickFile);
+  btnSave.addEventListener('click', saveFile);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+    if (e.key === 'Escape' && isEditing) toggleEdit();
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (isDirty) { e.preventDefault(); e.returnValue = ''; }});
+
+  if (!window.showOpenFilePicker) {
+    statusEl.textContent = '⚠️ このブラウザは上書き保存非対応。Chromeで開いてください';
+    statusEl.className = 'status dirty';
+    btnSave.disabled = true; btnPick.disabled = true;
+  } else {
+    statusEl.textContent = '📁 まず保存先（このファイル）を選択';
+  }
+})();
+</script>
+
+</body>
+</html>
